@@ -1,27 +1,38 @@
-package transaction
+package main
 
 import (
+	"fmt"
 	"log"
 
-	"github.com/syafiqparadisam/paymentku/domain/transaction/api"
-	"github.com/syafiqparadisam/paymentku/domain/transaction/mongodbrepo"
-	"github.com/syafiqparadisam/paymentku/domain/transaction/mysqlrepo"
-	"github.com/syafiqparadisam/paymentku/domain/transaction/services"
+	"github.com/joho/godotenv"
+	"github.com/syafiqparadisam/paymentku/domain/transaction/apitransaction"
+	"github.com/syafiqparadisam/paymentku/domain/transaction/mongotransaction"
+	"github.com/syafiqparadisam/paymentku/domain/transaction/mysqltransaction"
+	"github.com/syafiqparadisam/paymentku/domain/transaction/providertransaction"
 )
 
 func TransactionServer(port string) error {
-	mysql, errSql := mysqlrepo.ConnectMySql()
+	mysql, errSql := mysqltransaction.ConnectMySql()
 	if errSql != nil {
 		log.Fatal(errSql)
 	}
-	mongo, errMongo := mongodbrepo.ConnectMongoDB()
+	mongo, errMongo := mongotransaction.ConnectMongoDB()
 	if errMongo != nil {
 		log.Fatal(errMongo)
 	}
-	topUp := mongodbrepo.NewTopUpCollection(mongo)
-	transfer := mongodbrepo.NewTransferCollection(mongo)
+	topUp := mongotransaction.NewTopUpCollection(mongo)
+	transfer := mongotransaction.NewTransferCollection(mongo)
 
-	service := services.NewService(mysql, topUp, transfer)
-	server := api.NewServer(service, port)
+	service := providertransaction.NewProvider(mysql, topUp, transfer)
+	server := apitransaction.NewServer(service, port)
 	return server.Run()
+}
+
+func main() {
+	if err := godotenv.Load(".env"); err != nil {
+		fmt.Println("Failed to load env file")
+	}
+	if err := TransactionServer(":8802"); err != nil {
+		log.Fatal(err)
+	}
 }

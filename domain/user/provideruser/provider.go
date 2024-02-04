@@ -3,6 +3,7 @@ package provideruser
 import (
 	"github.com/syafiqparadisam/paymentku/domain/user/mongouser"
 	"github.com/syafiqparadisam/paymentku/domain/user/mysqluser"
+	"github.com/syafiqparadisam/paymentku/shared"
 )
 
 type Provider struct {
@@ -20,7 +21,7 @@ func NewService(mysql mysqluser.MySqlRepository, topup mongouser.TopUpRepository
 }
 
 type ProviderMethod interface {
-
+	GetUserProfile(string, string) shared.APIResponse
 }
 
 // func (s *Provider) GetUserProfile() shared.APIResponse {

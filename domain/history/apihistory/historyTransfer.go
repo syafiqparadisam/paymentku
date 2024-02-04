@@ -6,11 +6,11 @@ import (
 	"github.com/syafiqparadisam/paymentku/shared"
 )
 
-func (s *Server) handleTransferHistory(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error {
+func (s *Server) HandleTransferHistory(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error {
 	if r.Method == "GET" {
 
 		// find id from this user
-		result := s.svc.GetAllTransferHistory(decode)
+		result := s.Svc.GetAllTransferHistory(decode)
 		if result.StatusCode != http.StatusOK {
 			return shared.WriteJSON(w, result.StatusCode, result)
 		}
@@ -21,14 +21,14 @@ func (s *Server) handleTransferHistory(w http.ResponseWriter, r *http.Request, d
 	}
 }
 
-func (s *Server) handleTransferHistoryById(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error {
+func (s *Server) HandleTransferHistoryById(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error {
 	if r.Method == "GET" {
 
 		idHistory, errParseUrl := utils.ParseURlParamsToObjectId(r.URL.Path)
 		if errParseUrl != nil {
 			return shared.WriteJSON(w, http.StatusBadRequest, shared.APIResponse{StatusCode: http.StatusBadRequest, Error: errParseUrl.Error()})
 		}
-		result := s.svc.GetAllTransferHistoryByIdHistory(idHistory, decode)
+		result := s.Svc.GetAllTransferHistoryByIdHistory(idHistory, decode)
 		if result.StatusCode != http.StatusOK {
 			return shared.WriteJSON(w, result.StatusCode, result)
 		}

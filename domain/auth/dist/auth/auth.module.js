@@ -13,6 +13,8 @@ const auth_service_1 = require("./auth.service");
 const jwt_1 = require("@nestjs/jwt");
 const users_module_1 = require("../users/users.module");
 const config_1 = require("@nestjs/config");
+const google_strategy_1 = require("./strategies/google.strategy");
+const refreshToken_module_1 = require("../refreshToken/refreshToken.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -21,14 +23,16 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             jwt_1.JwtModule.register({
                 global: true,
+                secret: process.env.JWT_SECRET
             }),
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
             users_module_1.UsersModule,
+            refreshToken_module_1.RefreshTokenModule
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService],
+        providers: [auth_service_1.AuthService, google_strategy_1.GoogleStrategy],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

@@ -12,11 +12,11 @@ import (
 )
 
 type TopUpStore struct {
-	db *mongo.Collection
+	Db *mongo.Collection
 }
 
 type TransferStore struct {
-	db *mongo.Collection
+	Db *mongo.Collection
 }
 
 type TopUpRepository interface {
@@ -72,7 +72,7 @@ func (tp *TopUpStore) GetHistoryTopUpIdAndDateByUserId(id int) (*[]TopUpIdAndDat
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	result, err := tp.db.Find(ctx, bson.D{{Key: "userid", Value: id}}, options.Find().SetProjection(bson.D{{Key: "userid", Value: 1}, {Key: "created_at", Value: 1}, {Key: "_id", Value: 1}, {Key: "isRead", Value: 1}, {Key: "amount", Value: 1}}).SetSort(bson.D{{Key: "created_at", Value: -1}}))
+	result, err := tp.Db.Find(ctx, bson.D{{Key: "userid", Value: id}}, options.Find().SetProjection(bson.D{{Key: "userid", Value: 1}, {Key: "created_at", Value: 1}, {Key: "_id", Value: 1}, {Key: "isRead", Value: 1}, {Key: "amount", Value: 1}}).SetSort(bson.D{{Key: "created_at", Value: -1}}))
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (tp *TopUpStore) GetHistoryTopUpIdAndDateByUserId(id int) (*[]TopUpIdAndDat
 func (tp *TopUpStore) GetHistoryTopUpByIdWithUserId(idUser int, idHistory *primitive.ObjectID) (*TopUpHistory, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	result := tp.db.FindOne(ctx, bson.D{{Key: "userid", Value: idUser}, {Key: "_id", Value: idHistory}})
+	result := tp.Db.FindOne(ctx, bson.D{{Key: "userid", Value: idUser}, {Key: "_id", Value: idHistory}})
 	if result.Err() != nil {
 		return nil, result.Err()
 	}
@@ -110,7 +110,7 @@ func (tf *TransferStore) GetHistoryTransferIdAndDateByUserId(id int) (*[]Transfe
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	result, err := tf.db.Find(ctx, bson.D{{Key: "userid", Value: id}}, options.Find().SetProjection(bson.D{{Key: "userid", Value: 1}, {Key: "created_at", Value: 1}, {Key: "_id", Value: 1}, {Key: "isRead", Value: 1}, {Key: "amount", Value: 1}, {Key: "to", Value: 1}}).SetSort(bson.D{{Key: "created_at", Value: -1}}))
+	result, err := tf.Db.Find(ctx, bson.D{{Key: "userid", Value: id}}, options.Find().SetProjection(bson.D{{Key: "userid", Value: 1}, {Key: "created_at", Value: 1}, {Key: "_id", Value: 1}, {Key: "isRead", Value: 1}, {Key: "amount", Value: 1}, {Key: "to", Value: 1}}).SetSort(bson.D{{Key: "created_at", Value: -1}}))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (tf *TransferStore) GetHistoryTransferIdAndDateByUserId(id int) (*[]Transfe
 func (tp *TransferStore) GetHistoryTransferByIdWithUserId(idUser int, idHistory *primitive.ObjectID) (*TransferHistory, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	result := tp.db.FindOne(ctx, bson.D{{Key: "userid", Value: idUser}, {Key: "_id", Value: idHistory}})
+	result := tp.Db.FindOne(ctx, bson.D{{Key: "userid", Value: idUser}, {Key: "_id", Value: idHistory}})
 	if result.Err() != nil {
 		return nil, result.Err()
 	}

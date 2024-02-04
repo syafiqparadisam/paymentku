@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 	"github.com/syafiqparadisam/paymentku/domain/history/apihistory"
@@ -28,7 +29,10 @@ func HistoryServer(port string) error {
 	return server.Run()
 }
 func main() {
-	if err := godotenv.Load(".env"); err != nil {
+	// start with /home/* + "../../.env" dir
+	envFilePath := filepath.Join("/home/syafiq/Desktop/codingan/paymentkumicroservices/", ".env")
+	fmt.Println(envFilePath)
+	if err := godotenv.Load(envFilePath); err != nil {
 		fmt.Println("Failed to load env file")
 	}
 	if err := HistoryServer(":8801"); err != nil {

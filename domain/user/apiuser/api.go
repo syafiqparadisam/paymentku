@@ -5,8 +5,7 @@ import (
 	"os"
 
 	jwtWare "github.com/gofiber/contrib/jwt"
-	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/gofiber/fiber/v2"
 	"github.com/syafiqparadisam/paymentku/domain/user/provideruser"
 )
 
@@ -25,20 +24,17 @@ func NewServer(svc provideruser.ProviderMethod, port string) *Server {
 func (s *Server) Run() error {
 	app := fiber.New()
 
-	app.Use(logger.New(logger.Config{
-		Format:     "${pid} ${status} - ${method} ${path}\n",
-		TimeFormat: "02-Jan-2006",
-		TimeZone:   "America/New_York",
-	}))
+	// app.Use(logger.New(logger.Config{
+	// 	Format:     "${pid} ${status} - ${method} ${path}\n",
+	// 	TimeFormat: "02-Jan-2006",
+	// 	TimeZone:   "America/New_York",
+	// }))
 	fmt.Println(os.Getenv("JWT_SECRET"))
 	// MIDDLEWARE JWT TOKEN
 	app.Use(jwtWare.New(jwtWare.Config{
-		SigningKey: jwtWare.SigningKey{Key: []byte(os.Getenv("JWT_SECRET"))},
+		SigningKey: jwtWare.SigningKey{Key: []byte(string(os.Getenv("JWT_SECRET")))},
 	}))
 	println("success middlewarw")
-	app.Get("/", func(c fiber.Ctx) error {
-		return c.JSON(map[string]any{"hello": "anjayay"})
-	})
-	defer fmt.Printf("User Server is running on port %s", s.Port)
+	app.Get("/", s.getUserProfile)
 	return app.Listen(s.Port)
 }

@@ -56,7 +56,7 @@ func (t *TransferStore) InsertTransferHistory(payload *TransferInfo) error {
 		RemainingMoney uint64
 		IsRead         bool
 	}{
-		UserId:         payload.History.UserId,
+		HistoryId:         payload.History.UserId,
 		To:             payload.Destination.To,
 		Notes:          payload.Dto.Catatan,
 		CreatedAt:      payload.History.CreatedAt,

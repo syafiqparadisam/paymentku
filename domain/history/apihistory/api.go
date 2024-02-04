@@ -10,14 +10,14 @@ import (
 )
 
 type Server struct {
-	svc  providerhistory.ProviderMethod
+	Svc  providerhistory.ProviderMethod
 	port string
 }
 
 type decodeJWTTokenFunc func(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error
 type HandlerFunc func(w http.ResponseWriter, r *http.Request) error
 
-func makeHTTPHandler(f HandlerFunc) http.HandlerFunc {
+func MakeHTTPHandler(f HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := f(w, r)
 		if err != nil {
@@ -26,7 +26,7 @@ func makeHTTPHandler(f HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func decodeJWTToken(f decodeJWTTokenFunc) HandlerFunc {
+func DecodeJWTToken(f decodeJWTTokenFunc) HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		authHeader := r.Header.Get("Authorization")
 		if (len(authHeader) == 0) || (authHeader == "") {
@@ -45,15 +45,15 @@ func decodeJWTToken(f decodeJWTTokenFunc) HandlerFunc {
 }
 
 func NewServer(svc providerhistory.ProviderMethod, port string) *Server {
-	return &Server{svc: svc, port: port}
+	return &Server{Svc: svc, port: port}
 }
 
 func (s *Server) Run() error {
-	http.HandleFunc("/topup", makeHTTPHandler(decodeJWTToken(s.handleTopUpHistory)))
-	http.HandleFunc("/topup/", makeHTTPHandler(decodeJWTToken(s.handleTopUpHistoryById)))
-	http.HandleFunc("/", makeHTTPHandler(decodeJWTToken(s.handleAllHistory)))
-	http.HandleFunc("/transfer", makeHTTPHandler(decodeJWTToken(s.handleTransferHistory)))
-	http.HandleFunc("/transfer/", makeHTTPHandler(decodeJWTToken(s.handleTransferHistoryById)))
+	http.HandleFunc("/topup", MakeHTTPHandler(DecodeJWTToken(s.HandleTopUpHistory)))
+	http.HandleFunc("/topup/",MakeHTTPHandler(DecodeJWTToken(s.HandleTopUpHistoryById)))
+	http.HandleFunc("/", MakeHTTPHandler(DecodeJWTToken(s.HandleAllHistory)))
+	http.HandleFunc("/transfer", MakeHTTPHandler(DecodeJWTToken(s.HandleTransferHistory)))
+	http.HandleFunc("/transfer/",MakeHTTPHandler(DecodeJWTToken(s.HandleTransferHistoryById)))
 	defer fmt.Printf("History Server is running on port %s\n", s.port)
 	return http.ListenAndServe(s.port, nil)
 }

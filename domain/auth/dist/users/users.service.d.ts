@@ -1,14 +1,19 @@
-import { Users } from './users.entity';
+import { Users } from './schemas/users.entity';
 import { Repository } from 'typeorm';
-import { registerRequest } from '../interfaces/request';
+import { loginWithGoogle, registerRequest } from '../auth/dtos/request';
 export declare class UsersService {
     private repository;
     constructor(repository: Repository<Users>);
     findByNumber(accNumber: number): Promise<Users[]>;
-    createAccount(data: registerRequest): Promise<void>;
-    findUser(user: string): Promise<Users>;
-    findRefreshToken(token: string): Promise<Users>;
+    createAccount(data: registerRequest): Promise<{
+        success: boolean;
+        error?: any;
+    }>;
+    findUserById(id: number): Promise<Users>;
+    findUserByEmail(email: string): Promise<Users>;
+    findUserByUsername(user: string): Promise<Users>;
+    createAccountWithGoogle(user: loginWithGoogle): Promise<{
+        success: boolean;
+    }>;
     comparePassword(passwordFromPayload: string, passFromFindData: string): Promise<boolean>;
-    addRefreshToken(token: string, user: string): Promise<void>;
-    deleteRefreshToken(user: string): Promise<void>;
 }

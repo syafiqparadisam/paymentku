@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 	"github.com/syafiqparadisam/paymentku/domain/transaction/apitransaction"
@@ -29,7 +31,14 @@ func TransactionServer(port string) error {
 }
 
 func main() {
-	if err := godotenv.Load(".env"); err != nil {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Failed to get current working directory: %v", err)
+	}
+	
+	// start with /home/* + "../../.env" dir
+	envFilePath := filepath.Join(currentDir, "../../.env")
+	if err := godotenv.Load(envFilePath); err != nil {
 		fmt.Println("Failed to load env file")
 	}
 	if err := TransactionServer(":8802"); err != nil {

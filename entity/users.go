@@ -5,5 +5,15 @@ type Users struct {
 	User  string
 	Pass  string
 	Email string
-	RefreshToken string
+	HistoryId int
+	TokenId int
+	Bio string
+	ProfilePicture string
+	PhoneNumber int
+}
+
+
+type RefreshToken struct {
+	TokenId int
+	RefreshToken []string
 }

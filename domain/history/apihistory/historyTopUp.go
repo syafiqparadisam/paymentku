@@ -9,11 +9,11 @@ import (
 	"github.com/syafiqparadisam/paymentku/shared"
 )
 
-func (s *Server) handleTopUpHistory(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error {
+func (s *Server) HandleTopUpHistory(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error {
 
 	if r.Method == "GET" {
 
-		result := s.svc.GetAllTopUpHistory(decode)
+		result := s.Svc.GetAllTopUpHistory(decode)
 		if result.StatusCode != http.StatusOK {
 			return shared.WriteJSON(w, result.StatusCode, result)
 		}
@@ -23,14 +23,14 @@ func (s *Server) handleTopUpHistory(w http.ResponseWriter, r *http.Request, deco
 	}
 }
 
-func (s *Server) handleTopUpHistoryById(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error {
+func (s *Server) HandleTopUpHistoryById(w http.ResponseWriter, r *http.Request, decode *shared.UserJwtDecode) error {
 	if r.Method == "GET" {
 
 		idHistory, errParseUrl := utils.ParseURlParamsToObjectId(r.URL.Path)
 		if errParseUrl != nil {
 			return shared.WriteJSON(w, http.StatusBadRequest, shared.APIResponse{StatusCode: http.StatusBadRequest, Error: errParseUrl.Error()})
 		}
-		result := s.svc.GetAllTopUpHistoryByIdHistory(idHistory, decode)
+		result := s.Svc.GetAllTopUpHistoryByIdHistory(idHistory, decode)
 		if result.StatusCode != http.StatusOK {
 			return shared.WriteJSON(w, result.StatusCode, result)
 		}

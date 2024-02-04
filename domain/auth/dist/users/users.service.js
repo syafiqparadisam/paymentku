@@ -15,10 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const users_entity_1 = require("./users.entity");
+const users_entity_1 = require("./schemas/users.entity");
 const typeorm_2 = require("typeorm");
 const bcrypt = require("bcrypt");
-const generateAccNumber_1 = require("./utils/generateAccNumber");
+const CreateAccNumber_1 = require("./utils/CreateAccNumber");
+const randNum_1 = require("./utils/randNum");
+const profile_entity_1 = require("./schemas/profile.entity");
 let UsersService = class UsersService {
     constructor(repository) {
         this.repository = repository;
@@ -27,39 +29,50 @@ let UsersService = class UsersService {
         return this.repository.findBy({ accountNumber: accNumber });
     }
     async createAccount(data) {
-        const salt = await bcrypt.genSalt(10);
-        const password = await bcrypt.hash(data.password, salt);
-        let accNumber;
-        while (true) {
-            const randNum = (0, generateAccNumber_1.default)();
-            const user = await this.findByNumber(randNum);
-            if (user.length === 0) {
-                accNumber = randNum;
-                break;
-            }
+        try {
+            const salt = await bcrypt.genSalt(10);
+            const password = await bcrypt.hash(data.password, salt);
+            const accNumber = await (0, CreateAccNumber_1.createAccountNumber)();
+            const profile = new profile_entity_1.Profile();
+            profile.name = data.user + (0, randNum_1.default)().toString();
+            await this.repository.insert({
+                user: data.user,
+                email: data.email,
+                password,
+                accountNumber: accNumber,
+                profile
+            });
+            return { success: true };
         }
-        await this.repository.insert({
-            user: data.user,
-            password: password,
-            email: data.email,
-            accountNumber: accNumber,
-        });
+        catch (error) {
+            return { success: false, error: error };
+        }
     }
-    findUser(user) {
+    findUserById(id) {
+        return this.repository.findOne({ where: { id } });
+    }
+    findUserByEmail(email) {
+        return this.repository.findOne({ where: { email } });
+    }
+    findUserByUsername(user) {
         return this.repository.findOne({ where: { user } });
     }
-    findRefreshToken(token) {
-        console.log(token);
-        return this.repository.findOne({ where: { refreshToken: token } });
+    async createAccountWithGoogle(user) {
+        const accNumber = await (0, CreateAccNumber_1.createAccountNumber)();
+        const profile = new profile_entity_1.Profile();
+        profile.name = user.name;
+        profile.photo_profile = user.picture;
+        try {
+            await this.repository.insert({ user: user.username, email: user.email, accountNumber: accNumber, profile: profile });
+            return { success: true };
+        }
+        catch (error) {
+            console.log(error);
+            return { success: false };
+        }
     }
     comparePassword(passwordFromPayload, passFromFindData) {
         return bcrypt.compare(passwordFromPayload, passFromFindData);
-    }
-    async addRefreshToken(token, user) {
-        await this.repository.update({ user: user }, { refreshToken: token });
-    }
-    async deleteRefreshToken(user) {
-        await this.repository.update({ user }, { refreshToken: null });
     }
 };
 exports.UsersService = UsersService;

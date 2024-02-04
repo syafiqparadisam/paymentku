@@ -3,7 +3,6 @@ package mongohistory
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,8 +10,8 @@ import (
 )
 
 func NewMongoDBStore() (*mongo.Database, error) {
-	pass := os.Getenv("PASS_MONGO")
-	uri := fmt.Sprintf("mongodb+srv://mongotutorial:%s@cluster0.u6antwt.mongodb.net/?retryWrites=true&w=majority", pass)
+	// pass := os.Getenv("PASS_MONGO")
+	uri := fmt.Sprintf("mongodb+srv://mongotutorial:%s@cluster0.u6antwt.mongodb.net/?retryWrites=true&w=majority", "return500")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -33,10 +32,10 @@ func NewMongoDBStore() (*mongo.Database, error) {
 
 func NewTransferCollection(db *mongo.Database) *TransferStore {
 	transferInfoCollection := db.Collection("transfer_info")
-	return &TransferStore{db: transferInfoCollection}
+	return &TransferStore{Db: transferInfoCollection}
 }
 
 func NewTopUpCollection(c *mongo.Database) *TopUpStore {
 	topupCollection := c.Collection("topup_info")
-	return &TopUpStore{db: topupCollection}
+	return &TopUpStore{Db: topupCollection}
 }

@@ -14,15 +14,69 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 const users_service_1 = require("../users/users.service");
+const refreshToken_service_1 = require("../refreshToken/refreshToken.service");
 let AuthService = class AuthService {
-    constructor(usersService, jwtService, configService) {
+    constructor(usersService, jwtService, rTokenService, configService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
+        this.rTokenService = rTokenService;
         this.configService = configService;
     }
-    async signIn(payload) {
+    async generateJWT(payload) {
+        return await this.jwtService.signAsync(payload, { secret: this.configService.get("JWT_SECRET") });
+    }
+    async signInWithGoogle(payload) {
+        if (!payload) {
+            return {
+                statusCode: 400,
+                message: "Field is null"
+            };
+        }
+        const findDuplicateUserByEmail = await this.usersService.findUserByEmail(payload.email);
+        const findDuplicateUserByUsername = await this.usersService.findUserByUsername(payload.username);
+        if (findDuplicateUserByEmail) {
+            return {
+                statusCode: 409,
+                message: `Email ${findDuplicateUserByEmail.email} has been exist`
+            };
+        }
+        if (findDuplicateUserByUsername) {
+            return {
+                statusCode: 409,
+                message: `User ${findDuplicateUserByUsername.user} has been exist`,
+            };
+        }
+        if (!findDuplicateUserByEmail && !findDuplicateUserByUsername) {
+            const result = await this.usersService.createAccountWithGoogle(payload);
+            if (!result.success) {
+                return {
+                    statusCode: 500,
+                    message: "Server error"
+                };
+            }
+            else {
+                const findUser = await this.usersService.findUserByEmail(payload.email);
+                const accessToken = await this.generateJWT({ user_id: findUser.id, email: findUser.email });
+                const refreshToken = await this.generateJWT({ user_id: findUser.id, email: findUser.email });
+                return {
+                    statusCode: 200,
+                    data: { accessToken, refreshToken },
+                    message: "Ok"
+                };
+            }
+        }
+        const accessToken = await this.generateJWT({ user_id: findDuplicateUserByUsername.id, email: findDuplicateUserByUsername.email });
+        const refreshToken = await this.generateJWT({ user_id: findDuplicateUserByUsername.id, email: findDuplicateUserByUsername.email });
+        return {
+            statusCode: 200,
+            data: { accessToken, refreshToken },
+            message: "OK"
+        };
+    }
+    async signIn(payload, cookies) {
         try {
-            const user = await this.usersService.findUser(payload.user);
+            console.log(payload);
+            const user = await this.usersService.findUserByUsername(payload.user);
             console.log(user);
             if (user == null) {
                 return {
@@ -38,9 +92,9 @@ let AuthService = class AuthService {
                     message: 'Wrong Username or Password',
                 };
             }
-            else {
+            if (user) {
                 const payload = {
-                    user: user.user,
+                    user_id: user.id,
                     email: user.email,
                 };
                 const secret = this.configService.get('JWT_SECRET');
@@ -53,7 +107,22 @@ let AuthService = class AuthService {
                     secret,
                     expiresIn: 3600 * 24 * 30,
                 });
-                await this.usersService.addRefreshToken(refreshToken, payload.user);
+                const findTokenFromCookieAndDelete = await this.rTokenService.findTokenAndDelete(user.refreshToken_id, cookies.refreshToken);
+                const findToken = await this.rTokenService.findTokenById(user.refreshToken_id);
+                let { success, data } = cookies.refToken ? findTokenFromCookieAndDelete : findToken;
+                if (data && success) {
+                    const findCookie = await this.rTokenService.findTokenFromToken(cookies.refreshToken);
+                    if (!findCookie) {
+                        console.log("Where Token Is Come From ?");
+                        data = [];
+                    }
+                    return {
+                        statusCode: 204,
+                        message: "Delete Cookie"
+                    };
+                }
+                const newRtokenArray = [...data, refreshToken];
+                await this.rTokenService.add(user.refreshToken_id, newRtokenArray);
                 return {
                     statusCode: 200,
                     data: { accessToken, refreshToken },
@@ -65,36 +134,47 @@ let AuthService = class AuthService {
             return {
                 statusCode: 400,
                 data: null,
-                message: err,
+                error: err
             };
         }
     }
     async createAccount(data) {
         try {
-            const findDuplicateUser = await this.usersService.findUser(data.user);
-            if (findDuplicateUser) {
+            const findDuplicateUserByEmail = await this.usersService.findUserByEmail(data.email);
+            const findDuplicateUserByUsername = await this.usersService.findUserByUsername(data.user);
+            if (findDuplicateUserByEmail) {
                 return {
                     statusCode: 409,
-                    message: `User ${data.user} has been exist`,
+                    message: `Email ${findDuplicateUserByEmail.email} has been exist`
                 };
             }
-            else {
-                await this.usersService.createAccount(data);
+            if (findDuplicateUserByUsername) {
                 return {
-                    statusCode: 201,
-                    message: `User ${data.user} has been succesfully created`,
+                    statusCode: 409,
+                    message: `User ${findDuplicateUserByUsername.user} has been exist`,
                 };
             }
+            const { success, error } = await this.usersService.createAccount(data);
+            if (!success && error) {
+                return {
+                    statusCode: 500,
+                    error: error,
+                    message: "Internal Server Error"
+                };
+            }
+            return {
+                statusCode: 201,
+                message: `User ${data.user} has been succesfully created`,
+            };
         }
         catch (err) {
             return {
-                statusCode: 400,
-                data: null,
-                message: err,
+                statusCode: 500,
+                error: err,
             };
         }
     }
-    async getNewRefreshToken(cookie) {
+    async getNewAccessToken(cookie) {
         if (!cookie.refreshToken) {
             return {
                 statusCode: 401,
@@ -105,23 +185,31 @@ let AuthService = class AuthService {
             console.log(cookie);
             const secret = this.configService.get('JWT_SECRET');
             console.log(secret);
-            const user = await this.usersService.findRefreshToken(cookie.refreshToken);
+            const user = await this.rTokenService.findTokenFromToken(cookie.refreshToken);
             if (user == null) {
-                return { statusCode: 400, message: 'Bad Request' };
+                const decoded = await this.jwtService.verifyAsync(cookie.refreshToken);
+                console.log(decoded);
+                if (decoded) {
+                    const HACKED_USER = await this.usersService.findUserById(decoded.user_id);
+                    await this.rTokenService.deleteAllToken(user.data.refreshToken_id);
+                    return {
+                        statusCode: 204,
+                        message: "Delete cookie"
+                    };
+                }
             }
             else {
-                const checkUserIsVerify = await this.jwtService.verifyAsync(cookie.refreshToken, { secret: secret });
+                const checkUserIsVerify = await this.jwtService.verifyAsync(cookie.refreshToken);
                 console.log(checkUserIsVerify);
                 if (!checkUserIsVerify) {
-                    await this.usersService.deleteRefreshToken(user.user);
+                    await this.rTokenService.deleteToken(user.data.refreshToken_id, cookie.refreshToken);
                     return { statusCode: 204, message: 'No Content' };
                 }
-                else if (checkUserIsVerify.user === user.user &&
-                    checkUserIsVerify.email === user.email) {
-                    console.log('ishere');
+                else if (checkUserIsVerify.user === user.data.user &&
+                    checkUserIsVerify.email === user.data.email) {
                     const accessToken = await this.jwtService.signAsync({
-                        user: user.user,
-                        email: user.email,
+                        user_id: user.data.id,
+                        email: user.data.email,
                     }, {
                         secret,
                         expiresIn: 3600 * 24 * 7,
@@ -151,14 +239,19 @@ let AuthService = class AuthService {
             };
         }
         try {
-            const user = await this.usersService.findRefreshToken(cookie.refreshToken);
+            const user = await this.rTokenService.findTokenFromToken(cookie.refreshToken);
             console.log(user);
-            if (user.refreshToken === null) {
+            if (!user.data.refreshToken) {
                 return {
                     statusCode: 204,
+                    message: "token wrong"
                 };
             }
-            await this.usersService.deleteRefreshToken(user.user);
+            const decode = await this.jwtService.verifyAsync(cookie.refreshToken);
+            if (!decode) {
+                return { statusCode: 403, message: "cookie wrong" };
+            }
+            await this.rTokenService.deleteToken(decode.user_id, cookie.refreshToken);
             return {
                 statusCode: 204,
             };
@@ -176,6 +269,7 @@ exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
         jwt_1.JwtService,
+        refreshToken_service_1.RefreshTokenService,
         config_1.ConfigService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -1,4 +1,8 @@
-declare const JwtAuthGuard_base: import("@nestjs/passport").Type<import("@nestjs/passport").IAuthGuard>;
-export declare class JwtAuthGuard extends JwtAuthGuard_base {
+import { CanActivate, ExecutionContext } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { Observable } from "rxjs";
+export declare class AccessTokenGuard implements CanActivate {
+    private jwtService;
+    constructor(jwtService: JwtService);
+    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean>;
 }
-export {};

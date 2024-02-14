@@ -27,24 +27,18 @@ export declare const RefreshTokenProviders: {
     provide: string;
     useFactory: (connection: Connection) => import("mongoose").Model<{
         refreshToken: string[];
-        user_id?: number;
     }, {}, {}, {}, import("mongoose").Document<unknown, {}, {
         refreshToken: string[];
-        user_id?: number;
     }> & {
         refreshToken: string[];
-        user_id?: number;
     } & {
         _id: import("mongoose").Types.ObjectId;
     }, import("mongoose").Schema<any, import("mongoose").Model<any, any, any, any, any, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, {
         refreshToken: string[];
-        user_id?: number;
     }, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<{
         refreshToken: string[];
-        user_id?: number;
     }>> & import("mongoose").FlatRecord<{
         refreshToken: string[];
-        user_id?: number;
     }> & {
         _id: import("mongoose").Types.ObjectId;
     }>>;

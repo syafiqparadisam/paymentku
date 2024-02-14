@@ -11,11 +11,10 @@ import (
 )
 
 func ConnectMongoDB() (*mongo.Database, error) {
-	pass := os.Getenv("PASS_MONGO")
-	uri := fmt.Sprintf("mongodb+srv://mongotutorial:%s@cluster0.u6antwt.mongodb.net/?retryWrites=true&w=majority", pass)
+	mongoUrl := os.Getenv("MONGO_URL")
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	clientOptions := options.Client().ApplyURI(uri)
+	clientOptions := options.Client().ApplyURI(mongoUrl)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		return nil, err

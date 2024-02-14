@@ -10,5 +10,7 @@ export declare class AuthController {
     register(registerDto: registerRequest, res: any): Promise<response>;
     logout(req: any, res: any): Promise<response>;
     getNewAccessToken(req: any, res: any): Promise<response>;
-    verifyUser(req: any): Promise<void>;
+    redirectToHistoryService(req: any, res: any): void;
+    redirectToTransactionService(req: any, res: any): void;
+    redirectToProfileService(req: any, res: any): void;
 }

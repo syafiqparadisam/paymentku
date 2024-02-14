@@ -9,16 +9,16 @@ export class HistoryTopup {
     @ManyToOne(() => Users, users => users.history_topup_id)
     user: Users
 
-    @Column()
+    @Column({nullable: true})
     amount: number
 
-    @Column({ type: "bigint" })
+    @Column({ type: "bigint", nullable: true })
     balance: number
 
-    @Column()
+    @Column({nullable: true})
     status: string
 
-    @Column({ type: "bigint" })
+    @Column({ type: "bigint",nullable: true })
     previous_balance: number
 
     @Column({ default: false })

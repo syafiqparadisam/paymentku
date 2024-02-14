@@ -11,42 +11,37 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtStrategy = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
 const users_service_1 = require("../../users/users.service");
-let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, "jwt") {
-    constructor(configService, userService) {
-        const extractJWTFromCookie = (req) => {
-            let token = null;
-            if (req && req.cookies) {
-                token = req.cookies['access_token'];
-            }
-            return token || passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-        };
+let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
+    constructor(usersService) {
         super({
-            ignoreExpiration: false,
-            secretOrKey: configService.get("JWT_SECRET"),
-            jwtFromRequest: extractJWTFromCookie
+            jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            secretOrKey: process.env.JWT_SECRET,
         });
-        this.configService = configService;
-        this.userService = userService;
+        this.usersService = usersService;
     }
     async validate(payload) {
-        const user = await this.userService.findUserById(payload.user_id);
-        if (!user) {
-            throw new common_1.UnauthorizedException("please login first");
+        if (!payload || payload == "") {
+            throw new common_1.UnauthorizedException();
         }
-        return {
-            id: payload.user_id,
-            email: payload.email
-        };
+        const findUser = await this.usersService.findUserById(payload.user_id);
+        if (payload.user_id === findUser.id && payload.email === findUser.email) {
+            return {
+                statusCode: 302,
+                data: payload,
+                message: "Redirected"
+            };
+        }
+        else {
+            throw new common_1.ForbiddenException();
+        }
     }
 };
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService,
-        users_service_1.UsersService])
+    __metadata("design:paramtypes", [users_service_1.UsersService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

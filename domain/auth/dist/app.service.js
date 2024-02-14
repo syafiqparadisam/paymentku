@@ -10,7 +10,7 @@ exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 let AppService = class AppService {
     getHello() {
-        return { message: 'Hello brosss' };
+        return { message: 'server ini diakses dari nginx port 80' };
     }
 };
 exports.AppService = AppService;

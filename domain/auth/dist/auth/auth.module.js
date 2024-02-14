@@ -15,6 +15,7 @@ const users_module_1 = require("../users/users.module");
 const config_1 = require("@nestjs/config");
 const google_strategy_1 = require("./strategies/google.strategy");
 const refreshToken_module_1 = require("../refreshToken/refreshToken.module");
+const access_token_guard_module_1 = require("../access-token-guard/access-token-guard.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -29,7 +30,8 @@ exports.AuthModule = AuthModule = __decorate([
                 isGlobal: true,
             }),
             users_module_1.UsersModule,
-            refreshToken_module_1.RefreshTokenModule
+            refreshToken_module_1.RefreshTokenModule,
+            access_token_guard_module_1.AccessTokenGuardModule
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, google_strategy_1.GoogleStrategy],

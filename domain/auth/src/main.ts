@@ -9,6 +9,7 @@ async function bootstrap() {
     cors: true,
   });
   app.useGlobalPipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true, whitelist: true }))
+  app.enableCors()
   app.use(cookieParser());
   await app.listen(8800);
 }

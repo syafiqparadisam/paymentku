@@ -24,19 +24,18 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { Model } from 'mongoose';
 import { RefToken } from 'src/interfaces/refToken';
-interface result {
-    data?: any;
-    success: boolean;
-}
+import { result } from 'src/interfaces/result';
 export declare class RefreshTokenService {
     private rtModel;
     constructor(rtModel: Model<RefToken>);
     insert(id: number, token: string): Promise<result>;
-    findTokenAndDelete(id: number, token: string): Promise<result>;
+    insertJustUserId(refreshTokenId: any, user_id: number): Promise<result>;
+    initAndFind(): Promise<result>;
+    getIdRefreshTokenByUserId(userid: string): Promise<result>;
+    findTokenAndDelete(id: string, token: string): Promise<result>;
     findTokenFromToken(token: string): Promise<result>;
-    add(id: number, token: string[]): Promise<result>;
-    findTokenById(id: number): Promise<result>;
+    add(id: string, token: string): Promise<result>;
+    findTokenById(id: string): Promise<result>;
     deleteAllToken(id: number): Promise<result>;
-    deleteToken(id: number, token: string): Promise<result>;
+    deleteToken(id: any, token: string): Promise<result>;
 }
-export {};

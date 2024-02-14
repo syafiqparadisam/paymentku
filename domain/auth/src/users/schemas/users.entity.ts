@@ -24,7 +24,7 @@ export class Users {
   accountNumber: number;
 
   @Column()
-  refreshToken_id: number;
+  refreshToken_id: string;
 
   @OneToMany(() => HistoryTopup, history_topup => history_topup.user)
   history_topup_id: HistoryTopup[]

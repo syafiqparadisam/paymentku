@@ -25,17 +25,13 @@
 import * as mongoose from "mongoose";
 export declare const RefreshTokenSchema: mongoose.Schema<any, mongoose.Model<any, any, any, any, any, any>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, {
     refreshToken: string[];
-    user_id?: number;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     refreshToken: string[];
-    user_id?: number;
 }>> & mongoose.FlatRecord<{
     refreshToken: string[];
-    user_id?: number;
 }> & {
     _id: mongoose.Types.ObjectId;
 }>;
 export interface RtSchema {
-    user_id: Number;
     refreshToken: [];
 }

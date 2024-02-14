@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne,OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity()
@@ -9,7 +9,7 @@ export class Profile {
     @Column()
     name: string;
 
-    @Column()
+    @Column({nullable: true})
     photo_profile: string
 
     @PrimaryGeneratedColumn()

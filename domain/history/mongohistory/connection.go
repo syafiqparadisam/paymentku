@@ -3,6 +3,7 @@ package mongohistory
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,12 +11,11 @@ import (
 )
 
 func NewMongoDBStore() (*mongo.Database, error) {
-	// pass := os.Getenv("PASS_MONGO")
-	uri := fmt.Sprintf("mongodb+srv://mongotutorial:%s@cluster0.u6antwt.mongodb.net/?retryWrites=true&w=majority", "return500")
+	mongoUrl := os.Getenv("MONGO_URL")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	clientOptions := options.Client().ApplyURI(uri)
+	clientOptions := options.Client().ApplyURI(mongoUrl)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		return nil, err

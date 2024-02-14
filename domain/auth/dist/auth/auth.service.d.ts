@@ -11,8 +11,9 @@ export declare class AuthService {
     private rTokenService;
     private readonly configService;
     constructor(usersService: UsersService, jwtService: JwtService, rTokenService: RefreshTokenService, configService: ConfigService);
-    generateJWT(payload: jwtPayload): Promise<string>;
-    signInWithGoogle(payload: loginWithGoogle): Promise<response>;
+    generateJWT(payload: jwtPayload, expiresIn: number | string): Promise<string>;
+    verifyJWT(token: string): Promise<jwtPayload>;
+    signInWithGoogle(payload: loginWithGoogle, cookies: any): Promise<response>;
     signIn(payload: loginRequest, cookies: any): Promise<response>;
     createAccount(data: registerRequest): Promise<response>;
     getNewAccessToken(cookie: any): Promise<response>;

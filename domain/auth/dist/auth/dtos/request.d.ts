@@ -12,6 +12,9 @@ export declare class loginWithGoogle {
     providerID: number;
     username: string;
     email: string;
-    name: string;
+    name: {
+        givenName: string;
+        familyName: string;
+    };
     picture: string;
 }

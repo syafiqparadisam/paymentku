@@ -24,6 +24,6 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { Document } from "mongoose";
 export interface RefToken extends Document {
-    readonly id: number;
-    readonly refreshToken: [String];
+    user_id: number;
+    refreshToken: [String];
 }

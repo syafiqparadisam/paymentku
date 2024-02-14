@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefreshTokenService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("mongoose");
+const mongodb_1 = require("mongodb");
 let RefreshTokenService = class RefreshTokenService {
     constructor(rtModel) {
         this.rtModel = rtModel;
@@ -30,11 +31,39 @@ let RefreshTokenService = class RefreshTokenService {
             return { success: false };
         }
     }
+    async insertJustUserId(refreshTokenId, user_id) {
+        try {
+            const data = await this.rtModel.updateOne({ _id: refreshTokenId }, { user_id });
+            return { success: true };
+        }
+        catch (error) {
+            return { success: false, data: error };
+        }
+    }
+    async initAndFind() {
+        try {
+            const newDocument = new this.rtModel();
+            await newDocument.save();
+            const findId = await this.rtModel.findOne({ _id: newDocument._id });
+            return { success: true, data: findId };
+        }
+        catch (error) {
+            return { success: false, data: error };
+        }
+    }
+    async getIdRefreshTokenByUserId(userid) {
+        try {
+            const result = await this.rtModel.findOne({ user_id: userid });
+            return { success: true, data: result };
+        }
+        catch (error) {
+            return { success: false, data: error };
+        }
+    }
     async findTokenAndDelete(id, token) {
         try {
-            await this.rtModel.updateOne({ id }, { $pull: { refreshToken: token } });
-            const user = await this.rtModel.findOne({ id }, { refreshToken: 1, id: 0 });
-            return { data: user, success: true };
+            await this.rtModel.updateOne({ _id: new mongodb_1.ObjectId(id) }, { $pull: { refreshToken: token } });
+            return { success: true };
         }
         catch (error) {
             console.log(error);
@@ -43,7 +72,7 @@ let RefreshTokenService = class RefreshTokenService {
     }
     async findTokenFromToken(token) {
         try {
-            const result = await this.rtModel.findOne({ refreshToken: token }, { id: 0, refreshToken: 1 });
+            const result = await this.rtModel.findOne({ refreshToken: token });
             return { data: result, success: true };
         }
         catch (error) {
@@ -52,17 +81,22 @@ let RefreshTokenService = class RefreshTokenService {
         }
     }
     async add(id, token) {
-        const result = await this.rtModel.updateOne({ id }, { $push: { refreshToken: { $each: token } } });
-        if (result.modifiedCount > 0) {
-            return { success: true };
+        try {
+            const result = await this.rtModel.updateOne({ _id: new mongodb_1.ObjectId(id) }, { $push: { refreshToken: token } });
+            if (result.modifiedCount > 0) {
+                return { success: true };
+            }
+            else if (result.modifiedCount == 0) {
+                return { success: false };
+            }
         }
-        else if (result.modifiedCount == 0) {
-            return { success: false };
+        catch (error) {
+            return { success: false, data: error };
         }
     }
     async findTokenById(id) {
         try {
-            const result = await this.rtModel.findOne({ id }, { id: 0, refreshToken: 1 });
+            const result = await this.rtModel.findOne({ _id: id }, { id: 0, refreshToken: 1 });
             return { data: result, success: true };
         }
         catch (error) {
@@ -81,12 +115,18 @@ let RefreshTokenService = class RefreshTokenService {
         }
     }
     async deleteToken(id, token) {
-        const result = await this.rtModel.updateOne({ id }, { $pull: { refreshToken: token } });
-        if (result.modifiedCount > 0) {
-            return { success: true };
+        console.log({ id, token });
+        try {
+            const result = await this.rtModel.updateOne({ _id: id }, { $pull: { refreshToken: token } });
+            if (result.modifiedCount > 0) {
+                return { success: true };
+            }
+            else if (result.modifiedCount == 0) {
+                return { success: false };
+            }
         }
-        else if (result.modifiedCount == 0) {
-            return { success: false };
+        catch (error) {
+            return { success: false, data: error };
         }
     }
 };

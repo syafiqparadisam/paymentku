@@ -19,7 +19,7 @@ class GoogleStrategy extends (0, passport_1.PassportStrategy)(passport_google_oa
             providerID: profile.id,
             username: profile.username,
             email: profile.emails[0].value,
-            name: profile.fullname,
+            name: { givenName: profile.name.givenName, familyName: profile.name.familyName },
             picture: profile.photos[0].value,
         };
         console.log(user);

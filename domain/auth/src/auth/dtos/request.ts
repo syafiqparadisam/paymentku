@@ -47,10 +47,15 @@ export class loginWithGoogle {
   email: string;
 
   @IsNotEmpty()
-  @MaxLength(100)
-  @MinLength(2)
-  name: string;
+  name: { givenName: string, familyName: string };
 
   @IsNotEmpty()
   picture: string;
+}
+
+export class EmailDto {
+  @IsEmail()
+  @IsNotEmpty()
+  @MinLength(2)
+  email: string;
 }

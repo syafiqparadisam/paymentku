@@ -24,31 +24,31 @@ __decorate([
     __metadata("design:type", users_entity_1.Users)
 ], HistoryTransfer.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], HistoryTransfer.prototype, "sender", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], HistoryTransfer.prototype, "receiver", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "bigint" }),
+    (0, typeorm_1.Column)({ type: "bigint", nullable: true }),
     __metadata("design:type", Number)
 ], HistoryTransfer.prototype, "receiver_account", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], HistoryTransfer.prototype, "status", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
     __metadata("design:type", String)
 ], HistoryTransfer.prototype, "notes", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], HistoryTransfer.prototype, "balance", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Number)
 ], HistoryTransfer.prototype, "amount", void 0);
 __decorate([

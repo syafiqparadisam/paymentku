@@ -24,19 +24,19 @@ __decorate([
     __metadata("design:type", users_entity_1.Users)
 ], HistoryTopup.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Number)
 ], HistoryTopup.prototype, "amount", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "bigint" }),
+    (0, typeorm_1.Column)({ type: "bigint", nullable: true }),
     __metadata("design:type", Number)
 ], HistoryTopup.prototype, "balance", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], HistoryTopup.prototype, "status", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "bigint" }),
+    (0, typeorm_1.Column)({ type: "bigint", nullable: true }),
     __metadata("design:type", Number)
 ], HistoryTopup.prototype, "previous_balance", void 0);
 __decorate([

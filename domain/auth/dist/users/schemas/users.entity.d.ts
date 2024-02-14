@@ -8,7 +8,7 @@ export declare class Users {
     email: string;
     balance: number;
     accountNumber: number;
-    refreshToken_id: number;
+    refreshToken_id: string;
     history_topup_id: HistoryTopup[];
     history_transfer_id: HistoryTransfer[];
     profile: Profile;

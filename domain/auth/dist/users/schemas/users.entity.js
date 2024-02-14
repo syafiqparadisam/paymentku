@@ -43,7 +43,7 @@ __decorate([
 ], Users.prototype, "accountNumber", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], Users.prototype, "refreshToken_id", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => history_topup_entity_1.HistoryTopup, history_topup => history_topup.user),

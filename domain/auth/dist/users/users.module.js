@@ -12,12 +12,15 @@ const users_service_1 = require("./users.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const users_entity_1 = require("./schemas/users.entity");
 const refreshToken_module_1 = require("../refreshToken/refreshToken.module");
+const history_topup_entity_1 = require("./schemas/history_topup.entity");
+const history_transfer_entity_1 = require("./schemas/history_transfer.entity");
+const profile_entity_1 = require("./schemas/profile.entity");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([users_entity_1.Users]), refreshToken_module_1.RefreshTokenModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([users_entity_1.Users, profile_entity_1.Profile, history_topup_entity_1.HistoryTopup, history_transfer_entity_1.HistoryTransfer]), refreshToken_module_1.RefreshTokenModule],
         providers: [users_service_1.UsersService],
         exports: [users_service_1.UsersService],
     })

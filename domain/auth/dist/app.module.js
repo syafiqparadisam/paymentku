@@ -19,6 +19,7 @@ const mongorepo_module_1 = require("./mongorepo/mongorepo.module");
 const profile_entity_1 = require("./users/schemas/profile.entity");
 const history_topup_entity_1 = require("./users/schemas/history_topup.entity");
 const history_transfer_entity_1 = require("./users/schemas/history_transfer.entity");
+const access_token_guard_module_1 = require("./access-token-guard/access-token-guard.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             refreshToken_module_1.RefreshTokenModule,
             mongorepo_module_1.MongorepoModule,
+            access_token_guard_module_1.AccessTokenGuardModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -1,40 +1,37 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { PassportStrategy } from "@nestjs/passport";
-import { Strategy, ExtractJwt } from "passport-jwt";
-import { jwtPayload } from "src/interfaces/jwtPayload";
-import { UsersService } from "src/users/users.service";
-
+// jwt.strategy.ts
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
+export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
-        private readonly configService: ConfigService,
-        private userService: UsersService
+        private usersService: UsersService
     ) {
-        const extractJWTFromCookie = (req) => {
-            let token = null;
-            if (req && req.cookies) {
-                token = req.cookies['access_token'];
-            }
-            return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-        }
-
         super({
-            ignoreExpiration: false,
-            secretOrKey: configService.get<string>("JWT_SECRET"),
-            jwtFromRequest: extractJWTFromCookie
-        })
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            secretOrKey: process.env.JWT_SECRET, // Ganti dengan secret key JWT Anda
+        });
     }
 
-    async validate(payload: jwtPayload) {
-        const user = await this.userService.findUserById(payload.user_id)
-        if (!user) {
-            throw new UnauthorizedException("please login first")
+    async validate(payload: any) {
+        // Di sini, Anda dapat menyesuaikan logika validasi payload token JWT
+        // Misalnya, memeriksa apakah pengguna ada di sistem Anda.
+        // Jika valid, kembalikan objek pengguna; jika tidak, lempar UnauthorizedException.
+        if (!payload || payload == "") {
+            throw new UnauthorizedException();
         }
-        return {
-            id: payload.user_id,
-            email: payload.email
+        const findUser = await this.usersService.findUserById(payload.user_id)
+        if (payload.user_id === findUser.id && payload.email === findUser.email) {
+            return {
+                statusCode: 302,
+                data: payload,
+                message: "Redirected"
+            }
+        } else {
+            throw new ForbiddenException()
         }
     }
 }

@@ -10,6 +10,9 @@ import { MongorepoModule } from './mongorepo/mongorepo.module';
 import { Profile } from './users/schemas/profile.entity';
 import { HistoryTopup } from './users/schemas/history_topup.entity';
 import { HistoryTransfer } from './users/schemas/history_transfer.entity';
+import { AccessTokenGuardModule } from './access-token-guard/access-token-guard.module';
+import { RedisModule } from './redis/redis.module';
+import { Redis } from 'ioredis';
 
 
 @Module({
@@ -28,7 +31,10 @@ import { HistoryTransfer } from './users/schemas/history_transfer.entity';
     AuthModule,
     RefreshTokenModule,
     MongorepoModule,
+    AccessTokenGuardModule,
+    RedisModule,
   ],
+
   controllers: [AppController],
   providers: [AppService],
 })

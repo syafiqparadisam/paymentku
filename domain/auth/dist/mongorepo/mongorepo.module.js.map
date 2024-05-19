@@ -1,1 +1,0 @@
-{"version":3,"file":"mongorepo.module.js","sourceRoot":"","sources":["../../src/mongorepo/mongorepo.module.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAAwC;AACxC,6DAAwD;AAMjD,IAAM,eAAe,GAArB,MAAM,eAAe;CAAG,CAAA;AAAlB,0CAAe;0BAAf,eAAe;IAJ3B,IAAA,eAAM,EAAC;QACN,SAAS,EAAE,CAAC,GAAG,qCAAgB,CAAC;QAChC,OAAO,EAAE,CAAC,GAAG,qCAAgB,CAAC;KAC/B,CAAC;GACW,eAAe,CAAG"}

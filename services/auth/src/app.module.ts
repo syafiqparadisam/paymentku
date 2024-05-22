@@ -29,7 +29,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     AuthModule,
     AccessTokenGuardModule,
     RedisModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true,envFilePath:  "../.env"}),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,

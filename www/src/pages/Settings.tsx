@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
 import User from './User'
-import { Box, Switch, ToggleButton, Typography } from '@mui/material'
+import { Box, Switch, Typography } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import { setDarkMode } from '../features/web/darkMode'
 import { ArrowBack } from '@mui/icons-material'

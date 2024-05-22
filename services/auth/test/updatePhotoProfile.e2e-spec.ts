@@ -88,7 +88,7 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
       // updateUsername.username = userRegister.user
       const user = await userSvc.findUserByUsername(updateUsername.username);
       const userAndProfile = await userSvc.joiningUserAndProfile(user.id);
-      await userSvc.deleteAccount(user.id, userAndProfile.data.profile.id);
+      await userSvc.deleteAccount(user.id, userAndProfile.profile.id);
 
       await app.close();
     } catch (error) {

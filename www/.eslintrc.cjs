@@ -14,11 +14,8 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
-    "no-restricted-imports": [
-      error,
-      {
-        patterns: ["@mui/*/*/*"]
-      }
-    ]
+    '@typescript-eslint/no-explicit-any': 'off',
+    'react-hooks/exhaustive-deps': 'off',
+    'no-case-declarations': 'off'
   },
 }

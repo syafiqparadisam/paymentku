@@ -6,7 +6,7 @@ export const initialState: User= {
     email: "",
     user: "",
     name: "",
-    photo_public_id: null,
+    photo_public_id: import.meta.env.VITE_DEFAULT_PHOTO_PROFILE,
     accountNumber: 0,
     photo_profile: "",
     phoneNumber: "",

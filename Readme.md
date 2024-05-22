@@ -2,6 +2,16 @@
 
 Paymentku is a payment application that makes it easy for users to perform various types of digital payments and transactions. This app offers various features for bill payments, top-ups, fund transfers, and tracking transaction history.
 
+## Tech stacks
+1. **ReactJS**: Frontend
+2. **NestJS**: Auth service
+3. **Golang**: History,transaction service
+4. **Gofiber**: User service
+5. **MySQL**: RDBMS
+6. **Redis** Key-value DB
+
+
+
 ## Main Features
 
 1. **Bill Payments**: Pay various bills such as electricity, water, and telephone easily and quickly.
@@ -14,11 +24,48 @@ Paymentku is a payment application that makes it easy for users to perform vario
 8. **Logout**: Log out of your account securely.
 9. **Delete Account**: Option to delete your account if you no longer wish to use Paymentku services.
 
+## How to clone and run this project
+
+### 1. Clone this repo
+```
+git clone https://github.com/syafiqparadisam/paymentku.git
+```
+or you may use other method to clone this repo
+
+### 2. Install docker
+you can install it on https://docs.docker.com/engine/install
+### 3. Run docker compose
+Open your terminal and paste 
+```
+make docker-compose
+```
+### 4. Run each service
+Open your each session terminal and paste **ONE BY ONE**
+```
+make run-auth // auth service run
+make run-user // user service run
+make run-history // history service run
+make run-transaction // transaction service run
+make run-fe // frontend run
+```
+### 5. Open website
+Open your website on http://localhost:5173
+
+### How to run this project very quick
+
+### 1. Install docker
+you can install it on https://docs.docker.com/engine/install
+### 2. Paste this code on your compose.yml
+```
+
+```
+
 ## How to Use
 
-### 1. Installation
+### 1. Open this website
 
-Download and install the Paymentku app from [Google Play Store](#) or [Apple App Store](#).
+- *Link*: https://syafiqparadisam.my.id 
+    if this website not found, maybe i dont publish this website online
 
 ### 2. Registration and Login
 
@@ -53,10 +100,7 @@ Download and install the Paymentku app from [Google Play Store](#) or [Apple App
 
 ## Contact and Support
 
-If you encounter any issues or have questions, please contact our support team via email at support@paymentku.com or call +62 123 4567 890.
+If you encounter any issues or have questions, please contact our email or dm me on instagram, i already provide on my bio.
 
 Thank you for using Paymentku!
 
----
-
-*Note: The download links for the Play Store and App Store are examples and should be replaced with the actual links when the app is available on those platforms.*

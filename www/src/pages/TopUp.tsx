@@ -35,7 +35,7 @@ const TopUp = () => {
         const total = calculatePrice(amount, isChecked, operational, bonus)
         setTotalPrice(total)
         setTotalGettingMoney(calculateGettingMoney(amount, bonus))
-    }, [amount, isChecked])
+    }, [amount, isChecked, bonus,operational])
 
     return (
         <>

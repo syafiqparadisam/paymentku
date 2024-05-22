@@ -1,22 +1,21 @@
 import {
     Box,
-    Container,
     Typography,
     TextField,
     InputLabel,
-    Button
+    Button,
+    Backdrop,
+    CircularProgress
 } from "@mui/material"
 import GoogleIcon from '@mui/icons-material/Google';
-import { red } from "@mui/material/colors";
 import { Link, useNavigate } from "react-router-dom";
 import { SignInInput } from "../types/dto";
 import { useForm, SubmitHandler } from "react-hook-form"
-import { useSignInMutation, useSignInWithGoogleMutation } from "../services/authApi";
+import { useSignInMutation } from "../services/authApi";
 import { useState } from "react";
 
 const SignIn = () => {
     const [err, setErr] = useState<any>("")
-    const [signInGoogle] = useSignInWithGoogleMutation()
     const [signIn, { isSuccess, isLoading }] = useSignInMutation()
     const { register, handleSubmit, formState: { errors } } = useForm<SignInInput>()
     const onSubmit: SubmitHandler<SignInInput> = async (data) => {
@@ -36,10 +35,12 @@ const SignIn = () => {
     }
     if (isSuccess) navigate("/dashboard")
 
-    // console.log(import.meta.env.VITE_CLIENT_ID)
 
     return (
         <>
+            <Backdrop open={isSuccess}>
+                <CircularProgress />
+            </Backdrop>
             <Box display={"flex"} justifyContent={"center"} alignItems={"center"} height={"100vh"}>
                 <Box display={"flex"} paddingBlock={"30px"} paddingInline={"60px"} flexDirection={"column"} width={"40%"} borderRadius={"20px"}>
                     <Box textAlign={"center"} width={"100%"} display={"flex"} flexDirection={"column"} justifyContent={"center"} padding={"10px"}>
@@ -63,7 +64,7 @@ const SignIn = () => {
                         </Box>
                         <Box display={"flex"} justifyContent={"center"} gap={1} flexDirection={"column"}>
                             <Button variant="contained" type="submit" fullWidth disabled={isLoading}>Sign in</Button>
-                            <Button variant="outlined" startIcon={<GoogleIcon color="error" sx={{ fontWeight: "bold", marginBottom: "2px", fontSize: "30px" }} />} fullWidth sx={{ border: "1px solid gray", fontWeight: "bold", fontSize: "14px", color: "black" }} onClick={() => signInGoogle()}>
+                            <Button variant="outlined" startIcon={<GoogleIcon color="error" sx={{ fontWeight: "bold", marginBottom: "2px", fontSize: "30px" }} />} fullWidth sx={{ border: "1px solid gray", fontWeight: "bold", fontSize: "14px", color: "black" }} onClick={() => window.location.replace(import.meta.env.VITE_API_URL + "/auth/login/google")}>
                                 Sign in With Google
                             </Button>
                         </Box>

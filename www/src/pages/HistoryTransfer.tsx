@@ -11,14 +11,14 @@ import { route } from "../constant/route"
 import { useState } from "react"
 import useAlert from "../hooks/useAlert"
 import Category from "../component/Category"
+import { Response } from '../types/response.ts';
 
 const HistoryTransfer = () => {
     const { open, handleClose, handleOpen } = useAlert()
     const { data, isSuccess, refetch } = useGetHistoryTransferQuery()
-    const [err, setErr] = useState<any>()
-    const [deleteTransfer, { }] = useDeleteHistoryTransferMutation()
+    const [err, setErr] = useState<Response<null>>()
+    const [deleteTransfer] = useDeleteHistoryTransferMutation()
     const navigate = useNavigate()
-
     return (
         <>
             <Dialog
@@ -41,7 +41,7 @@ const HistoryTransfer = () => {
                         try {
                             await deleteTransfer().unwrap()
                             handleOpen()
-                        } catch (error) {
+                        } catch (error: any) {
                             setErr(error)
                         }
                     }}>
@@ -59,7 +59,7 @@ const HistoryTransfer = () => {
                     </Box>
                     <Box width={"90%"} display={"flex"} justifyContent={"space-between"}>
                         <Category firstItem={"Transfer"} menuItem={[{ categories: "Topup", redirect: "/dashboard/user/history/topup" }, { categories: "Transfer", redirect: "/dashboard/user/history/transfer" }]} />
-                        {err && <Typography fontWeight={"bold"} color={"red"} fontSize={"20px"}>{err?.data?.message}</Typography>}
+                        {err && <Typography fontWeight={"bold"} color={"red"} fontSize={"20px"}>{err?.message}</Typography>}
                         <Box display={"flex"} gap={2} width={"30%"}>
                             <Button color="success" variant="contained" startIcon={<Loop />} onClick={refetch}>Reload</Button>
                             <Button color="error" variant="contained" startIcon={<Delete />} onClick={() => {

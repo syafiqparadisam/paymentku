@@ -1,7 +1,6 @@
-import { useSelector } from "react-redux"
 import User from "./User"
 import { Box, Button, TextareaAutosize, Typography, Dialog, DialogContent, DialogTitle, DialogContentText } from "@mui/material"
-import { useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import emailjs from "@emailjs/browser"
 import { ArrowBack } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
@@ -14,12 +13,12 @@ const Help = () => {
     const form = useRef()
     const navigate = useNavigate()
 
-    const submittedForm = async (e) => {
+    const submittedForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         try {
             await emailjs.sendForm(import.meta.env.VITE_SERVICE_ID_EMAILJS, import.meta.env.VITE_TEMPLATE_ID_HELPING_EMAILJS, form.current, import.meta.env.VITE_PUBLIC_KEY_EMAILJS)
             setValue("")
-        } catch (error) {
+        } catch (error: any) {
             setOpen(true)
             setErr(error)
             setValue("")

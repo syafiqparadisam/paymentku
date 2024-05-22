@@ -8,16 +8,27 @@ services:
       - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test
+      MYSQL_DATABASE: paymentku
       MYSQL_PASSWORD: password
     healthcheck:
-      test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "127.0.0.1",
+          "-u",
+          "root",
+          "--password=$$MYSQL_ROOT_PASSWORD",
+        ]
       start_period: 5s
       interval: 5s
       timeout: 5s
       retries: 10
     volumes:
       - ../../DB:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/initsql
     networks:
       - mysql-phpmyadmin
 

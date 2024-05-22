@@ -9,12 +9,7 @@ export const authApi = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: import.meta.env.VITE_API_URL,
         credentials: "include",
-        prepareHeaders: (headers: Headers, {endpoint}) => {
-            // console.log(endpoint)
-            // if (endpoint == "updatePhotoProfile") {
-            //     console.log("terset")
-            //     headers.set("x-data-publicid", "pepeeeee")
-            // }
+        prepareHeaders: (headers: Headers) => {
             return headers
         }
     }),
@@ -26,6 +21,16 @@ export const authApi = createApi({
                 url: "register",
                 body: user,
             }),
+            transformErrorResponse(baseQueryReturnValue, meta) {
+                if (meta?.response?.status === 500) {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
+                }
+                if (baseQueryReturnValue.status == "FETCH_ERROR") {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL
+                }
+                return baseQueryReturnValue
+            },
+            invalidatesTags: ["user", "historytopup", "historytransfer"],
         }),
         signIn: builder.mutation<Response<null>, SignInInput>({
             query: (user) => ({
@@ -33,14 +38,22 @@ export const authApi = createApi({
                 url: "login",
                 body: user
             }),
-            invalidatesTags: ["user", "historytopup", "historytransfer"]
+            invalidatesTags: ["user", "historytopup", "historytransfer"],
+            transformErrorResponse(baseQueryReturnValue, meta) {
+                if (meta?.response?.status === 500) {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
+                }
+                if (baseQueryReturnValue.status == "FETCH_ERROR") {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL
+                }
+                return baseQueryReturnValue
+            },
         }),
         logout: builder.mutation<Response<null>, void>({
             query: () => ({
                 url: "logout",
                 method: "DELETE"
             }),
-            invalidatesTags: ["user", "historytopup", "historytransfer"],
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
@@ -54,6 +67,7 @@ export const authApi = createApi({
                 return baseQueryReturnValue
 
             },
+            invalidatesTags: ["user", "historytopup", "historytransfer"],
         }),
         deleteAccount: builder.mutation<Response<null>, VerifyPassword>({
             query: (data) => ({
@@ -76,13 +90,7 @@ export const authApi = createApi({
                 return baseQueryReturnValue
 
             },
-        }),
-        signInWithGoogle: builder.mutation<Response<null>, void>({
-            query: () => ({
-                method: "GET",
-                url: "auth/login/google",
-                redirect: "follow"
-            })
+            invalidatesTags: ["user", "historytopup", "historytransfer"]
         }),
         sendEmailForgotPassword: builder.mutation<Response<null>, SendEmail>({
             query: data => ({
@@ -93,6 +101,15 @@ export const authApi = createApi({
                     email: data.email
                 }
             }),
+            transformErrorResponse(baseQueryReturnValue, meta) {
+                if (meta?.response?.status === 500) {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
+                }
+                if (baseQueryReturnValue.status == "FETCH_ERROR") {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL
+                }
+                return baseQueryReturnValue
+            },
         }),
         updateUsername: builder.mutation<Response<null>, Pick<Profile, "username" | "password">>({
             query: data => ({
@@ -127,9 +144,18 @@ export const authApi = createApi({
                     confirmPassword: data.confirmPassword
                 }
             }),
-            invalidatesTags: ["user"]
+            invalidatesTags: ["user"],
+            transformErrorResponse(baseQueryReturnValue, meta) {
+                if (meta?.response?.status === 500) {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
+                }
+                if (baseQueryReturnValue.status == "FETCH_ERROR") {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL
+                }
+                return baseQueryReturnValue
+            },
         })
     }),
 })
 
-export const { useSignUpMutation, useSignInMutation, useSignInWithGoogleMutation, usePasswordResetMutation, useSendEmailForgotPasswordMutation, useUpdateUsernameMutation, useLogoutMutation, useDeleteAccountMutation } = authApi
+export const { useSignUpMutation, useSignInMutation, usePasswordResetMutation, useSendEmailForgotPasswordMutation, useUpdateUsernameMutation, useLogoutMutation, useDeleteAccountMutation } = authApi

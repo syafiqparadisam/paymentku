@@ -80,7 +80,7 @@ describe('Logout Controller (e2e) DELETE /api/v1/logout', () => {
     try {
       const user = await userSvc.findUserByUsername(userRegister.user);
       const userAndProfile = await userSvc.joiningUserAndProfile(user.id);
-      await userSvc.deleteAccount(user.id, userAndProfile.data.profile.id);
+      await userSvc.deleteAccount(user.id, userAndProfile.profile.id);
 
       await app.close();
     } catch (error) {

@@ -1,4 +1,4 @@
-import { CopyrightOutlined, Email, EmailOutlined, GitHub, Instagram, LocalAtmRounded, ReportGmailerrorred, WhatsApp, YouTube } from "@mui/icons-material"
+import { CopyrightOutlined, Email, EmailOutlined, GitHub, Instagram, LocalAtmRounded, WhatsApp, YouTube } from "@mui/icons-material"
 import { Box, Button, Input, Link, Typography } from "@mui/material"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"

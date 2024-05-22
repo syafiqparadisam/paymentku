@@ -1,7 +1,6 @@
 import { ArrowBack } from '@mui/icons-material';
 import { Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import serverError from "../assets/servererror.jpg"
 
 const Maintenance = () => {
     const navigate = useNavigate()

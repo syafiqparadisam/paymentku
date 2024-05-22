@@ -17,21 +17,6 @@ import (
 	"github.com/syafiqparadisam/paymentku/services/history/usecase"
 )
 
-// // Initialize a gRPC connection to be used by both the tracer and meter
-// // providers.
-// func initConn() (*grpc.ClientConn, error) {
-// 	// Make a gRPC connection with otel collector.
-// 	conn, err := grpc.NewClient("otel-collector:4317",
-// 		// Note the use of insecure transport here. TLS is recommended in production.
-// 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-// 	)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
-// 	}
-
-// 	return conn, err
-// }
-
 func main() {
 	port := ":8801"
 

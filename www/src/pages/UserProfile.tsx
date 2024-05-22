@@ -1,7 +1,7 @@
 import { ArrowBack } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit'
 import { TextareaAutosize } from "@mui/base"
-import { useState, useEffect } from 'react'
+import { useState, useEffect, MouseEvent } from 'react'
 import { Box, Button, Input, Dialog, DialogTitle, Typography, Badge, Avatar, TextField, InputLabel, DialogActions, DialogContent } from '@mui/material'
 import { useUpdateNameMutation, useUpdateBioMutation, useUpdatePhoneMutation } from '../services/profileApi'
 import { useDeleteAccountMutation, useLogoutMutation, useUpdateUsernameMutation } from '../services/authApi'
@@ -24,14 +24,14 @@ const UserProfile = () => {
     const [err, setErr] = useState<any>(null)
     const { open: openAlert, handleOpen, handleClose } = useAlert()
     const [openUploadFile, setOpenUploadFile] = useState<boolean>(false)
-    const { handleUpdateUsername, setValueForUsername, validateInput, cleanUp, label, open, value, valueForUsername, updateVal, totalInput, openModal, validatePhoneNumber, valueForPassword, setValueForPassword } = useValidation("")
+    const { handleUpdateUsername, setValueForUsername, validateInput, cleanUp, label, open, value, valueForUsername, updateVal, totalInput, openModal, validatePhoneNumber, valueForPassword, setValueForPassword } = useValidation()
     const user = useSelector(state => state.user)
     const navigate = useNavigate()
 
     useEffect(() => {
         cleanUp()
         setErr("")
-    }, [successUpdateUser, successUpdateName, successUpdateBio, successUpdatePhone, successDeleteAccount])
+    }, [successUpdateUser, successUpdateName, successUpdateBio, successUpdatePhone, successDeleteAccount,cleanUp])
 
     if (successDeleteAccount) {
         navigate("/signup")
@@ -84,10 +84,12 @@ const UserProfile = () => {
     return (
         <>
             <UploadFileDialog open={openUploadFile} setOpen={setOpenUploadFile} />
+
             <Alert open={openAlert} handleClose={handleClose} actions={() => {
                 logout()
                 navigate("/signin")
-            }} title="Logout" desc="Are you sure you want to logout ?"/>
+            }} title="Logout" desc="Are you sure you want to logout ?" />
+
             <Dialog
                 open={open}
 
@@ -165,7 +167,7 @@ const UserProfile = () => {
                         <InputLabel>Username: </InputLabel>
                         <Input sx={{ marginBottom: "20px" }} fullWidth value={user.user} onClick={handleUpdateUsername} />
                         <InputLabel>Name: </InputLabel>
-                        <Input value={user.name} onClick={(e) => {
+                        <Input value={user.name} onClick={(e: MouseEvent<HTMLDivElement, MouseEvent> | any) => {
                             openModal(e.target.value, "name")
                         }} />
                     </Box>
@@ -185,13 +187,13 @@ const UserProfile = () => {
                     </Box>
                     <Box display={"flex"} flexDirection={"column"} justifyContent={"flex-start"} width={"50%"} pt={3}>
                         <label>Phone number :</label>
-                        <TextField size='small' disabled={user.phoneNumber == null ? false : true} value={user.phoneNumber} placeholder={user.phoneNumber == null ? "You haven't yet set your phone number" : ""} onClick={(e) => {
+                        <TextField size='small' disabled={user.phoneNumber == null ? false : true} value={user.phoneNumber} placeholder={user.phoneNumber == null ? "You haven't yet set your phone number" : ""} onClick={(e: MouseEvent<HTMLDivElement, MouseEvent> | any) => {
                             openModal(e.target.value, "Phone number")
                         }}></TextField>
                     </Box>
                     <Box display={"flex"} flexDirection={"column"} justifyContent={"flex-start"} width={"50%"} pt={3}>
                         <label>Bio :</label>
-                        <TextareaAutosize style={{ border: "1px solid black", fontFamily: "sans-serif" }} onClick={(e) => {
+                        <TextareaAutosize style={{ border: "1px solid black", fontFamily: "sans-serif" }} onClick={(e: MouseEvent<HTMLDivElement, MouseEvent> | any) => {
                             openModal(e.target.value, "Bio")
                         }} minRows={5} value={user.bio ? user.bio : "You don't have a bio"}></TextareaAutosize>
                     </Box>
@@ -200,9 +202,9 @@ const UserProfile = () => {
                     </Box>
                     <Box display={"flex"} flexDirection={"row"} mt={7} gap={2}>
                         <Button variant="contained" color="error" onClick={() => {
-                           handleOpen()
+                            handleOpen()
                         }}>Logout</Button>
-                        <Button variant="contained" color="error" onClick={(e) => {
+                        <Button variant="contained" color="error" onClick={(e: MouseEvent<HTMLButtonElement, MouseEvent> | any) => {
                             openModal(e.target.value + "", "delete account")
                         }}>Delete account</Button>
                     </Box>

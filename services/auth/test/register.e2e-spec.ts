@@ -32,7 +32,7 @@ describe('Register Controller (e2e) POST /api/v1/register', () => {
     try {
       const user = await userSvc.findUserByUsername(registerSuccess.user);
       const userAndProfile = await userSvc.joiningUserAndProfile(user.id);
-      await userSvc.deleteAccount(user.id, userAndProfile.data.profile.id);
+      await userSvc.deleteAccount(user.id, userAndProfile.profile.id);
       await app.close();
     } catch (error) {
       console.log(error);
@@ -116,11 +116,11 @@ describe('Register Controller (e2e) POST /api/v1/register', () => {
     expect(isUserAlreadyInDB.password).toBeTruthy();
     expect(isUserAlreadyInDB.email).toEqual(registerSuccess.email);
     expect(isUserAlreadyInDB.balance).toEqual('0');
-    expect(joinWithProfile.data.profile.id).toBeTruthy();
-    expect(joinWithProfile.data.profile.bio).toBeNull();
-    expect(joinWithProfile.data.profile.name).toBeTruthy();
-    expect(joinWithProfile.data.profile.phone_number).toBeNull();
-    expect(joinWithProfile.data.profile.photo_profile).toEqual(photoProfile);
+    expect(joinWithProfile.profile.id).toBeTruthy();
+    expect(joinWithProfile.profile.bio).toBeNull();
+    expect(joinWithProfile.profile.name).toBeTruthy();
+    expect(joinWithProfile.profile.phone_number).toBeNull();
+    expect(joinWithProfile.profile.photo_profile).toEqual(photoProfile);
     expect(req.statusCode).toBe(201);
     expect(req.body).toMatchObject(response);
   });

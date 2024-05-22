@@ -3,14 +3,6 @@ import { AccountBalance, CurrencyExchange, Wifi } from '@mui/icons-material'
 import CardItemDashboard from '../component/CardItemDashboard'
 import Category from '../component/Category';
 import toRupiah from '@develoka/angka-rupiah-js';
-import mlbbImg from "../assets/ml.jpg"
-import freeFireBg from "../assets/ff.jpg"
-import pubgImg from "../assets/pubg.png"
-import minecraftImg from "../assets/minecraft.webp"
-import growtopiaImg from "../assets/growtopia.jpg"
-import codmImg from "../assets/codm.jpg"
-import smartfrenImg from "../assets/smartfren.jpg"
-import plnImg from "../assets/pln.jpg"
 import { route } from '../constant/route'
 
 const Dashboard = () => {
@@ -80,7 +72,6 @@ const Dashboard = () => {
                 bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716341057/pln_pl49n2.jpg"
               },
               {
-                title: "Internet quota",
                 bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716341093/smartfren_fvelte.jpg"
               },
               {

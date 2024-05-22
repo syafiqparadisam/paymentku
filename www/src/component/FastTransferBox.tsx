@@ -8,10 +8,12 @@ interface listRequirement {
 
 }
 
+type fn = () => void;
+
 interface props {
     amount: number,
     requirement: listRequirement[],
-    onClick: Function
+    onClick: fn
 }
 
 const FastTransferBox: React.FC<props> = ({ amount, requirement, onClick}) => {

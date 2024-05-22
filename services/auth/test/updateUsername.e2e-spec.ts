@@ -88,7 +88,7 @@ describe('Update username Controller (e2e) PATCH /api/v1/username', () => {
       // updateUsername.username = userRegister.user
       const user = await userSvc.findUserByUsername(updateUsername.username);
       const userAndProfile = await userSvc.joiningUserAndProfile(user.id);
-      await userSvc.deleteAccount(user.id, userAndProfile.data.profile.id);
+      await userSvc.deleteAccount(user.id, userAndProfile.profile.id);
 
       await app.close();
     } catch (error) {
@@ -168,7 +168,7 @@ describe('Update username Controller (e2e) PATCH /api/v1/username', () => {
 
     const user = await userSvc.findUserByUsername(user2.user);
     const userAndProfile = await userSvc.joiningUserAndProfile(user.id);
-    await userSvc.deleteAccount(user.id, userAndProfile.data.profile.id);
+    await userSvc.deleteAccount(user.id, userAndProfile.profile.id);
   });
 
   it('should return 200, update username successfully', async () => {

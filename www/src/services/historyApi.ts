@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { HistoryTopUp, HistoryTopUps, HistoryTransfer, HistoryTransfers, Response } from "../types/response";
 import { authApi } from "./authApi";
 

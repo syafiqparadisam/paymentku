@@ -95,17 +95,17 @@ export class AuthService {
       const userAndprofile = await this.usersService.joiningUserAndProfile(
         user.id,
       );
-      console.log(userAndprofile.data.profile.id);
-      if (userAndprofile.data.profile.name == null) {
+      console.log(userAndprofile.profile.id);
+      if (userAndprofile.profile.name == null) {
         await this.usersService.updateName(
-          userAndprofile.data.profile.id,
+          userAndprofile.profile.id,
           payload.name,
         );
       }
-      if (userAndprofile.data.profile.photo_profile == null) {
+      if (userAndprofile.profile.photo_profile == null) {
         await this.usersService.updatePhotoProfile(
           payload.picture,
-          userAndprofile.data.profile.id,
+          userAndprofile.profile.id,
           ""
         );
       }
@@ -549,7 +549,7 @@ export class AuthService {
       console.log(userData);
       await this.usersService.deleteAccount(
         userData.user_id,
-        join.data.profile.id,
+        join.profile.id,
       );
 
       return { statusCode: 200, message: 'Successfully to delete' };
@@ -567,7 +567,7 @@ export class AuthService {
 
       // update url and publicid to database
       const joinUserAndProfile = await this.usersService.joiningUserAndProfile(userData.user_id)
-      await this.usersService.updatePhotoProfile(result.secure_url, joinUserAndProfile.data.profile.id, result.public_id)
+      await this.usersService.updatePhotoProfile(result.secure_url, joinUserAndProfile.profile.id, result.public_id)
 
       // delete from cloudinary if this image already updated, in order to not over storage in cloudinary
       publicIdImg == "" ? null : await this.cloudinaryService.deleteImage(publicIdImg)

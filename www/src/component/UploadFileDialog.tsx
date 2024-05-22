@@ -5,14 +5,16 @@ import { useUpdatePhotoProfileMutation } from "../services/profileApi"
 import { useSelector } from "react-redux"
 import { User } from "../types/response"
 
+type openFn = (state: React.Dispatch<React.SetStateAction<boolean>>) => void
+
 type UploadFileProps = {
     open: boolean,
-    setOpen: Function
+    setOpen: openFn,
 }
 
 const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
-    const [sourceImg, setSourceImg] = useState("")
-    const [file, setFile] = useState<File>(null)
+    const [sourceImg, setSourceImg] = useState<string | null | undefined | ArrayBuffer>("")
+    const [file, setFile] = useState<File | null>(null)
     const [update, { data, isLoading }] = useUpdatePhotoProfileMutation()
     const user: User = useSelector(state => state.user)
     const [response, setResponse] = useState("")
@@ -33,10 +35,11 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
         }
 
         if (fileImg && fileImg[0]) {
+            setResponse("")
             const reader = new FileReader()
             reader.addEventListener("load", (eventFR: ProgressEvent<FileReader>) => {
                 setResponse("")
-                setSourceImg(eventFR.target.result)
+                setSourceImg(() => eventFR.target?.result)
             })
             reader.readAsDataURL(fileImg[0])
             setFile(fileImg[0])
@@ -78,7 +81,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
                 open={open}
 
                 onClose={() => {
-                    setOpen(false)
+                    setOpen(() => false)
                 }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
@@ -104,7 +107,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="contained" color="error" onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button variant="contained" color="error" onClick={() => setOpen(() => false)}>Cancel</Button>
                     <Button variant="contained" color="primary" onClick={() => {
                         updatePhotoProfile()
                     }}>Update</Button>

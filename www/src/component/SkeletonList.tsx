@@ -7,12 +7,8 @@ const SkeletonList:React.FC<{total: number}> = ({ total }) => {
     useEffect(() => {
         for (let i = 1; i <= total; i++) {
             setTotalSkeleton(v => [...v, i])
-            // Tambahkan elemen Skeleton ke dalam array
-            // skeletonElements.push();
         }
-        console.log(totalSkeleton)
     }, [])
-    console.log(totalSkeleton)
     return totalSkeleton.map(() => {
         return (
             <Skeleton width={"100%"} height={200} animation="wave" style={{ marginBottom: "-70px" }} />

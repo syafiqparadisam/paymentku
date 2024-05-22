@@ -27,10 +27,10 @@ export class UsersService {
     return Math.floor(Math.random() * 9999999999) + 1;
   }
 
-  async updatePhotoProfile(photoProfileUrl: string, profileId: number,publicId: string) {
+  async updatePhotoProfile(photoProfileUrl: string, profileId: number, publicId: string) {
     try {
       await this.ds.manager.transaction("READ COMMITTED", async (entityManager: EntityManager) => {
-        await entityManager.update<Profile>(Profile, {id: profileId}, {
+        await entityManager.update<Profile>(Profile, { id: profileId }, {
           photo_profile: photoProfileUrl
         })
         await entityManager.update<Profile>(Profile, { id: profileId }, { photo_public_id: publicId })
@@ -77,7 +77,7 @@ export class UsersService {
         profile.name = data.user + generateRandNum().toString();
         profile.photo_profile = userIcon;
         await entitymanager.save(profile);
-
+        console.log(userIcon)
         // insert into users
         await entitymanager.insert(Users, {
           user: data.user,
@@ -148,7 +148,7 @@ export class UsersService {
     }
   }
 
-  async joiningUserAndProfile(userId: number): Promise<result> {
+  async joiningUserAndProfile(userId: number): Promise<Users> {
     try {
       // join table users and profile
       const JoininguserAndProfile = await this.userRepo
@@ -156,7 +156,7 @@ export class UsersService {
         .leftJoinAndSelect('users.profile', 'profile')
         .where('users.id = :id', { id: userId })
         .getOne();
-      return { success: true, data: JoininguserAndProfile };
+      return JoininguserAndProfile
     } catch (error) {
       throw error;
     }

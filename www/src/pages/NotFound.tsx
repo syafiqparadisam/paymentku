@@ -1,7 +1,6 @@
 import { Typography, Box, Container, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import notfoundImg from "../assets/notfound.jpg"
 import { ArrowBack } from '@mui/icons-material'
 import { route } from '../constant/route'
 

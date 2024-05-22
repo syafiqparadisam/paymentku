@@ -294,14 +294,6 @@ export class AuthController {
     }
   }
 
-  // setImageUpload(filename: string) {
-  //   this.pathImageUpload = filename
-  // }
-
-  // getPathImageUpload(): string {
-  //   return this.pathImageUpload
-  // }
-
   @Patch("profile/photoprofile")
   @UseGuards(AccessTokenGuardGuard)
   @UseInterceptors(FileInterceptor("image", {

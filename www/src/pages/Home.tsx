@@ -16,7 +16,7 @@ const Home = () => {
           <Typography fontSize={"14px"}>Enjoy the convenience of handling all your financial transactions in one place. At paymentku, we offer quick, secure, and reliable services for money top-ups, game top-ups, and bill payments.</Typography>
         </Box>
         <Box width={"40%"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
-          <img src={transactionIllustration} width={500}/>
+          <img src={"https://res.cloudinary.com/dktwq4f3f/image/upload/v1716341150/transaction-illustration_uq2wmn.png"} width={500}/>
         </Box>
       </Box>
       <Box display={"flex"} justifyContent={"space-around"} width={"80%"} alignItems={"center"} p={5} height={"100vh"}>
@@ -84,7 +84,7 @@ const Home = () => {
           </List>
         </Box>
         <Box width={"30%"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
-          <img src={successPeople} width={400}/>
+          <img src={"https://res.cloudinary.com/dktwq4f3f/image/upload/v1716342319/chooseus_fac0xl.png"} width={400}/>
         </Box>
       </Box>
       <Box display={"flex"} justifyContent={"space-around"} width={"80%"} alignItems={"center"} p={5} height={"100vh"}>

@@ -49,22 +49,22 @@ const Dashboard = () => {
           <CardItemDashboard
             card={[
               {
-                bgImg: mlbbImg,
+                bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716341251/ml_og50uc.jpg",
               },
               {
-                bgImg: freeFireBg,
+                bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716340604/ff_b08hl6.jpg",
               },
               {
-                bgImg: pubgImg,
+                bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716340656/pubg_l9dko2.png",
               },
               {
-                bgImg: minecraftImg
+                bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716105033/hwseyeswegkwwloth7up.webp"
               },
               {
-                bgImg: growtopiaImg,
+                bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716340610/growtopia_j5rviy.jpg",
               },
               {
-                bgImg: codmImg
+                bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716340437/codm_pm6ibk.jpg"
               }
             ]}
           />
@@ -77,11 +77,11 @@ const Dashboard = () => {
           <CardItemDashboard
             card={[
               {
-                bgImg: plnImg
+                bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716341057/pln_pl49n2.jpg"
               },
               {
                 title: "Internet quota",
-                bgImg: smartfrenImg
+                bgImg: "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716341093/smartfren_fvelte.jpg"
               },
               {
                 title: "Wifi",

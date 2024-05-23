@@ -11,7 +11,6 @@ const HistoryTopupById = () => {
     const { id } = useParams()
     const navigate = useNavigate()
     const idNum = id?.match(/^[0-9]+$/)
-    console.log(idNum)
     if (idNum == null) {
         navigate("/notfound")
     }

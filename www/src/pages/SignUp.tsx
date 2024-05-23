@@ -23,8 +23,6 @@ const SignUp = () => {
   }
   const navigate = useNavigate()
   if (isSuccess) navigate("/signin")
-  console.log(data)
-  console.log(error)
   return (
     <>
       <Backdrop open={isSuccess}>

@@ -18,11 +18,9 @@ const Transfer = () => {
   const [notes, setNotes] = useState<string>("")
   const [transfer, { data: dataTransfer, error: errTransfer, isSuccess: successTransfer }] = useTransferMutation()
   const [accountNumber, { data, isSuccess }] = useFindAccountMutation()
-  console.log(dataTransfer)
   useEffect(() => {
     if (accNum.length == 0) return
     if (!(/^\d+$/.test(accNum))) {
-      console.log("this is not number")
       setErr({ data: { message: "Please fill right account number" } })
       return
     }
@@ -41,7 +39,6 @@ const Transfer = () => {
       setErrAmount({ data: { message: "Cannot transfer larger than billion" } })
       return
     }
-    console.log("lahh")
     setErrAmount({ data: { message: "" } })
   }, [amount])
 

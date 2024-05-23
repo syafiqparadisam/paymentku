@@ -14,6 +14,7 @@ import { Button, Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { route } from '../constant/route';
 
+
 const settings: Array<{ name: string, link: string }> = [
     {
         name: "Home",
@@ -37,17 +38,8 @@ const settings: Array<{ name: string, link: string }> = [
     }
 ];
 
-// const useStyles = makeStyles({
-//     nav: {
-//         '&:hover': {
-//             backgroundColor: 'gray',
-//         },
-//     },
-// });
-
 function Navbar() {
     const user = useSelector((state) => state.user)
-    console.log(user)
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -72,7 +64,7 @@ function Navbar() {
     return (
         <AppBar position="sticky">
             <Box maxWidth="xl" display={"flex"} justifyContent={"space-between"} p={1} >
-                <Box display={"flex"} width="40%" alignItems={"center"} ml={2} sx={{cursor: "pointer"}} onClick={() => navigate("/")}>
+                <Box display={"flex"} width="40%" alignItems={"center"} ml={2} sx={{ cursor: "pointer" }} onClick={() => navigate("/")}>
                     <LocalAtmRounded sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
                     <Typography
                         variant="h6"
@@ -114,7 +106,7 @@ function Navbar() {
                                 onClose={handleCloseUserMenu}
                             >
                                 {settings.map((setting) => (
-                                    <RouterLink style={{textDecoration: "none", color: "black"}} to={setting.link}>
+                                    <RouterLink style={{ textDecoration: "none", color: "black" }} to={setting.link}>
                                         <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
                                             <Typography textAlign="center" width={"100%"}>{setting.name}</Typography>
                                         </MenuItem>

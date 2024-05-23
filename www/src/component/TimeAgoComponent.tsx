@@ -9,15 +9,15 @@ const TimeAgoComponent: React.FC<{ timestamp: string, color?: string }> = ({ tim
         const previousTime = new Date(timestamp).getTime()
         const difference = Math.floor((currentTime - previousTime) / (1000 * 60)); // Menghitung selisih waktu dalam menit
         if (difference === 0) {
-            setTimeAgo('Baru saja');
+            setTimeAgo('Just recently');
         } else if (difference < 60) {
-            setTimeAgo(`${difference} menit yang lalu`);
+            setTimeAgo(`${difference} minutes ago`);
         } else if (difference < 1440) {
             const hours = Math.floor(difference / 60);
-            setTimeAgo(`${hours} jam yang lalu`);
+            setTimeAgo(`${hours} hours ago`);
         } else {
             const days = Math.floor(difference / 1440);
-            setTimeAgo(`${days} hari yang lalu`);
+            setTimeAgo(`${days} days ago`);
         }
     }
 

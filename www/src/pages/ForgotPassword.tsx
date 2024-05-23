@@ -16,7 +16,6 @@ const ForgotPassword = () => {
   const onSubmit = async (dataForm: sendEmail) => {
     try {
       await sendEmail({ email: dataForm.email }).unwrap()
-      console.log(open)
     } catch (error) {
       setErr(error)
     }

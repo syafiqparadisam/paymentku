@@ -45,9 +45,7 @@ const UserProfile = () => {
                     if (!successUsername) {
                         throw { data: { message: errUsername } }
                     }
-                    console.log(trimmedval, valueForPassword)
                     await updateUser({ username: trimmedval, password: valueForPassword }).unwrap()
-                    console.log("apakah berhasil ?")
                     break;
                 case "name":
                     const { success: successName, error: errName, trimmedval: nameVal } = validateInput(value)
@@ -75,7 +73,6 @@ const UserProfile = () => {
             }
 
         } catch (e) {
-            console.log(e)
             setErr(e)
         }
     }

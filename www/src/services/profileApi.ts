@@ -10,9 +10,6 @@ const profileApi = authApi.injectEndpoints({
             }),
             providesTags: ["user"],
             transformErrorResponse(baseQueryReturnValue, meta) {
-                if (meta?.response?.status === 401 || meta?.response?.status == 403) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
                 if (meta?.response?.status === 500) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
@@ -104,7 +101,7 @@ const profileApi = authApi.injectEndpoints({
                     headers: {
                         'x-data-publicid': payload.publicId
                     },
-                    timeout: 1000 * 20
+                    // timeout: 1000 * 20
                 }
             },
             invalidatesTags: ["user"],

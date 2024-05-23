@@ -30,7 +30,6 @@ const TopUp = () => {
         return amount + bonus
     }
 
-    console.log(data)
     useEffect(() => {
         const total = calculatePrice(amount, isChecked, operational, bonus)
         setTotalPrice(total)

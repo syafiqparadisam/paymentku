@@ -16,13 +16,11 @@ const HistoryTransferById = () => {
     const navigate = useNavigate()
     const [err, setErr] = useState<any>()
     const idNum = id?.match(/^[0-9]+$/)
-    console.log(idNum)
     if (idNum == null) {
         navigate("/notfound")
     }
     const { data, isSuccess } = useGetHistoryTransferByIdQuery(id)
     const [deleteHistory, { data: dataDeleteHistory }] = useDeleteHistoryTransferByIdMutation()
-    console.log(data)
 
     if (err?.data?.statusCode == 500) {
         navigate("/maintenance")

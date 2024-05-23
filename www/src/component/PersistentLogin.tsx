@@ -1,16 +1,22 @@
 import { useEffect } from "react"
 import { useGetUserQuery } from "../services/profileApi"
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
-import { initialState, setUser } from "../features/user/userSlice"
-import { User } from "../types/response"
+import { setUser } from "../features/user/userSlice"
+import { route } from "../constant/route"
 
 const PersistentLogin = () => {
     const { data } = useGetUserQuery()
+
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     useEffect(() => {
-        const user: User = data?.data == null ? initialState : data.data
-        dispatch(setUser(user))
+        if (data?.statusCode == 401 || data?.statusCode == 403) {
+            navigate(route["signin"])
+            return
+        } else if (data?.statusCode == 200) {
+           data?.data ? dispatch(setUser(data?.data)) : null
+        }
     })
     return <Outlet />
 }

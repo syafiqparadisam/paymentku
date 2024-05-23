@@ -15,6 +15,7 @@ import {
 import { response } from 'src/interfaces/response';
 import { parsingCookie } from './utils';
 import crypto from 'crypto';
+import * as path from 'node:path';
 
 describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofile', () => {
   let app: INestApplication;
@@ -23,6 +24,7 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
   let loginDto: loginRequest;
   let userRegister: registerRequest;
   let cookies;
+  let assetsMockPath: string;
   let updateUsername: updateUsernameDTO;
 
   // server on
@@ -44,6 +46,7 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
       password: '12345678',
       email: 'bro@gmail.com',
     };
+    assetsMockPath = path.join(__dirname, "assets")
 
     // create user
     await userSvc.createAccount(userRegister);
@@ -103,7 +106,7 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
       message: "file type application/zip not allowed"
     }
     
-    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").send().set("Cookie", cookies)
+    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").attach("file", assetsMockPath + "1307837.ai").set("Cookie", cookies)
     
     expect(req.statusCode).toBe(response.statusCode)
     expect(req.body).toMatchObject(response)
@@ -116,7 +119,7 @@ it("should return 422, update photo profile failed, file is larger than 2mb size
       message: "Image should be less than 2 mb size",
     }
     
-    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").send().set("Cookie", cookies)
+    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").attach("file", assetsMockPath + "zip.zip").set("Cookie", cookies)
     
     expect(req.statusCode).toBe(response.statusCode)
     expect(req.body).toMatchObject(response)
@@ -130,7 +133,7 @@ it("should return 200, update photo profile success", async () => {
       message: "Photo profile has been changed",
     }
     
-    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").send().set("Cookie", cookies)
+    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").attach("file", assetsMockPath + "Mongodb.png").set("Cookie", cookies)
     
     expect(req.statusCode).toBe(response.statusCode)
     expect(req.body).toMatchObject(response)

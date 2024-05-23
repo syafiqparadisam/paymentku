@@ -1,4 +1,5 @@
 import { Box, Button, List, ListItem, ListItemIcon, ListItemText, Typography } from "@mui/material"
+import { CardCover, Card } from "@mui/joy"
 import { Circle } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
 import { route } from "../constant/route"
@@ -86,9 +87,24 @@ const Home = () => {
         </Box>
       </Box>
       <Box display={"flex"} justifyContent={"space-around"} width={"80%"} alignItems={"center"} p={5} height={"100vh"}>
-        <Box width={"30%"}>
-          {/* <img src="https://res.cloudinary.com/dktwq4f3f/image/upload/v1716381830/1307837_etmmv7.jpg" width={400}/> */}
+        <Box display={"flex"} width={"40%"} height={"40%"} justifyContent={"center"} alignItems={"center"}>
+          <Card sx={{ width: "100%", height: "100%" }}>
+            <CardCover>
+              <video
+                autoPlay
+                loop
+                muted
+                
+              >
+                <source
+                  src="https://res.cloudinary.com/dktwq4f3f/video/upload/v1716439798/lv_0_20240523101204_lelo6d.mp4"
+                  type="video/mp4"
+                />
+              </video>
+            </CardCover>
+          </Card>
         </Box>
+
         <Box width={"50%"}>
           <Typography fontWeight={"bold"} fontSize={"25px"}>How it works ?</Typography>
           <List>
@@ -136,7 +152,7 @@ const Home = () => {
 
         </Box>
       </Box>
-    </Box>
+    </Box >
   )
 }
 

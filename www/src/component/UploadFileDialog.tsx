@@ -1,5 +1,5 @@
 import { UploadFile } from "@mui/icons-material"
-import { Dialog, DialogTitle, DialogContent, Box, Typography, DialogActions, Button, styled, Backdrop, CircularProgress } from "@mui/material"
+import { Dialog, DialogTitle, DialogContent, Box, Typography, DialogActions, Button, styled, Backdrop, CircularProgress, Snackbar } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { useUpdatePhotoProfileMutation } from "../services/profileApi"
 import { useSelector } from "react-redux"
@@ -15,15 +15,14 @@ type UploadFileProps = {
 const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
     const [sourceImg, setSourceImg] = useState<string | null | undefined | ArrayBuffer>("")
     const [file, setFile] = useState<File | null>(null)
-    const [update, { data, isLoading }] = useUpdatePhotoProfileMutation()
+    const [update, { data, isLoading, error }] = useUpdatePhotoProfileMutation()
     const user: User = useSelector(state => state.user)
     const [response, setResponse] = useState("")
-
+    console.log(data, error)
     const previewImage = (e: any) => {
         const fileImg: File[] = e.target.files
         const maxFileSize = 2 * 1024 * 1024
         const allowedFile = ["image/jpeg", "image/png", "image/bmp", "image/webp"];
-        console.log(fileImg)
         if (!allowedFile.includes(fileImg[0].type)) {
             setResponse(`File ${fileImg[0].type} is not allowed`)
             return
@@ -48,7 +47,14 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
 
     const updatePhotoProfile = () => {
-        update({ file, publicId: user.photo_public_id ? user.photo_public_id : "" })
+        const req = update({ file, publicId: user.photo_public_id ? user.photo_public_id : "" })
+        console.log("start")
+        setTimeout(() => {
+            console.log("aborted")
+            req.abort()
+        }, 2000);
+        // clearTimeout(tm)
+        console.log("finish")
     }
 
     useEffect(() => {
@@ -76,7 +82,14 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
     return (
         <>
-
+            {error?.message == "Aborted" && (
+                <Snackbar
+                    autoHideDuration={3000}
+                    color="red"
+                    open={true}
+                    message="Sorry your request was cancelled"
+                />
+            )}
             <Dialog
                 open={open}
 

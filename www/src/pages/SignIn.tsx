@@ -19,13 +19,10 @@ const SignIn = () => {
     const [signIn, { isSuccess, isLoading }] = useSignInMutation()
     const { register, handleSubmit, formState: { errors } } = useForm<SignInInput>()
     const onSubmit: SubmitHandler<SignInInput> = async (data) => {
-        console.log(data)
         try {
             const data2 = await signIn(data).unwrap()
-            console.log(data2)
         } catch (err) {
             setErr(err)
-            console.log(err)
         }
     }
     const navigate = useNavigate()

@@ -27,7 +27,7 @@ func NewTopUpSeeder(mysql *transaction_config.MySqlStore) *TopUpSeeder {
 }
 
 func (topupSeeder *TopUpSeeder) Find(idUser int64) *[]TopUp {
-	rows, err := topupSeeder.MySql.Db.Query("SELECT * FROM history_topup WHERE userId = ?", idUser)
+	rows, err := topupSeeder.MySql.Db.Query("SELECT id,amount,balance,previous_balance,isRead,userId,status,created_at FROM history_topup WHERE userId = ?", idUser)
 	if err != nil {
 		panic(err)
 	}
@@ -35,6 +35,7 @@ func (topupSeeder *TopUpSeeder) Find(idUser int64) *[]TopUp {
 	for rows.Next() {
 		topup := &TopUp{}
 		if err := rows.Scan(&topup.Id, &topup.Amount, &topup.Balance, &topup.PreviousBalance, &topup.IsRead, &topup.UserId, &topup.Status, &topup.CreatedAt); err != nil {
+			fmt.Println("SCANNING ERROR")
 			panic(err)
 		}
 		arrTopUp = append(arrTopUp, *topup)

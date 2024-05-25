@@ -111,11 +111,12 @@ describe('Register Controller (e2e) POST /api/v1/register', () => {
     );
     const photoProfile = configService.get<string>('USER_ICON_DEFAULT');
 
+    console.log(isUserAlreadyInDB)
     expect(isUserAlreadyInDB.id).toBeTruthy();
     expect(isUserAlreadyInDB.user).toEqual(registerSuccess.user);
     expect(isUserAlreadyInDB.password).toBeTruthy();
     expect(isUserAlreadyInDB.email).toEqual(registerSuccess.email);
-    expect(isUserAlreadyInDB.balance).toEqual('0');
+    expect(isUserAlreadyInDB.balance).toEqual("0");
     expect(joinWithProfile.profile.id).toBeTruthy();
     expect(joinWithProfile.profile.bio).toBeNull();
     expect(joinWithProfile.profile.name).toBeTruthy();

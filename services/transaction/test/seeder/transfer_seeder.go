@@ -28,6 +28,8 @@ type HistoryTransfer struct {
 	SenderName   string
 	ReceiverName string
 	CreatedAt    string
+	PreviousBalance int64
+	Balance int64
 	UserId       int64
 }
 
@@ -43,13 +45,15 @@ func (transferSeeder *TransferSeeder) Find(idUser int64) *[]HistoryTransfer {
 		if err := rows.Scan(
 			&history.Id,
 			&history.Sender,
+			&history.SenderName,
 			&history.Receiver,
+			&history.ReceiverName,
+			&history.PreviousBalance,
+			&history.Balance,
+			&history.Status,
 			&history.Notes,
 			&history.Amount,
 			&history.IsRead,
-			&history.Status,
-			&history.SenderName,
-			&history.ReceiverName,
 			&history.CreatedAt,
 			&history.UserId,
 		); err != nil {

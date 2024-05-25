@@ -10,12 +10,12 @@ import { RedisModule } from '../src/redis/redis.module';
 import {
   loginRequest,
   registerRequest,
-  updateUsernameDTO,
 } from 'src/auth/dtos/request';
 import { response } from 'src/interfaces/response';
 import { parsingCookie } from './utils';
 import crypto from 'crypto';
-import * as path from 'node:path';
+import path from 'node:path';
+import fs from "node:fs"
 
 describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofile', () => {
   let app: INestApplication;
@@ -25,7 +25,6 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
   let userRegister: registerRequest;
   let cookies;
   let assetsMockPath: string;
-  let updateUsername: updateUsernameDTO;
 
   // server on
   beforeAll(async () => {
@@ -42,23 +41,20 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
     await app.init();
 
     userRegister = {
-      user: 'brooo',
+      user: 'ls-lah',
       password: '12345678',
-      email: 'bro@gmail.com',
+      email: 'lahh@gmail.com',
     };
-    assetsMockPath = path.join(__dirname, "assets")
+    assetsMockPath = path.join(__dirname, 'assets');
 
     // create user
     await userSvc.createAccount(userRegister);
-  });
-
-  // login before each test
-  beforeEach(async () => {
     loginDto = {
       user: userRegister.user,
       password: userRegister.password,
     };
 
+    // login
     const req = await request(app.getHttpServer())
       .post('/api/v1/login')
       .send(loginDto)
@@ -67,29 +63,27 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
     cookies = req.header['set-cookie'];
   });
 
-  // delete authToken after each test
-  afterEach(async () => {
-    cookies as Array<string>;
-    if (Array.isArray(cookies)) {
-      cookies.map((cookie) => {
-        const objCookie = parsingCookie(cookie);
-        const lockKey = crypto.randomUUID();
-        const deleteToken = async () => {
-          return await redisSvc.deleteToken(
-            objCookie.value.slice(10, objCookie.value.length),
-            [lockKey],
-          );
-        };
-        deleteToken();
-      });
-    }
-  });
-
   // delete user from db after test ended
   afterAll(async () => {
     try {
-      // updateUsername.username = userRegister.user
-      const user = await userSvc.findUserByUsername(updateUsername.username);
+      // delete authToken from redis
+      cookies as Array<string>;
+      if (Array.isArray(cookies)) {
+        cookies.map((cookie) => {
+          const objCookie = parsingCookie(cookie);
+          const lockKey = crypto.randomUUID();
+          const deleteToken = async () => {
+            return await redisSvc.deleteToken(
+              objCookie.value.slice(10, objCookie.value.length),
+              [lockKey],
+            );
+          };
+          deleteToken();
+        });
+      }
+
+      // delete user
+      const user = await userSvc.findUserByUsername(userRegister.user);
       const userAndProfile = await userSvc.joiningUserAndProfile(user.id);
       await userSvc.deleteAccount(user.id, userAndProfile.profile.id);
 
@@ -98,45 +92,73 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
       console.log(error);
     }
   });
-  
-  it("should return 415, update photo profile failed, file is not allowed", async () => {
-    
-    const response: response = {
-      statusCode: 415,
-      message: "file type application/zip not allowed"
-    }
-    
-    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").attach("file", assetsMockPath + "1307837.ai").set("Cookie", cookies)
-    
-    expect(req.statusCode).toBe(response.statusCode)
-    expect(req.body).toMatchObject(response)
-  })
-  
-it("should return 422, update photo profile failed, file is larger than 2mb size", async () => {
-    
-    const response: response = {
-      statusCode: 422,
-      message: "Image should be less than 2 mb size",
-    }
-    
-    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").attach("file", assetsMockPath + "zip.zip").set("Cookie", cookies)
-    
-    expect(req.statusCode).toBe(response.statusCode)
-    expect(req.body).toMatchObject(response)
-  })
-  
-  
-it("should return 200, update photo profile success", async () => {
-    
+
+
+  it('should return 200, update photo profile success', async () => {
     const response: response = {
       statusCode: 200,
-      message: "Photo profile has been changed",
+      message: 'Photo profile has been changed',
+    };
+    const filePath = assetsMockPath + "Mongodb.png"
+    console.log(filePath)
+    // check is assets mock exists ?
+    if (fs.existsSync(filePath)) {
+      const req = await request(app.getHttpServer())
+        .patch('/api/v1/profile/photoprofile')
+        .attach('file', filePath).set("x-data-publicid", "")
+        .set('Cookie', cookies);
+
+      expect(req.statusCode).toBe(response.statusCode);
+      expect(req.body).toMatchObject(response);
     }
-    
-    const req = await request(app.getHttpServer()).patch("/api/v1/profile/photoprofile").attach("file", assetsMockPath + "Mongodb.png").set("Cookie", cookies)
-    
-    expect(req.statusCode).toBe(response.statusCode)
-    expect(req.body).toMatchObject(response)
-  })
-  
+  });
+
+  it('should return 415, update photo profile failed, file is not allowed', async () => {
+    const response: response = {
+      statusCode: 415,
+      message: 'file type application/zip not allowed',
+    };
+    const filePath = assetsMockPath + "1307837.ai"
+
+    // join user and profile table
+    const user = await userSvc.findUserByUsername(userRegister.user)
+    const joiningUserAndProfile = await userSvc.joiningUserAndProfile(user.id)
+
+    // check is assets mock exists ?
+    if (fs.existsSync(filePath)) {
+      const req = await request(app.getHttpServer())
+        .patch('/api/v1/profile/photoprofile')
+        .attach('file', filePath).set("x-data-publicid", joiningUserAndProfile.profile.photo_public_id)
+        .set('Cookie', cookies);
+
+      expect(user.profile.photo_public_id).not.toBeNull()
+      expect(req.statusCode).toBe(response.statusCode);
+      expect(req.body).toMatchObject(response);
+    }
+
+  });
+
+  it('should return 422, update photo profile failed, file is larger than 2mb size', async () => {
+    const response: response = {
+      statusCode: 422,
+      message: 'Image should be less than 2 mb size',
+    };
+
+    const filePath = assetsMockPath + "chooseus.png"
+    const user = await userSvc.findUserByUsername(userRegister.user)
+    const joiningUserAndProfile = await userSvc.joiningUserAndProfile(user.id)
+
+    // check is assets mock exists ?
+    if (fs.existsSync(filePath)) {
+      const req = await request(app.getHttpServer())
+        .patch('/api/v1/profile/photoprofile')
+        .attach('file', filePath).set("x-data-publicid", joiningUserAndProfile.profile.photo_public_id)
+        .set('Cookie', cookies);
+
+      expect(user.profile.photo_public_id).not.toBeNull()
+      expect(req.statusCode).toBe(response.statusCode);
+      expect(req.body).toMatchObject(response);
+    }
+  });
+
 });

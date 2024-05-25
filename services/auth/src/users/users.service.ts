@@ -6,7 +6,6 @@ import { loginWithGoogle, registerRequest } from '../auth/dtos/request';
 import * as bcrypt from 'bcrypt';
 import generateRandNum from './utils/randNum';
 import { Profile } from './schemas/profile.entity';
-import { result } from '../interfaces/result';
 import { HistoryTopup } from './schemas/history_topup.entity';
 import { Notification } from './schemas/notification.entity';
 import { HistoryTransfer } from './schemas/history_transfer.entity';
@@ -21,22 +20,37 @@ export class UsersService {
     private profileRepo: Repository<Profile>,
     private readonly ds: DataSource,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   generateAccountNumber(): number {
     return Math.floor(Math.random() * 9999999999) + 1;
   }
 
-  async updatePhotoProfile(photoProfileUrl: string, profileId: number, publicId: string) {
+  async updatePhotoProfile(
+    photoProfileUrl: string,
+    profileId: number,
+    publicId: string,
+  ) {
     try {
-      await this.ds.manager.transaction("READ COMMITTED", async (entityManager: EntityManager) => {
-        await entityManager.update<Profile>(Profile, { id: profileId }, {
-          photo_profile: photoProfileUrl
-        })
-        await entityManager.update<Profile>(Profile, { id: profileId }, { photo_public_id: publicId })
-      })
+      await this.ds.manager.transaction(
+        'READ COMMITTED',
+        async (entityManager: EntityManager) => {
+          await entityManager.update<Profile>(
+            Profile,
+            { id: profileId },
+            {
+              photo_profile: photoProfileUrl,
+            },
+          );
+          await entityManager.update<Profile>(
+            Profile,
+            { id: profileId },
+            { photo_public_id: publicId },
+          );
+        },
+      );
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -77,7 +91,7 @@ export class UsersService {
         profile.name = data.user + generateRandNum().toString();
         profile.photo_profile = userIcon;
         await entitymanager.save(profile);
-        console.log(userIcon)
+        console.log(userIcon);
         // insert into users
         await entitymanager.insert(Users, {
           user: data.user,
@@ -141,8 +155,10 @@ export class UsersService {
     try {
       const salt = await bcrypt.genSalt(10);
       const hashPassword = await bcrypt.hash(password, salt);
-      console.log(hashPassword, user_id)
-      console.log(await this.userRepo.update({ id: user_id }, { password: hashPassword }))
+      console.log(hashPassword, user_id);
+      console.log(
+        await this.userRepo.update({ id: user_id }, { password: hashPassword }),
+      );
     } catch (error) {
       throw error;
     }
@@ -156,7 +172,7 @@ export class UsersService {
         .leftJoinAndSelect('users.profile', 'profile')
         .where('users.id = :id', { id: userId })
         .getOne();
-      return JoininguserAndProfile
+      return JoininguserAndProfile;
     } catch (error) {
       throw error;
     }

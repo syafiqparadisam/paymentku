@@ -22,10 +22,10 @@ export class HistoryTransfer {
   @Column()
   receiver_name: string;
 
-  @Column({ type: "bigint" })
+  @Column({ type: 'bigint' })
   previous_balance: number;
 
-  @Column({ type: "bigint" })
+  @Column({ type: 'bigint' })
   balance: number;
 
   @Column({ type: 'enum', enum: Status })

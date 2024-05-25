@@ -1,7 +1,7 @@
 import cloudinary from 'cloudinary';
 
 export const CloudinaryProvider = {
-  provide: "cloudinary",
+  provide: 'cloudinary',
   useFactory: () => {
     return cloudinary.v2.config({
       cloud_name: process.env.CLOUDINARY_CLOUDNAME,
@@ -11,4 +11,9 @@ export const CloudinaryProvider = {
   },
 };
 
-export const allowedFile = ["image/jpeg", "image/png", "image/bmp", "image/webp"];
+export const allowedFile = [
+  'image/jpeg',
+  'image/png',
+  'image/bmp',
+  'image/webp',
+];

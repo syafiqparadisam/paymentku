@@ -8,7 +8,7 @@ export class Profile {
   @Column()
   name: string;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   photo_public_id: string;
 
   @Column({ type: 'text' })

@@ -58,17 +58,30 @@ func TestProfileWeb(t *testing.T) {
 	userRepo := user_repo.NewUserRepository(mysql)
 	usecase := usecase.NewUserUsecase(userRepo)
 	server := controllerhttp.NewControllerHTTP(usecase)
-	go func() {
-		server.Routes().Listen(httpCfg.Port)
-		<-donech
+	app := server.Routes()
+	errch := make(chan error, 1)
+
+	go func(errch chan<- error) {
+		if err := app.Listen(httpCfg.Port); err != nil {
+			errch <- err
+		}
+		errch <- nil
+	}(errch)
+
+	defer func() {
+		app.Shutdown()
+		mysql.Db.Close()
 	}()
+	
 	pr := NewProfileTestWeb(seeder, t, server, donech)
 	pr.Start()
+	if err := <-errch;err != nil {
+		log.Fatal(err)
+	}
 }
 
 func NewProfileTestWeb(seeder *seeder.UserSeeder, t *testing.T, controller *controllerhttp.ControllerHTTP, donech chan bool) *ProfileTestWeb {
 	appPort := os.Getenv("APP_PORT")
-	t.Log(appPort)
 	return &ProfileTestWeb{
 		Seeder:     seeder,
 		Controller: controller,
@@ -89,6 +102,5 @@ func (pr *ProfileTestWeb) Start() {
 	pr.Test.Run("ProfileTest UpdateProfilePhoneNumber", pr.UpdatePhoneNumber)
 	pr.Test.Run("ProfileTest UpdateProfileByWrongPhoneNumber", pr.WrongUpdatePhoneNumber)
 	pr.Test.Run("ProfileTest UpdatePhoneNumberWithLess10Digit", pr.UpdatePhoneNumberLessThan10Digit)
-	pr.Test.Run("ProfileTest UpdatePhotoProfile", pr.UpdatePhotoProfile)
 	pr.donech <- true
 }

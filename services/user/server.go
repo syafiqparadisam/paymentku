@@ -30,8 +30,9 @@ var serviceName = semconv.ServiceNameKey.String("otlp-user")
 // Initialize a gRPC connection to be used by both the tracer and meter
 // providers.
 func initConn() (*grpc.ClientConn, error) {
+	grpcServerUrl := os.Getenv("GRPC_SERVER_URL")
 	// Make a gRPC connection with otel collector.
-	conn, err := grpc.NewClient("127.0.0.53:4317",
+	conn, err := grpc.NewClient(grpcServerUrl,
 		// Note the use of insecure transport here. TLS is recommended in production.
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
@@ -111,39 +112,49 @@ func main() {
 	}
 
 	ctx := context.TODO()
+	defer func() {
+		if err := recover(); err != nil {
+			os.Exit(20)
+		}
+	}()
 
-	log := config.Log()
-	conn, _ := initConn()
-	// if err != nil {
-	// log.Fatal().Err(err).Msg("Connection grpc error")
-	// }
+	logZero := config.Log()
+	conn, err := initConn()
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Connection grpc error")
+		panic(err)
+	}
 
-	shutdownTracerProvider, _ := initTracerProvider(ctx, conn)
-	// if err != nil {
-	// log.Fatal().Err(err).Msg("is this ??")
-	// }
+	shutdownTracerProvider, err := initTracerProvider(ctx, conn)
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("is this ??")
+		panic(err)
+	}
 
-	shutdownMeterProvider, _ := initMeterProvider(ctx, conn)
-	// if err != nil {
-	// log.Fatal().Err(err).Msg(err.Error())
-	// }
+	shutdownMeterProvider, err := initMeterProvider(ctx, conn)
+	if err != nil {
+		logZero.Fatal().Err(err).Msg(err.Error())
+		panic(err)
+	}
 
 	appPort := os.Getenv("APP_PORT")
 	httpCfg := config.NewHTTPConfig().WithPort(appPort)
+
 	user := os.Getenv("DB_USER")
 	pass := os.Getenv("DB_PASS")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 	dbParam := os.Getenv("DB_PARAM")
+
 	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s", user, pass, host, dbPort, dbName, dbParam)
 	mysql, errConnMySQL := config.NewMySqlStore(url)
 	if errConnMySQL != nil {
-		log.Fatal().Err(errConnMySQL).Msg("Mysql connection error")
+		logZero.Fatal().Err(errConnMySQL).Msg("Mysql connection error")
 	}
-	fmt.Printf("connected to mysql on port %s", dbPort)
 
-	// dbConfig := user_config.NewDatabaseConfig(mysql)
+	fmt.Println("Connected to mysql on port ", dbPort)
+
 	userRepo := user_repo.NewUserRepository(mysql)
 	usecase := usecase.NewUserUsecase(userRepo)
 
@@ -151,7 +162,8 @@ func main() {
 	app := server.Routes()
 
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, os.Interrupt)
+	errch := make(chan error, 1)
+	signal.Notify(signalChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM, os.Interrupt)
 
 	go func() {
 		<-signalChan
@@ -161,33 +173,38 @@ func main() {
 		// server shutdown
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		mysql.Db.Close()
-		app.ShutdownWithContext(ctx)
-
+		errch <- mysql.Db.Close()
+		errch <- app.ShutdownWithContext(ctx)
 		select {
 		case <-time.After(11 * time.Second):
 			fmt.Println("Connection still exist, not all connections done")
 		case <-ctx.Done():
 			fmt.Println("Shutdown successfully")
 		}
-		time.Sleep(2 * time.Second)
+		close(errch)
 	}()
-	defer func() {
-		if err := os.Remove("server"); err != nil {
-			log.Err(err).Msg("Remove build file error")
-		}
 
+	defer func() {
+		for e := range errch {
+			fmt.Println(e)
+			if e != nil {
+				logZero.Err(e).Msg("error shutdowning app")
+				panic(e)
+			}
+		}
+		os.Remove("server")
 		if err := shutdownTracerProvider(ctx); err != nil {
-			log.Fatal().Err(err).Msg("failed to shutdown TracerProvider")
+			logZero.Err(err).Msg("failed to shutdown TracerProvider")
+			panic(err)
 		}
 		if err := shutdownMeterProvider(ctx); err != nil {
-			log.Fatal().Err(err).Msg("failed to shutdown MeterProvider")
+			logZero.Err(err).Msg("failed to shutdown MeterProvider")
+			panic(err)
 		}
 	}()
-
-	err := app.Listen(httpCfg.Port)
+	err = app.Listen(httpCfg.Port)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Server error")
+		logZero.Fatal().Err(err).Msg("Server error")
 	}
 
 }

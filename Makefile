@@ -23,7 +23,7 @@ install-user:
 
 # TRANSACTION START
 run-transaction: docker-compose	
-	cd ${TRANSACTION_SVC_PATH} && go build server.go && ./server
+	cd ${TRANSACTION_SVC_PATH} && go build -o server server.go && ./server
 
 test-transaction:
 	cd ${TRANSACTION_SVC_PATH}/test && go test -v ./... --count=1

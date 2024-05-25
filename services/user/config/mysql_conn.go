@@ -14,7 +14,6 @@ type MySqlStore struct {
 }
 
 func NewMySqlStore(mysqlCfg string) (*MySqlStore, error) {
-	// url := config_golang.NewMYSQLConfig().DefaultDevelopment()
 	db, err := otelsql.Open("mysql", mysqlCfg, otelsql.WithAttributes(semconv.DBSystemMySQL))
 	db.SetMaxOpenConns(40)
 	db.SetMaxIdleConns(40)

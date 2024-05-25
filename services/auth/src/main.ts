@@ -7,7 +7,7 @@ async function bootstrap() {
     logger: console,
   });
   app.use(cookieParser());
-  const urlCors = process.env.FRONTEND
+  const urlCors = process.env.FRONTEND;
   app.enableCors({
     origin: ['https://d070-114-79-21-145.ngrok-free.app', urlCors],
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],

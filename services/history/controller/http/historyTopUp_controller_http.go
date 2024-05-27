@@ -3,7 +3,6 @@ package controller_http
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/syafiqparadisam/paymentku/services/history/dto"
 	"github.com/syafiqparadisam/paymentku/services/history/errors"
@@ -30,17 +29,20 @@ func (c *ControllerHTTP) HandleAllTopUpHistory(w http.ResponseWriter, r *http.Re
 }
 
 func (c *ControllerHTTP) GetTopUpHistoryById(w http.ResponseWriter, r *http.Request, user *dto.XUserData) error {
-	idparams := r.PathValue("id")
-	id, _ := strconv.Atoi(idparams)
+	id, err := ExtractIDFromPath(r, "/topup/")
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, &dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid history id"})
+	}
+
 	result := c.usecase.GetHistoryTopUpById(user, id)
 	return WriteJSON(w, result.StatusCode, result)
 }
 
 func (c *ControllerHTTP) DeleteTopUpHistoryById(w http.ResponseWriter, r *http.Request, user *dto.XUserData) error {
-	// idparams := strings.TrimPrefix(r.URL.Path, "/topup/")
-	idparams := r.PathValue("id")
-	id, _ := strconv.Atoi(idparams)
-	fmt.Println("testing")
+	id, err := ExtractIDFromPath(r, "/topup/")
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, &dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid history id"})
+	}
 	result := c.usecase.DeleteHistoryTopUpById(user, id)
 	return WriteJSON(w, result.StatusCode, result)
 }

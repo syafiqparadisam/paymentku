@@ -41,13 +41,13 @@ func NewHistoryTransfer(userid int, sender string, senderName, receiver string, 
 	}
 }
 
-func NewHistoryTopUp(amount uint, balance int64, status string, userid int) *HistoryTopUp {
+func NewHistoryTopUp(amount uint, balance int64, prevBalance int64, status string, userid int) *HistoryTopUp {
 	return &HistoryTopUp{
 		UserId:          userid,
 		Amount:          amount,
-		Balance:         balance + int64(amount),
+		Balance:         balance,
 		Status:          status,
-		PreviousBalance: balance,
+		PreviousBalance: prevBalance,
 		CreatedAt:       time.Now().UTC().Format("2006-01-02T15:04:05.999Z"),
 	}
 }

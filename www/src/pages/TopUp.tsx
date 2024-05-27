@@ -14,7 +14,7 @@ const TopUp = () => {
     const user: User = useSelector(state => state.user)
     const [totalPrice, setTotalPrice] = useState<number>(0)
     const [isChecked, setIsChecked] = useState<boolean>(false)
-    const [topup, { data, isSuccess }] = useTopupMutation()
+    const [topup, { data, isSuccess, error,isLoading }] = useTopupMutation()
     const [operational, setOperational] = useState<boolean>(true)
     const [bonus, setBonus] = useState<number>(0)
     const [totalGettingMoney, setTotalGettingMoney] = useState<number>(0)
@@ -30,20 +30,29 @@ const TopUp = () => {
         return amount + bonus
     }
 
+
     useEffect(() => {
         const total = calculatePrice(amount, isChecked, operational, bonus)
         setTotalPrice(total)
         setTotalGettingMoney(calculateGettingMoney(amount, bonus))
-    }, [amount, isChecked, bonus,operational])
+    }, [amount, isChecked, bonus, operational])
+
+    console.log(data)
 
     return (
         <>
             {isSuccess && <Snackbar
                 open={isSuccess}
-                key={"top" + "center"}
                 autoHideDuration={3000}
                 color="success"
-                message="Successfully topup"
+                message={data.message}
+            />}
+            {error && <Snackbar
+                open={true}
+                anchorOrigin={{vertical: "top", horizontal: "center"}}
+                autoHideDuration={3000}
+                color="error"
+                message="Ups something went wrong"
             />}
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -66,12 +75,12 @@ const TopUp = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)} variant="contained" color="error">No</Button>
-                    <Button variant="contained" color="success" onClick={async () => {
+                    <Button variant="contained" disabled={isLoading == false ? false : true} color="success" onClick={async () => {
                         try {
                             await topup({ amount: totalGettingMoney }).unwrap()
                             setOpen(false)
 
-                        } catch (error: response) {
+                        } catch (error: any) {
                             setErr(error.data.message)
                         }
                     }}>
@@ -178,7 +187,7 @@ const TopUp = () => {
                                         <Typography>Protection costs : {toRupiah(500, { dot: ",", floatingPoint: 0 })}</Typography>
                                         <Checkbox
                                             checked={isChecked}
-                                            onChange={(event) => {setIsChecked(event.target.checked)}}
+                                            onChange={(event) => { setIsChecked(event.target.checked) }}
                                             inputProps={{ 'aria-label': 'controlled' }}
                                         />
                                     </Box>
@@ -194,7 +203,6 @@ const TopUp = () => {
                         </Box>
                     </Box>
                 </Box>
-
             </Box>
         </>
     )

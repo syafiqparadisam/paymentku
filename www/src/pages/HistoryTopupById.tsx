@@ -20,6 +20,7 @@ const HistoryTopupById = () => {
     if (error?.data?.statusCode === 404) {
         navigate("/notfound")
     }
+    
 
     return (
         <>
@@ -38,7 +39,7 @@ const HistoryTopupById = () => {
                                     navigate(-1)
                                 }
                                 }>
-                                    <Delete fontSize="medium" color={data?.data?.status == "SUCCESS" ? "inherit" : "error"} />
+                                    <Delete fontSize="medium" sx={{color: data?.data?.status == "SUCCESS" ? "black" : "white"}}/>
                                 </Box>
                                 <Box display={"flex"}>
                                     <Typography fontSize={"20px"} fontWeight={"bold"} color={data?.data?.status === "SUCCESS" && data.data.status != null ? "green" : "white"}>{data?.data?.status}</Typography>

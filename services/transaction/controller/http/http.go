@@ -76,8 +76,8 @@ func NewControllerHTTP(usecase usecase.UsecaseInterface) *ControllerHTTP {
 
 func (s *ControllerHTTP) Routes() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/topup", MakeHTTPHandler(ExstractHeaderXUserData(s.HandlerTopUp), http.MethodPost))
-	mux.HandleFunc("/transfer", MakeHTTPHandler(ExstractHeaderXUserData(s.HandleTransfer), http.MethodPost))
+	mux.HandleFunc("POST /topup", MakeHTTPHandler(ExstractHeaderXUserData(s.HandlerTopUp), http.MethodPost))
+	mux.HandleFunc("POST /transfer", MakeHTTPHandler(ExstractHeaderXUserData(s.HandleTransfer), http.MethodPost))
 
 	return mux
 }

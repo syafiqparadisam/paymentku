@@ -12,28 +12,30 @@ type HistoryTopUp struct {
 }
 
 type HistoryTransfer struct {
-	UserId       int64
-	Sender       string
-	SenderName   string
-	Receiver     string
-	ReceiverName string
-	Status       string
-	Notes        string
-	Amount       uint
-	CreatedAt    string
+	UserId          int64
+	Sender          string
+	SenderName      string
+	Receiver        string
+	PreviousBalance int64
+	ReceiverName    string
+	Status          string
+	Notes           string
+	Amount          uint
+	CreatedAt       string
 }
 
 func NewHistoryTransfer1(userid int64, user1 *Profile, user2 *Profile) *HistoryTransfer {
 	return &HistoryTransfer{
-		UserId:       userid,
-		Sender:       user1.User,
-		SenderName:   user1.Name,
-		Receiver:     user2.User,
-		ReceiverName: user2.Name,
-		Status:       "SUCCESS",
-		Notes:        "",
-		Amount:       10000,
-		CreatedAt:    time.Now().UTC().Format("2006-01-02T15:04:05.999Z"),
+		UserId:          userid,
+		Sender:          user1.User,
+		SenderName:      user1.Name,
+		Receiver:        user2.User,
+		ReceiverName:    user2.Name,
+		PreviousBalance: user1.Balance,
+		Status:          "SUCCESS",
+		Notes:           "",
+		Amount:          10000,
+		CreatedAt:       time.Now().UTC().Format("2006-01-02T15:04:05.999Z"),
 	}
 }
 
@@ -43,6 +45,7 @@ func NewHistoryTransfer2(userid int64, user1 *Profile, user2 *Profile) *HistoryT
 		Sender:       user1.User,
 		SenderName:   user1.Name,
 		Receiver:     user2.User,
+		PreviousBalance: user1.Balance,
 		ReceiverName: user2.Name,
 		Status:       "FAILED",
 		Notes:        "",

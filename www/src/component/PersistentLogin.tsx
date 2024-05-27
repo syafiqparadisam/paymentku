@@ -8,13 +8,9 @@ import { route } from "../constant/route"
 const PersistentLogin = () => {
     const { data } = useGetUserQuery()
 
-    const navigate = useNavigate()
     const dispatch = useDispatch()
     useEffect(() => {
-        if (data?.statusCode == 401 || data?.statusCode == 403) {
-            navigate(route["signin"])
-            return
-        } else if (data?.statusCode == 200) {
+       if (data?.statusCode == 200) {
            data?.data ? dispatch(setUser(data?.data)) : null
         }
     })

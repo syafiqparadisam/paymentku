@@ -16,7 +16,7 @@ const Transfer = () => {
   const [amount, setAmount] = useState<string>("")
   const [open, setOpen] = useState<boolean>(false)
   const [notes, setNotes] = useState<string>("")
-  const [transfer, { data: dataTransfer, error: errTransfer, isSuccess: successTransfer }] = useTransferMutation()
+  const [transfer, { data: dataTransfer, error: errTransfer, isSuccess: successTransfer,isLoading }] = useTransferMutation()
   const [accountNumber, { data, isSuccess }] = useFindAccountMutation()
   useEffect(() => {
     if (accNum.length == 0) return
@@ -49,8 +49,9 @@ const Transfer = () => {
         key={"top" + "center"}
         autoHideDuration={3000}
         color="success"
-        message="Successfully transfer"
+        message={dataTransfer.message}
       />}
+      {/* {errTransfer?.} */}
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -72,7 +73,7 @@ const Transfer = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} variant="contained" color="error">No</Button>
-          <Button variant="contained" color="success" onClick={() => {
+          <Button variant="contained" disabled={isLoading == false ? false : true} color="success" onClick={() => {
             transfer({ accountNumber: Number(accNum), notes, amount: Number(amount) })
             setOpen(false)
           }}>
@@ -97,8 +98,7 @@ const Transfer = () => {
                 <TextField placeholder="0123456789" fullWidth onChange={(e) => setAccNum(e.target.value)} />
                 <Button variant="contained" color="primary" onClick={async () => {
                   try {
-                    await accountNumber({ accountNumber: Number(accNum) }).unwrap()
-
+                    accNum.length == 0 ? null : await accountNumber({ accountNumber: Number(accNum) }).unwrap()
                   } catch (error) {
                     setErr(error)
                   }

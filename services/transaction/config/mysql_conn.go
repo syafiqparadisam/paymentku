@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -13,9 +12,8 @@ type MySqlStore struct {
 
 func NewMySqlStore(mysqlCfg string) (*MySqlStore, error) {
 	db, err := sql.Open("mysql", mysqlCfg)
-	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(50)
-	fmt.Println(err)
+	db.SetMaxOpenConns(20)
+	db.SetMaxIdleConns(20)
 	if err != nil {
 		return nil, err
 	}

@@ -31,7 +31,7 @@ const UserProfile = () => {
     useEffect(() => {
         cleanUp()
         setErr("")
-    }, [successUpdateUser, successUpdateName, successUpdateBio, successUpdatePhone, successDeleteAccount,cleanUp])
+    }, [successUpdateUser, successUpdateName, successUpdateBio, successUpdatePhone, successDeleteAccount])
 
     if (successDeleteAccount) {
         navigate("/signup")
@@ -128,7 +128,7 @@ const UserProfile = () => {
                     {totalInput > 1 && (
                         <Box display={"flex"} flexDirection={"column"} width={"100%"}>
                             <InputLabel sx={{ fontWeight: "bold", fontSize: "15px" }} htmlFor='pass'>Password :</InputLabel>
-                            <TextField id='pass' type="text" onChange={(e) => {
+                            <TextField id='pass' type="password" onChange={(e) => {
                                 setValueForPassword(e.target.value)
                             }} />
                         </Box>

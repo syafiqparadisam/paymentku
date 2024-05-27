@@ -23,7 +23,6 @@ export class CloudinaryService {
 
   async deleteImage(publicIdImg: string) {
     try {
-      console.log('publicidimg', publicIdImg);
       await v2.uploader.destroy(publicIdImg, { resource_type: 'image' });
     } catch (error) {
       throw error;

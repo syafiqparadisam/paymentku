@@ -65,7 +65,7 @@ func (u *Usecase) DeleteAllHistoryTopUp(user *dto.XUserData) dto.APIResponse[int
 	}
 	err = u.topUpRepo.DeleteAllHistoryTopUp(tx, ctx, userid)
 	if err == errors.ErrNothingToDel {
-		return dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrNothingToDel.Error()}
+		return dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrNothingToDel.Error()}
 	}
 	if err != nil {
 		panic(err)
@@ -85,7 +85,7 @@ func (u *Usecase) DeleteHistoryTopUpById(user *dto.XUserData, id int) dto.APIRes
 	}
 	err = u.topUpRepo.DeleteHistoryTopUpById(tx, ctx, id, userid)
 	if err == errors.ErrNothingToDel {
-		return dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrNothingToDel.Error()}
+		return dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrNothingToDel.Error()}
 	}
 	if err != nil {
 		panic(err)

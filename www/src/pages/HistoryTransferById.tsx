@@ -74,7 +74,7 @@ const HistoryTransferById = () => {
                                     setOpen(true)
                                 }
                                 }>
-                                    <Delete fontSize="medium" color={data?.data?.status == "SUCCESS" ? "inherit" : "error"} />
+                                    <Delete fontSize="medium" sx={{ color: data?.data?.status == "SUCCESS" ? "black" : "white" }} />
                                 </Box>
                                 <Box display={"flex"}>
                                     <Typography fontSize={"20px"} fontWeight={"bold"} color={data?.data?.status === "SUCCESS" && data.data.status != null ? "green" : "white"}>{data?.data?.status}</Typography>

@@ -18,19 +18,19 @@ func NewTransferSeeder(mysql *transaction_config.MySqlStore) *TransferSeeder {
 }
 
 type HistoryTransfer struct {
-	Id           int64
-	Sender       string
-	Receiver     string
-	Notes        string
-	Amount       uint
-	IsRead       int8
-	Status       string
-	SenderName   string
-	ReceiverName string
-	CreatedAt    string
+	Id              int64
+	Sender          string
+	Receiver        string
+	Notes           string
+	Amount          uint
+	IsRead          int8
+	Status          string
+	SenderName      string
+	ReceiverName    string
+	CreatedAt       string
 	PreviousBalance int64
-	Balance int64
-	UserId       int64
+	Balance         int64
+	UserId          int64
 }
 
 func (transferSeeder *TransferSeeder) Find(idUser int64) *[]HistoryTransfer {
@@ -59,7 +59,9 @@ func (transferSeeder *TransferSeeder) Find(idUser int64) *[]HistoryTransfer {
 		); err != nil {
 			panic(err)
 		}
+		arrOfHistory = append(arrOfHistory, *history)
 	}
+	fmt.Println("Transfer Seeder has been up")
 	return &arrOfHistory
 }
 

@@ -79,7 +79,7 @@ const HistoryTransfer = () => {
                             ) : data?.data?.map((d: HistoryTransfers) => {
                                 return (
                                     <Link to={route["transferhistory"] + "/" + d.id} style={{ textDecoration: "none" }}>
-                                        <Box width={"100%"} justifyContent={"space-around"} borderRadius={"10px"} alignItems={"center"} display={"flex"} bgcolor={d.isRead ? "#ddd" : "lightgreen"} p={3}>
+                                        <Box width={"100%"} justifyContent={"space-around"} borderRadius={"10px"} alignItems={"center"} display={"flex"} bgcolor={d.isRead == true ? "#ddd" : d.status === "SUCCESS" ? "lightgreen" : "red"} p={3}>
                                             <Box width={"30%"} display={"flex"} flexDirection={"column"}>
                                                 <Typography color={d.status as unknown === "SUCCESS" ? "green" : "red"} fontWeight={"bold"}>{d.status}</Typography>
                                                 <Typography color={"black"}>Amount: Rp.{d.amount}</Typography>

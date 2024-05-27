@@ -15,9 +15,6 @@ const transactionApi = authApi.injectEndpoints({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -35,9 +32,6 @@ const transactionApi = authApi.injectEndpoints({
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL

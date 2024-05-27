@@ -68,12 +68,9 @@ func main() {
 		errch <- mysql.Db.Close()
 		errch <- server.Shutdown(ctx)
 
-		select {
-		case <-time.After(11 * time.Second):
-			fmt.Println("Connection still exist, not all connections done")
-		case <-ctx.Done():
+		
+		<-ctx.Done()
 			fmt.Println("Shutdown successfully")
-		}
 		close(errch)
 	}()
 

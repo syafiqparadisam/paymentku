@@ -66,7 +66,6 @@ export class AuthService {
         const userAfterCreateAccount = await this.usersService.findUserByEmail(
           payload.email,
         );
-        console.log(userAfterCreateAccount.id);
 
         // store auth token to redis
         await this.redisService.addAuthTokenWithExpire(
@@ -93,7 +92,6 @@ export class AuthService {
       const userAndprofile = await this.usersService.joiningUserAndProfile(
         user.id,
       );
-      console.log(userAndprofile.profile.id);
       if (userAndprofile.profile.name == null) {
         await this.usersService.updateName(
           userAndprofile.profile.id,
@@ -148,7 +146,6 @@ export class AuthService {
 
       // find user and check password
       const user = await this.usersService.findUserByUsername(payload.user);
-      console.log(user);
       if (user == null || !user) {
         return {
           statusCode: HttpStatus.BAD_REQUEST,
@@ -159,7 +156,6 @@ export class AuthService {
         payload.password,
         user.password,
       );
-      console.log(comparePass);
       if (comparePass == false) {
         return {
           statusCode: HttpStatus.BAD_REQUEST,
@@ -338,7 +334,6 @@ export class AuthService {
         lockKey,
       ]);
       if (isUserHavePWToken) {
-        console.log(isUserHavePWToken);
         await this.redisService.deletePWToken(token, [lockKey]);
         res.clearCookie('pwToken', {
           httpOnly: true,
@@ -390,7 +385,6 @@ export class AuthService {
         'templates',
         'resetPassword.ejs',
       );
-      console.log('directory ejs' + emailTemplatePath);
       const emailTemplate = await fs.readFile(emailTemplatePath, {
         encoding: 'utf8',
       });
@@ -479,7 +473,6 @@ export class AuthService {
           dto.password,
           user.password,
         );
-        console.log(checkPassword);
         if (!checkPassword) {
           return {
             statusCode: HttpStatus.BAD_REQUEST,
@@ -543,8 +536,6 @@ export class AuthService {
       const join = await this.usersService.joiningUserAndProfile(
         userData.user_id,
       );
-      console.log(join);
-      console.log(userData);
       await this.usersService.deleteAccount(userData.user_id, join.profile.id);
 
       return { statusCode: HttpStatus.OK, message: 'Successfully to delete' };
@@ -559,7 +550,6 @@ export class AuthService {
     publicIdImg: string,
   ): Promise<response> {
     try {
-      console.log(publicIdImg);
 
       // upload file to cloudinary
       const result = await this.cloudinaryService.uploadImage(pathUploadfile);
@@ -575,6 +565,7 @@ export class AuthService {
       );
 
       // delete from cloudinary if this image already updated, in order to not over storage in cloudinary
+      console.log("public id from auth service", publicIdImg)
       publicIdImg == ''
         ? null
         : await this.cloudinaryService.deleteImage(publicIdImg);

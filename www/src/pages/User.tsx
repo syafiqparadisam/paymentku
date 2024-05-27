@@ -19,7 +19,7 @@ const User: React.FC<Props> = ({ children }) => {
     return (
         <>
             <Box display={"flex"} height={"100%"}>
-                <Box display={"flex"} width={"15%"} bgcolor={darkMode.isDark ? "#222" : "white"} mr={3} height={"180vh"} flexDirection={"column"} alignItems={"center"}>
+                <Box display={"flex"} width={"20%"} bgcolor={darkMode.isDark ? "#222" : "white"} mr={3} height={"180vh"} flexDirection={"column"} alignItems={"center"}>
                     <List sx={{ width: "100%" }}>
                         <ListItem disablePadding onClick={() => navigate(route["user"])} sx={{ width: "100%" }}>
                             <ListItemButton>

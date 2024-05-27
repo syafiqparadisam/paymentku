@@ -51,7 +51,7 @@ func (tf *TransactionTestWeb) CreateTopUpTransaction(t *testing.T) {
 	// expected response
 	expected := &dto.APIResponse[interface{}]{
 		StatusCode: 200,
-		Message:    "succesfully topup",
+		Message:    "Succesfully topup",
 	}
 
 	bytesResp, err := io.ReadAll(resp.Body)

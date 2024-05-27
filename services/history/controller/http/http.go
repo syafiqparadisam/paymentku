@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -72,11 +74,18 @@ func NewControllerHTTP(usecase usecase.UsecaseInterface, cfg *config.HTTPConfig)
 	return &ControllerHTTP{usecase: usecase, cfg: cfg}
 }
 
+func ExtractIDFromPath(r *http.Request, prefix string) (int, error) {
+	path := strings.TrimPrefix(r.URL.Path, prefix)
+	idStr := strings.Trim(path, "/")
+	return strconv.Atoi(idStr)
+}
+
 func (s *ControllerHTTP) Routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/transfer", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTransferHistory), http.MethodGet, http.MethodDelete))
 	mux.HandleFunc("/topup", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTopUpHistory), http.MethodGet, http.MethodDelete))
 	mux.HandleFunc("/topup/{id}", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTopUpHistoryById), http.MethodGet, http.MethodDelete))
+
 	mux.HandleFunc("/transfer/{id}", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
 	fmt.Printf("Server listening on port%s\n", s.cfg.Port)
 

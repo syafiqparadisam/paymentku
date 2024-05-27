@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -17,29 +16,30 @@ func (u *Usecase) InsertHistoryTopUp(payload *dto.TopUpRequest, user *dto.XUserD
 	}
 	// update balance and find user
 	userid, _ := strconv.Atoi(user.UserId)
-	ctx := context.TODO()
-	tx, errTx := u.TopUpRepo.StartTransaction(ctx)
+	ctxTopUp := context.Background()
+	ctxTopUpCreateHistory := context.TODO()
+	tx, errTx := u.TopUpRepo.StartTransaction(ctxTopUp)
 	if errTx != nil {
 		panic(errTx)
 	}
-	balance, err := u.TopUpRepo.FindBalanceById(tx, ctx, userid)
+	balance, err := u.TopUpRepo.FindBalanceById(tx, ctxTopUp, userid)
 	if err != nil {
 		panic(err)
 	}
 
-	err = u.TopUpRepo.IncreaseBalanceById(tx, ctx, payload.Amount, userid)
+	err = u.TopUpRepo.IncreaseBalanceById(tx, ctxTopUp, payload.Amount, userid)
 	if err != nil {
 		tx.Rollback()
-		topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance, "FAILED", userid)
-		errInsertHistory := u.TopUpRepo.CreateTopUpHistory(tx, ctx, topUpInfo)
+		topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance, balance.Balance, "FAILED", userid)
+		errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctxTopUpCreateHistory, topUpInfo)
 		if errInsertHistory != nil {
 			panic(errInsertHistory)
 		}
 		panic(err)
 	}
 	// insert history info
-	topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance, "SUCCESS", userid)
-	errInsertHistory := u.TopUpRepo.CreateTopUpHistory(tx, ctx, topUpInfo)
+	topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance+int64(payload.Amount), balance.Balance, "SUCCESS", userid)
+	errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctxTopUpCreateHistory, topUpInfo)
 	if errInsertHistory != nil {
 		tx.Rollback()
 		panic(errInsertHistory)
@@ -47,7 +47,6 @@ func (u *Usecase) InsertHistoryTopUp(payload *dto.TopUpRequest, user *dto.XUserD
 	if err := tx.Commit(); err != nil {
 		panic(err)
 	}
-	fmt.Println("sudah terkirim")
 
-	return dto.APIResponse[interface{}]{StatusCode: http.StatusOK, Message: "successfully topup"}
+	return dto.APIResponse[interface{}]{StatusCode: http.StatusOK, Message: "Successfully topup"}
 }

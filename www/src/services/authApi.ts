@@ -21,10 +21,7 @@ export const authApi = createApi({
                 url: "register",
                 body: user,
             }),
-            transformErrorResponse(baseQueryReturnValue, meta) {
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
+            transformErrorResponse(baseQueryReturnValue) {
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -40,9 +37,6 @@ export const authApi = createApi({
             }),
             invalidatesTags: ["user", "historytopup", "historytransfer"],
             transformErrorResponse(baseQueryReturnValue, meta) {
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -57,9 +51,6 @@ export const authApi = createApi({
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
@@ -81,9 +72,6 @@ export const authApi = createApi({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -102,9 +90,6 @@ export const authApi = createApi({
                 }
             }),
             transformErrorResponse(baseQueryReturnValue, meta) {
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -125,9 +110,6 @@ export const authApi = createApi({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -146,9 +128,6 @@ export const authApi = createApi({
             }),
             invalidatesTags: ["user"],
             transformErrorResponse(baseQueryReturnValue, meta) {
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }

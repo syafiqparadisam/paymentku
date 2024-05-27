@@ -2,7 +2,6 @@ package controller_http
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/syafiqparadisam/paymentku/services/history/dto"
 )
@@ -30,15 +29,19 @@ func (c *ControllerHTTP) HandleAllTransferHistory(w http.ResponseWriter, r *http
 }
 
 func (c *ControllerHTTP) GetTransferHistoryById(w http.ResponseWriter, r *http.Request, user *dto.XUserData) error {
-	idparams := r.PathValue("id")
-	id, _ := strconv.Atoi(idparams)
+	id, err := ExtractIDFromPath(r, "/transfer/")
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, &dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid history id"})
+	}
 	result := c.usecase.GetHistoryTransferById(user, id)
 	return WriteJSON(w, result.StatusCode, result)
 }
 
 func (c *ControllerHTTP) DeleteTransferHistoryById(w http.ResponseWriter, r *http.Request, user *dto.XUserData) error {
-	idparams := r.PathValue("id")
-	id, _ := strconv.Atoi(idparams)
+	id, err := ExtractIDFromPath(r, "/transfer/")
+	if err != nil {
+		return WriteJSON(w, http.StatusBadRequest, &dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid history id"})
+	}
 	result := c.usecase.DeleteHistoryTransferById(user, id)
 	return WriteJSON(w, result.StatusCode, result)
 }

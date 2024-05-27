@@ -40,6 +40,7 @@ func (topupSeeder *TopUpSeeder) Find(idUser int64) *[]TopUp {
 		}
 		arrTopUp = append(arrTopUp, *topup)
 	}
+	fmt.Println("Topup seeder has been up")
 	return &arrTopUp
 }
 

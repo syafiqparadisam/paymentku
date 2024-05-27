@@ -17,7 +17,7 @@ type TopUpRepository struct {
 type TopUpInterface interface {
 	FindBalanceById(tx *sql.Tx, ctx context.Context, id int) (*domain.Balance, error)
 	IncreaseBalanceById(tx *sql.Tx, ctx context.Context, amount uint, id int) error
-	CreateTopUpHistory(tx *sql.Tx, ctx context.Context, domain *domain.HistoryTopUp) error
+	CreateTopUpHistory(ctx context.Context, domain *domain.HistoryTopUp) error
 	StartTransaction(ctx context.Context) (*sql.Tx, error)
 }
 
@@ -64,8 +64,8 @@ func (s *TopUpRepository) IncreaseBalanceById(tx *sql.Tx, ctx context.Context, a
 	return nil
 }
 
-func (s *TopUpRepository) CreateTopUpHistory(tx *sql.Tx, ctx context.Context, entity *domain.HistoryTopUp) error {
-	result, err := tx.ExecContext(ctx, "INSERT INTO history_topup (amount, balance, previous_balance, status, userId, created_at) values (?, ?, ?, ?, ?, ?)", entity.Amount, entity.Balance, entity.PreviousBalance, entity.Status, entity.UserId, entity.CreatedAt)
+func (s *TopUpRepository) CreateTopUpHistory(ctx context.Context, entity *domain.HistoryTopUp) error {
+	result, err := s.mysql.Db.ExecContext(ctx, "INSERT INTO history_topup (amount, balance, previous_balance, status, userId, created_at) values (?, ?, ?, ?, ?, ?)", entity.Amount, entity.Balance, entity.PreviousBalance, entity.Status, entity.UserId, entity.CreatedAt)
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ type sendEmail = {
 
 const ForgotPassword = () => {
   const [err, setErr] = useState<any>(null)
-  const [sendEmail, { data, isLoading, isSuccess }] = useSendEmailForgotPasswordMutation()
+  const [sendEmail, { data, isLoading, isSuccess, error }] = useSendEmailForgotPasswordMutation()
   const [open, setOpen] = useState<boolean>(false)
   const { register, handleSubmit, formState: { errors } } = useForm<SendEmail>()
   const onSubmit = async (dataForm: sendEmail) => {
@@ -26,7 +26,7 @@ const ForgotPassword = () => {
       setOpen(true)
     }
   }, [isSuccess])
-  
+
   return (
     <>
       <Backdrop

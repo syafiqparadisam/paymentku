@@ -46,7 +46,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-  ) {}
+  ) { }
 
   @Post('login')
   @UsePipes(new ValidationPipe())
@@ -82,7 +82,7 @@ export class AuthController {
   }
 
   @Get('google')
-  async auth() {}
+  async auth() { }
 
   @Get('auth/login/google')
   @UseGuards(GoogleOauthGuard)
@@ -137,7 +137,6 @@ export class AuthController {
 
   @Delete('logout')
   async logout(@Request() req, @Response() res): Promise<response> {
-    console.log(req.cookies);
     try {
       const result = await this.authService.logout(req.cookies, res);
       res.clearCookie('authToken', {
@@ -159,7 +158,6 @@ export class AuthController {
     @Req() req: any,
     @Res() res,
   ): Promise<response> {
-    console.log(req.cookies);
     try {
       const result = await this.authService.getPasswordResetToken(
         emailDto,
@@ -257,8 +255,11 @@ export class AuthController {
     }
 
     try {
-      console.log(url);
-      const data = await this.fetcherService(url, req, body);
+      const result = await this.fetcherService(url, req, body);
+      if (result.status == 500) {
+        return res.sendStatus(result.status)
+      }
+      const data = await result.json()
       return res.status(data.statusCode).json(data);
     } catch (error) {
       console.log(error);
@@ -276,7 +277,6 @@ export class AuthController {
     // config url to fetch into another service
     const history_svc = this.configService.get<string>('HISTORY_SVC');
     const spliturl: string[] = req.url.split('/');
-    console.log(spliturl);
     const urlAfterProfile = spliturl.slice(4, spliturl.length).join('/');
     let url;
     if (spliturl.length == 4 || spliturl[4] == '') {
@@ -286,10 +286,14 @@ export class AuthController {
     }
 
     try {
-      const data = await this.fetcherService(url, req, body);
+      const result = await this.fetcherService(url, req, body);
+      if (result.status == 500) {
+        return res.sendStatus(result.status)
+      }
+      const data = await result.json()
       return res.status(data.statusCode).json(data);
     } catch (error) {
-      console.log(error);
+      console.log(error)
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -300,7 +304,7 @@ export class AuthController {
     FileInterceptor('image', {
       storage: diskStorage({
         destination: path.join(__dirname, '..', '..', 'src', 'uploads'),
-        filename(req, file, cb) {
+        filename(_, file, cb) {
           const uniqueFile = new Date() + file.originalname;
           cb(null, uniqueFile);
         },
@@ -333,7 +337,6 @@ export class AuthController {
       const userData: jwtPayload = {
         user_id: req.user_id,
       };
-      console.log(req.headers);
       const result = await this.authService.updatePhotoProfile(
         userData,
         file.path,
@@ -367,9 +370,7 @@ export class AuthController {
           body: JSON.stringify(body),
         });
       }
-      console.log(result);
-      const data = await result.json();
-      return data;
+      return result
     } catch (error) {
       throw error;
     }
@@ -393,7 +394,11 @@ export class AuthController {
       url = usr_svc + '/' + urlAfterProfile + '?userid=' + req.user_id;
     }
     try {
-      const data = await this.fetcherService(url, req, body);
+      const result = await this.fetcherService(url, req, body)
+      if (result.status == 500) {
+        return rs.sendStatus(result.status)
+      }
+      const data = await result.json()
       return rs.status(data.statusCode).json(data);
     } catch (error) {
       return rs.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);

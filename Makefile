@@ -14,7 +14,7 @@ run-user: docker-compose
 	cd ${USER_SVC_PATH} && go build -o server server.go && ./server
 
 test-user: docker-compose
-	cd ${USER_SVC_PATH}/test && go test -v ./... --count=1
+	cd ${USER_SVC_PATH}/test && go test -v ./... 
 
 install-user: 
 	cd ${USER_SVC_PATH} && go mod download

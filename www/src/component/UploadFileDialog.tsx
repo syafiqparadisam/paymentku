@@ -5,11 +5,11 @@ import { useUpdatePhotoProfileMutation } from "../services/profileApi"
 import { useSelector } from "react-redux"
 import { User } from "../types/response"
 
-type openFn = (state: React.Dispatch<React.SetStateAction<boolean>>) => void
+// type openFn = (state: React.Dispatch<React.SetStateAction<boolean>>) => void
 
 type UploadFileProps = {
     open: boolean,
-    setOpen: openFn,
+    setOpen: Function,
 }
 
 const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
@@ -52,7 +52,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
         setTimeout(() => {
             console.log("aborted")
             req.abort()
-        }, 2000);
+        }, 20000);
         // clearTimeout(tm)
         console.log("finish")
     }
@@ -64,6 +64,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
     useEffect(() => {
         setSourceImg("")
+        setFile(null)
         setResponse(data?.message ? data?.message : "")
     }, [data])
 
@@ -121,7 +122,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button variant="contained" color="error" onClick={() => setOpen(() => false)}>Cancel</Button>
-                    <Button variant="contained" color="primary" onClick={() => {
+                    <Button variant="contained" color="primary" disabled={file == null ? true : false} onClick={() => {
                         updatePhotoProfile()
                     }}>Update</Button>
                 </DialogActions>

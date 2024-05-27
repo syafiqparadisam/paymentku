@@ -14,10 +14,10 @@ import Category from '../component/Category';
 
 const HistoryTopup = () => {
     const { open, handleClose, handleOpen } = useAlert()
+    // const [bgColor, setBgColor] = useState<string>("")
     const { data, refetch, isSuccess } = useGetHistoryTopUpQuery()
     const [deleteTopUp, { error: errDeleteAllHistory }] = useDeleteHistoryTopUpMutation()
     const navigate = useNavigate()
-
 
     return (
         <>
@@ -74,10 +74,10 @@ const HistoryTopup = () => {
                             ) : (
                                 data?.data?.map((d: HistoryTopUps) => {
                                     return (
-                                        <Box width={"100%"} onClick={() => navigate(`${route["topuphistory"]}/${d.id}`)} justifyContent={"space-around"} borderRadius={"10px"} alignItems={"center"} display={"flex"} bgcolor={d.isRead == true ? "#ddd" : "lightgreen"} p={3}>
+                                        <Box width={"100%"} onClick={() => navigate(`${route["topuphistory"]}/${d.id}`)} justifyContent={"space-around"} borderRadius={"10px"} alignItems={"center"} display={"flex"} bgcolor={d.isRead == true ? "#ddd" : d.status === "SUCCESS" ? "lightgreen" : "red"} p={3}>
 
                                             <Box width={"50%"} display={"flex"} flexDirection={"column"}>
-                                                <Typography color={d.status === "SUCCESS" ? "green" : "red"} fontWeight={"bold"}>{d.status}</Typography>
+                                                <Typography color={d.status === "SUCCESS" ? "green" : "white"} fontWeight={"bold"}>{d.status}</Typography>
                                                 <Typography color={"black"}>Amount: Rp.{d.amount}</Typography>
                                             </Box>
                                             <Box width={"50%"}>

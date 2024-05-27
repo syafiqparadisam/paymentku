@@ -175,12 +175,9 @@ func main() {
 		defer cancel()
 		errch <- mysql.Db.Close()
 		errch <- app.ShutdownWithContext(ctx)
-		select {
-		case <-time.After(11 * time.Second):
-			fmt.Println("Connection still exist, not all connections done")
-		case <-ctx.Done():
-			fmt.Println("Shutdown successfully")
-		}
+
+		<-ctx.Done()
+		fmt.Println("Shutdown successfully")
 		close(errch)
 	}()
 

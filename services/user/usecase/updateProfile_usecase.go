@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"strconv"
 	"unicode"
 
@@ -12,10 +13,10 @@ type DataImageResp struct {
 	PublicId string `json:"publicId"`
 }
 
-func (s *Usecase) UpdateBio(payload *dto.UpdateBioDTO, userid string) dto.APIResponse[interface{}] {
+func (s *Usecase) UpdateBio(ctx context.Context, payload *dto.UpdateBioDTO, userid string) dto.APIResponse[interface{}] {
 
 	userId, _ := strconv.Atoi(userid)
-	err := s.User.UpdateBioProfile(userId, payload.Bio)
+	err := s.User.UpdateBioProfile(ctx, userId, payload.Bio)
 	if err == errors.ErrAffectedRows {
 		return dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrAffectedRows.Error()}
 	}
@@ -26,12 +27,12 @@ func (s *Usecase) UpdateBio(payload *dto.UpdateBioDTO, userid string) dto.APIRes
 	return dto.APIResponse[interface{}]{StatusCode: 200, Message: "Bio already updated"}
 }
 
-func (s *Usecase) UpdateName(payload *dto.UpdateNameDTO, userid string) dto.APIResponse[interface{}] {
+func (s *Usecase) UpdateName(ctx context.Context, payload *dto.UpdateNameDTO, userid string) dto.APIResponse[interface{}] {
 	if len(payload.Name) == 0 {
 		return dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrEmptyField.Error()}
 	}
 	userId, _ := strconv.Atoi(userid)
-	err := s.User.UpdateNameProfile(userId, payload.Name)
+	err := s.User.UpdateNameProfile(ctx, userId, payload.Name)
 	if err == errors.ErrAffectedRows {
 		return dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrAffectedRows.Error()}
 	}
@@ -41,14 +42,14 @@ func (s *Usecase) UpdateName(payload *dto.UpdateNameDTO, userid string) dto.APIR
 	return dto.APIResponse[interface{}]{StatusCode: 200, Message: "Name already updated"}
 }
 
-func (s *Usecase) UpdatePhoneNumber(payload *dto.UpdatePhoneNumberDTO, userid string) dto.APIResponse[interface{}] {
+func (s *Usecase) UpdatePhoneNumber(ctx context.Context, payload *dto.UpdatePhoneNumberDTO, userid string) dto.APIResponse[interface{}] {
 
 	validateErr := validatePhoneNumber(payload.PhoneNumber)
 	if validateErr != nil {
 		return dto.APIResponse[interface{}]{StatusCode: 400, Message: validateErr.Error()}
 	}
 	userId, _ := strconv.Atoi(userid)
-	err := s.User.UpdatePhoneNumber(userId, payload.PhoneNumber)
+	err := s.User.UpdatePhoneNumber(ctx,userId, payload.PhoneNumber)
 	if err == errors.ErrAffectedRows {
 		return dto.APIResponse[interface{}]{StatusCode: 200, Message: err.Error()}
 	}

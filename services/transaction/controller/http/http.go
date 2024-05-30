@@ -11,6 +11,7 @@ import (
 	"github.com/syafiqparadisam/paymentku/services/transaction/dto"
 	"github.com/syafiqparadisam/paymentku/services/transaction/errors"
 	"github.com/syafiqparadisam/paymentku/services/transaction/usecase"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type ControllerHTTP struct {
@@ -26,11 +27,43 @@ func WriteJSON(w http.ResponseWriter, statusCode int, message any) error {
 	return json.NewEncoder(w).Encode(&message)
 }
 
+// func MakeHTTPHandler(f HandlerFunc, method string) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		if r.Method != method {
+// 			WriteJSON(w, http.StatusMethodNotAllowed, dto.APIResponse[interface{}]{StatusCode: http.StatusMethodNotAllowed, Message: errors.ErrMethodNotAllowed.Error()})
+// 		} else {
+// 			start := time.Now()
+// 			log := config.Log()
+// 			header := r.Header
+// 			res := r.Response
+// 			fmt.Println(res)
+
+// 			defer func() {
+
+// 				if r := recover(); r != nil {
+// 					log.WithLevel(zerolog.PanicLevel).Err(r.(error)).Str("Request-id", header.Get("X-Request-Id")).Msg("Server paniccing")
+// 					w.Header().Set("Retry-After", "60")
+// 					http.Error(w, "", http.StatusInternalServerError)
+// 				}
+// 				log.Info().Str("Request-id", header.Get("X-Request-Id")).Str("User-agent", header.Get("User-Agent")).Str("Origin", header.Get("Origin")).Str("Method", r.Method).Dur("Latency (milisecond)", time.Duration(time.Duration(time.Since(start)).Milliseconds())).Str("Path", r.URL.Path).Interface("Query", r.URL.Query()).Int("Status", 200).Str("Ip", r.RemoteAddr).Msg("Request Logs")
+// 			}()
+// 			err := f(w, r)
+// 			if err != nil {
+// 				fmt.Println(err)
+// 				panic(err)
+// 			}
+// 		}
+// 	}
+// }
+
 func MakeHTTPHandler(f HandlerFunc, method string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != method {
 			WriteJSON(w, http.StatusMethodNotAllowed, dto.APIResponse[interface{}]{StatusCode: http.StatusMethodNotAllowed, Message: errors.ErrMethodNotAllowed.Error()})
-		} else {
+			return
+		}
+
+		handler := otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 			log := config.Log()
 			header := r.Header
@@ -38,20 +71,21 @@ func MakeHTTPHandler(f HandlerFunc, method string) http.HandlerFunc {
 			fmt.Println(res)
 
 			defer func() {
-
-				if r := recover(); r != nil {
-					log.WithLevel(zerolog.PanicLevel).Err(r.(error)).Str("Request-id", header.Get("X-Request-Id")).Msg("Server paniccing")
+				if rec := recover(); rec != nil {
+					log.WithLevel(zerolog.PanicLevel).Err(rec.(error)).Str("Request-id", header.Get("X-Request-Id")).Msg("Server panicking")
 					w.Header().Set("Retry-After", "60")
 					http.Error(w, "", http.StatusInternalServerError)
 				}
-				log.Info().Str("Request-id", header.Get("X-Request-Id")).Str("User-agent", header.Get("User-Agent")).Str("Origin", header.Get("Origin")).Str("Method", r.Method).Dur("Latency (milisecond)", time.Duration(time.Duration(time.Since(start)).Milliseconds())).Str("Path", r.URL.Path).Interface("Query", r.URL.Query()).Int("Status", 200).Str("Ip", r.RemoteAddr).Msg("Request Logs")
+				log.Info().Str("Request-id", header.Get("X-Request-Id")).Str("User-agent", header.Get("User-Agent")).Str("Origin", header.Get("Origin")).Str("Method", r.Method).Dur("Latency (milisecond)", time.Duration(time.Since(start).Milliseconds())).Str("Path", r.URL.Path).Interface("Query", r.URL.Query()).Int("Status", 200).Str("Ip", r.RemoteAddr).Msg("Request Logs")
 			}()
-			err := f(w, r)
-			if err != nil {
+
+			if err := f(w, r); err != nil {
 				fmt.Println(err)
 				panic(err)
 			}
-		}
+		}), "user server")
+
+		handler.ServeHTTP(w, r)
 	}
 }
 
@@ -76,6 +110,7 @@ func NewControllerHTTP(usecase usecase.UsecaseInterface) *ControllerHTTP {
 
 func (s *ControllerHTTP) Routes() http.Handler {
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("POST /topup", MakeHTTPHandler(ExstractHeaderXUserData(s.HandlerTopUp), http.MethodPost))
 	mux.HandleFunc("POST /transfer", MakeHTTPHandler(ExstractHeaderXUserData(s.HandleTransfer), http.MethodPost))
 

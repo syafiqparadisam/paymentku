@@ -14,9 +14,9 @@ import (
 
 func (u *Usecase) InsertHistoryTransfer(payload *dto.TransferRequest, user *dto.XUserData) dto.APIResponse[interface{}] {
 	userid, _ := strconv.Atoi(user.UserId)
-	ctxTransfer, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	ctxTransferCreateHistory := context.TODO()
+	ctxTransfer, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
+	
 	tx, err := u.TransferRepo.StartTransaction(ctxTransfer)
 	if err != nil {
 		panic(err)
@@ -45,7 +45,7 @@ func (u *Usecase) InsertHistoryTransfer(payload *dto.TransferRequest, user *dto.
 		tx.Rollback()
 		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
 		// insert to mongodb transfer
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctxTransferCreateHistory, transferInfo)
+		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctxTransfer, transferInfo)
 		if errInsertHistory != nil {
 			tx.Rollback()
 			panic(errInsertHistory)
@@ -57,7 +57,7 @@ func (u *Usecase) InsertHistoryTransfer(payload *dto.TransferRequest, user *dto.
 		tx.Rollback()
 
 		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctxTransferCreateHistory, transferInfo)
+		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctxTransfer, transferInfo)
 		if errInsertHistory != nil {
 			tx.Rollback()
 			panic(errInsertHistory)
@@ -67,19 +67,19 @@ func (u *Usecase) InsertHistoryTransfer(payload *dto.TransferRequest, user *dto.
 	transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "SUCCESS", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance-int64(payload.Amount))
 	// insert to mongodb transfer
 
-	errInsertHistory := u.TransferRepo.InsertTransferHistory(ctxTransferCreateHistory, transferInfo)
+	errInsertHistory := u.TransferRepo.InsertTransferHistory(ctxTransfer, transferInfo)
 	if errInsertHistory != nil {
 		tx.Rollback()
 		panic(errInsertHistory)
 	}
-	
+
 	// insert notification to receiver
 	notification := domain.NewNotification(foundReceiver.Id, transferInfo, foundReceiver)
 	errInsertNotification := u.TransferRepo.InsertToNotification(tx, ctxTransfer, notification)
 	if errInsertNotification != nil {
 		tx.Rollback()
 		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctxTransferCreateHistory, transferInfo)
+		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctxTransfer, transferInfo)
 		if errInsertHistory != nil {
 			tx.Rollback()
 			panic(errInsertHistory)

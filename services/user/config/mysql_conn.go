@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/XSAM/otelsql"
 	_ "github.com/go-sql-driver/mysql"
@@ -33,6 +32,5 @@ func NewMySqlStore(mysqlCfg string) (*MySqlStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(err)
 	return &MySqlStore{Db: db}, nil
 }

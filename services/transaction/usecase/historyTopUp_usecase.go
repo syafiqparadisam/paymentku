@@ -4,11 +4,13 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/syafiqparadisam/paymentku/services/transaction/domain"
 	"github.com/syafiqparadisam/paymentku/services/transaction/dto"
 	"github.com/syafiqparadisam/paymentku/services/transaction/errors"
 )
+
 
 func (u *Usecase) InsertHistoryTopUp(payload *dto.TopUpRequest, user *dto.XUserData) dto.APIResponse[interface{}] {
 	if payload.Amount <= 0 {
@@ -16,8 +18,9 @@ func (u *Usecase) InsertHistoryTopUp(payload *dto.TopUpRequest, user *dto.XUserD
 	}
 	// update balance and find user
 	userid, _ := strconv.Atoi(user.UserId)
-	ctxTopUp := context.Background()
-	ctxTopUpCreateHistory := context.TODO()
+	ctxTopUp, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
 	tx, errTx := u.TopUpRepo.StartTransaction(ctxTopUp)
 	if errTx != nil {
 		panic(errTx)
@@ -31,7 +34,7 @@ func (u *Usecase) InsertHistoryTopUp(payload *dto.TopUpRequest, user *dto.XUserD
 	if err != nil {
 		tx.Rollback()
 		topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance, balance.Balance, "FAILED", userid)
-		errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctxTopUpCreateHistory, topUpInfo)
+		errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctxTopUp, topUpInfo)
 		if errInsertHistory != nil {
 			panic(errInsertHistory)
 		}
@@ -39,7 +42,7 @@ func (u *Usecase) InsertHistoryTopUp(payload *dto.TopUpRequest, user *dto.XUserD
 	}
 	// insert history info
 	topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance+int64(payload.Amount), balance.Balance, "SUCCESS", userid)
-	errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctxTopUpCreateHistory, topUpInfo)
+	errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctxTopUp, topUpInfo)
 	if errInsertHistory != nil {
 		tx.Rollback()
 		panic(errInsertHistory)

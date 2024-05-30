@@ -44,7 +44,7 @@ func initConn() (*grpc.ClientConn, error) {
 }
 
 // Initializes an OTLP exporter, and configures the corresponding trace providers.
-func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (func(context.Context) error, error) {
+func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (*sdktrace.TracerProvider, error) {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
@@ -75,12 +75,12 @@ func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (func(contex
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 
 	// Shutdown will flush any remaining spans and shut down the exporter.
-	return tracerProvider.Shutdown, nil
+	return tracerProvider, nil
 }
 
 // Initializes an OTLP exporter, and configures the corresponding meter
 // provider.
-func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (func(context.Context) error, error) {
+func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.MeterProvider, error) {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
@@ -102,7 +102,7 @@ func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (func(context
 	)
 	otel.SetMeterProvider(meterProvider)
 
-	return meterProvider.Shutdown, nil
+	return meterProvider, nil
 }
 
 func main() {
@@ -111,30 +111,23 @@ func main() {
 		fmt.Println("Failed to load env file")
 	}
 
-	ctx := context.TODO()
-	defer func() {
-		if err := recover(); err != nil {
-			os.Exit(20)
-		}
-	}()
+	ctx,cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel()
 
 	logZero := config.Log()
 	conn, err := initConn()
 	if err != nil {
 		logZero.Fatal().Err(err).Msg("Connection grpc error")
-		panic(err)
 	}
 
-	shutdownTracerProvider, err := initTracerProvider(ctx, conn)
+	tracerProvider, err := initTracerProvider(ctx, conn)
 	if err != nil {
-		logZero.Fatal().Err(err).Msg("is this ??")
-		panic(err)
+		logZero.Fatal().Err(err).Msg("Tracer provider error")
 	}
 
-	shutdownMeterProvider, err := initMeterProvider(ctx, conn)
+	metricProvider, err := initMeterProvider(ctx, conn)
 	if err != nil {
-		logZero.Fatal().Err(err).Msg(err.Error())
-		panic(err)
+		logZero.Fatal().Err(err).Msg("Meter provider error")
 	}
 
 	appPort := os.Getenv("APP_PORT")
@@ -174,6 +167,8 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		errch <- mysql.Db.Close()
+		errch <- tracerProvider.Shutdown(ctx)
+		errch <- metricProvider.Shutdown(ctx)
 		errch <- app.ShutdownWithContext(ctx)
 
 		<-ctx.Done()
@@ -186,18 +181,9 @@ func main() {
 			fmt.Println(e)
 			if e != nil {
 				logZero.Err(e).Msg("error shutdowning app")
-				panic(e)
 			}
 		}
 		os.Remove("server")
-		if err := shutdownTracerProvider(ctx); err != nil {
-			logZero.Err(err).Msg("failed to shutdown TracerProvider")
-			panic(err)
-		}
-		if err := shutdownMeterProvider(ctx); err != nil {
-			logZero.Err(err).Msg("failed to shutdown MeterProvider")
-			panic(err)
-		}
 	}()
 	err = app.Listen(httpCfg.Port)
 	if err != nil {

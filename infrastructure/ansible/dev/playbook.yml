@@ -1,0 +1,22 @@
+- name: Update and upgrade system, then install neofetch
+  hosts: all
+  become: true
+
+  tasks:
+    # - name: Update the package list
+    #   apt:
+    #     update_cache: yes
+
+    # - name: Upgrade all packages
+    #   apt:
+    #     upgrade: dist
+
+    # - name: Install neofetch
+    #   apt:
+    #     name: neofetch
+    #     state: present
+
+    - name: Check if neofetch is installed
+      command: neofetch --version
+      register: neofetch_version
+      # ignore_errors: true

@@ -256,6 +256,7 @@ export class AuthController {
 
     try {
       const result = await this.fetcherService(url, req, body);
+      console.log(result)
       if (result.status == 500) {
         return res.sendStatus(result.status)
       }
@@ -399,7 +400,8 @@ export class AuthController {
         return rs.sendStatus(result.status)
       }
       const data = await result.json()
-      return rs.status(data.statusCode).json(data);
+      console.log(data)
+      return rs.status(data.statusCode).json(data)
     } catch (error) {
       return rs.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }

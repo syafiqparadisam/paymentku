@@ -14,11 +14,12 @@ const TopUp = () => {
     const user: User = useSelector(state => state.user)
     const [totalPrice, setTotalPrice] = useState<number>(0)
     const [isChecked, setIsChecked] = useState<boolean>(false)
-    const [topup, { data, isSuccess, error,isLoading }] = useTopupMutation()
+    const [topup, { data, isSuccess, error, isLoading }] = useTopupMutation()
     const [operational, setOperational] = useState<boolean>(true)
     const [bonus, setBonus] = useState<number>(0)
     const [totalGettingMoney, setTotalGettingMoney] = useState<number>(0)
     const [open, setOpen] = useState<boolean>(false)
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false)
     const navigate = useNavigate()
 
     function calculatePrice(amount: number, checked: boolean, operationalFee: boolean, bonus: number): number {
@@ -30,29 +31,31 @@ const TopUp = () => {
         return amount + bonus
     }
 
+    console.log("error", error)
 
     useEffect(() => {
         const total = calculatePrice(amount, isChecked, operational, bonus)
         setTotalPrice(total)
         setTotalGettingMoney(calculateGettingMoney(amount, bonus))
     }, [amount, isChecked, bonus, operational])
-
+    useEffect(() => {
+        if (isSuccess) {
+            setOpenSnackbar(true)
+        }
+        if (error?.originalStatus == 500) {
+            setOpenSnackbar(true)
+        }
+    }, [isSuccess, error])
     console.log(data)
 
     return (
         <>
-            {isSuccess && <Snackbar
-                open={isSuccess}
+            {openSnackbar && <Snackbar
+                open={openSnackbar}
+                onClose={() => setOpenSnackbar(false)}
                 autoHideDuration={3000}
                 color="success"
-                message={data.message}
-            />}
-            {error && <Snackbar
-                open={true}
-                anchorOrigin={{vertical: "top", horizontal: "center"}}
-                autoHideDuration={3000}
-                color="error"
-                message="Ups something went wrong"
+                message={error?.originalStatus == 500 ? "Ups something went wrong" : data.message}
             />}
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -81,6 +84,7 @@ const TopUp = () => {
                             setOpen(false)
 
                         } catch (error: any) {
+
                             setErr(error.data.message)
                         }
                     }}>
@@ -196,7 +200,7 @@ const TopUp = () => {
                             </Box>
                             <Typography>Total obtained : {toRupiah(totalGettingMoney, { dot: ",", floatingPoint: 0 })}</Typography>
                             <Typography mb={1}>Total payment : {toRupiah(totalPrice - bonus, { dot: ",", floatingPoint: 0 })}</Typography>
-                            <Button variant="contained" fullWidth color="success" onClick={() => {
+                            <Button variant="contained" fullWidth color="success" disabled={amount == 0 ? true : false} onClick={() => {
                                 if (totalPrice <= 0) return
                                 setOpen(true)
                             }}>Topup</Button>

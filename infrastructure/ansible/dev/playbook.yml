@@ -19,4 +19,4 @@
     - name: Check if neofetch is installed
       command: neofetch --version
       register: neofetch_version
-      # ignore_errors: true
+      ignore_errors: true

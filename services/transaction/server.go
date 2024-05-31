@@ -140,12 +140,20 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		errch <- mysql.Db.Close()
-		errch <- tracerProvider.Shutdown(ctx)
-		errch <- meterProvider.Shutdown(ctx)
+		fmt.Println("db already closed")
 		errch <- server.Shutdown(ctx)
+		fmt.Println("server already closed")
+		errch <- tracerProvider.Shutdown(ctx)
+		fmt.Println("tracer provider already closed")
+		errch <- meterProvider.Shutdown(ctx)
+		fmt.Println("metric provider already closed")
 
-		<-ctx.Done()
-		fmt.Println("Shutdown successfully")
+		select {
+		case <-ctx.Done():
+			fmt.Println("Shutdown successfully")
+		case <-time.After(11 * time.Second):
+			fmt.Println("still has connection, not successfully shutdown")
+		}
 		close(errch)
 	}()
 

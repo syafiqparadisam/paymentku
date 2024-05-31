@@ -14,7 +14,6 @@ import Category from '../component/Category';
 
 const HistoryTopup = () => {
     const { open, handleClose, handleOpen } = useAlert()
-    // const [bgColor, setBgColor] = useState<string>("")
     const { data, refetch, isSuccess } = useGetHistoryTopUpQuery()
     const [deleteTopUp, { error: errDeleteAllHistory }] = useDeleteHistoryTopUpMutation()
     const navigate = useNavigate()

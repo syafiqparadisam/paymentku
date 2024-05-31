@@ -16,7 +16,8 @@ const Transfer = () => {
   const [amount, setAmount] = useState<string>("")
   const [open, setOpen] = useState<boolean>(false)
   const [notes, setNotes] = useState<string>("")
-  const [transfer, { data: dataTransfer, error: errTransfer, isSuccess: successTransfer,isLoading }] = useTransferMutation()
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false)
+  const [transfer, { data: dataTransfer, error: errTransfer, isSuccess: successTransfer, isLoading }] = useTransferMutation()
   const [accountNumber, { data, isSuccess }] = useFindAccountMutation()
   useEffect(() => {
     if (accNum.length == 0) return
@@ -42,14 +43,25 @@ const Transfer = () => {
     setErrAmount({ data: { message: "" } })
   }, [amount])
 
+  useEffect(() => {
+    if (successTransfer) {
+      setOpenSnackbar(true)
+    }
+    if (errTransfer?.originalStatus == 500) {
+      setOpenSnackbar(true)
+    }
+  }, [errTransfer, successTransfer])
+  console.log("error", errTransfer)
   return (
     <>
-      {successTransfer && <Snackbar
-        open={successTransfer}
+
+      {openSnackbar && <Snackbar
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
         key={"top" + "center"}
         autoHideDuration={3000}
         color="success"
-        message={dataTransfer.message}
+        message={errTransfer?.originalStatus == 500 ? "Ups something went wrong" : dataTransfer?.message}
       />}
       {/* {errTransfer?.} */}
       <Backdrop
@@ -75,7 +87,6 @@ const Transfer = () => {
           <Button onClick={() => setOpen(false)} variant="contained" color="error">No</Button>
           <Button variant="contained" disabled={isLoading == false ? false : true} color="success" onClick={() => {
             transfer({ accountNumber: Number(accNum), notes, amount: Number(amount) })
-            setOpen(false)
           }}>
             Yes
           </Button>

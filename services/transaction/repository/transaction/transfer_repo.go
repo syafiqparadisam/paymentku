@@ -25,7 +25,7 @@ type TransferInterface interface {
 	FindUserByAccNum(tx *sql.Tx, ctx context.Context, accNum uint64) (*domain.UserInfo, error)
 	InsertTransferHistory(ctx context.Context, domain *domain.HistoryTransfer) error
 	StartTransaction(ctx context.Context) (*sql.Tx, error)
-	InsertToNotification(tx *sql.Tx, ctx context.Context, domain *domain.Notification) error
+	InsertToNotification(ctx context.Context, domain *domain.Notification) error
 }
 
 func (s *TransferRepository) StartTransaction(ctx context.Context) (*sql.Tx, error) {
@@ -62,7 +62,7 @@ func (s *TransferRepository) DecreaseBalanceById(tx *sql.Tx, ctx context.Context
 }
 
 func (s *TransferRepository) IncreaseBalanceByAccNumber(tx *sql.Tx, ctx context.Context, amount uint, accNumber uint64) error {
-	result, err := tx.ExecContext(ctx, "update users set balance = balance + ? kjdsfjs, where accountNumber = ?", amount, accNumber)
+	result, err := tx.ExecContext(ctx, "update users set balance = balance + ? where accountNumber = ?", amount, accNumber)
 
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func (s *TransferRepository) FindUserByAccNum(tx *sql.Tx, ctx context.Context, a
 }
 
 func (s *TransferRepository) InsertTransferHistory(ctx context.Context, transfer *domain.HistoryTransfer) error {
-	result, err := s.mySqlDb.Db.ExecContext(ctx, "INSERT INTO history_transfer (sender, sender_name, receiver, receiver_name, status, notes, amount, created_at,previous_balance, balance, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", transfer.Sender, transfer.SenderName, transfer.Receiver, transfer.ReceiverName, transfer.Status, transfer.Notes, transfer.Amount, transfer.CreatedAt, transfer.PreviousBalance,transfer.Balance, transfer.UserId)
+	result, err := s.mySqlDb.Db.ExecContext(ctx, "INSERT INTO history_transfer (sender, sender_name, receiver, receiver_name, status, notes, amount, created_at,previous_balance, balance, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", transfer.Sender, transfer.SenderName, transfer.Receiver, transfer.ReceiverName, transfer.Status, transfer.Notes, transfer.Amount, transfer.CreatedAt, transfer.PreviousBalance, transfer.Balance, transfer.UserId)
 	if err != nil {
 		return err
 	}
@@ -104,8 +104,8 @@ func (s *TransferRepository) InsertTransferHistory(ctx context.Context, transfer
 	return nil
 }
 
-func (s *TransferRepository) InsertToNotification(tx *sql.Tx, ctx context.Context, domain *domain.Notification) error {
-	result, err := tx.ExecContext(ctx, "INSERT INTO notification (icon, title, description, type, userId, created_at) VALUES (?, ?, ?, ?, ?, ?);", domain.Icon, domain.Title, domain.Description, domain.Type, domain.UserId, domain.CreatedAt)
+func (s *TransferRepository) InsertToNotification(ctx context.Context, domain *domain.Notification) error {
+	result, err := s.mySqlDb.Db.ExecContext(ctx, "INSERT INTO notification (icon, title, description, type, userId, created_at) VALUES (?, ?, ?, ?, ?, ?);", domain.Icon, domain.Title, domain.Description, domain.Type, domain.UserId, domain.CreatedAt)
 	if err != nil {
 		return err
 	}

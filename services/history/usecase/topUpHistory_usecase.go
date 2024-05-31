@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 
 	"github.com/syafiqparadisam/paymentku/services/history/domain"
@@ -11,9 +10,8 @@ import (
 	"github.com/syafiqparadisam/paymentku/services/history/errors"
 )
 
-func (u *Usecase) GetAllHistoryTopUp(user *dto.XUserData) dto.APIResponse[*[]domain.HistoryTopUpForGetAll] {
+func (u *Usecase) GetAllHistoryTopUp(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.HistoryTopUpForGetAll] {
 	userid, _ := strconv.Atoi(user.UserId)
-	ctx := context.TODO()
 
 	history, err := u.topUpRepo.GetAllHistoryTopUp(ctx, userid)
 	if err != nil {
@@ -22,10 +20,8 @@ func (u *Usecase) GetAllHistoryTopUp(user *dto.XUserData) dto.APIResponse[*[]dom
 	return dto.APIResponse[*[]domain.HistoryTopUpForGetAll]{StatusCode: 200, Data: history, Message: "Ok"}
 }
 
-func (u *Usecase) GetHistoryTopUpById(user *dto.XUserData, id int) dto.APIResponse[*domain.HistoryTopUp] {
+func (u *Usecase) GetHistoryTopUpById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.HistoryTopUp] {
 	userid, _ := strconv.Atoi(user.UserId)
-	ctx := context.TODO()
-	fmt.Println(id)
 	// find is read and do some conditional
 	isRead, errFind := u.topUpRepo.FindIsRead(ctx, id)
 	if errFind == sql.ErrNoRows {
@@ -55,9 +51,8 @@ func (u *Usecase) GetHistoryTopUpById(user *dto.XUserData, id int) dto.APIRespon
 	return dto.APIResponse[*domain.HistoryTopUp]{StatusCode: 200, Data: history, Message: "Ok"}
 }
 
-func (u *Usecase) DeleteAllHistoryTopUp(user *dto.XUserData) dto.APIResponse[interface{}] {
+func (u *Usecase) DeleteAllHistoryTopUp(ctx context.Context, user *dto.XUserData) dto.APIResponse[interface{}] {
 	userid, _ := strconv.Atoi(user.UserId)
-	ctx := context.TODO()
 	tx, err := u.topUpRepo.StartACID(ctx)
 
 	if err != nil {
@@ -76,9 +71,8 @@ func (u *Usecase) DeleteAllHistoryTopUp(user *dto.XUserData) dto.APIResponse[int
 	return dto.APIResponse[interface{}]{StatusCode: 200, Message: "Successfully deleted"}
 }
 
-func (u *Usecase) DeleteHistoryTopUpById(user *dto.XUserData, id int) dto.APIResponse[interface{}] {
+func (u *Usecase) DeleteHistoryTopUpById(ctx  context.Context,user *dto.XUserData, id int) dto.APIResponse[interface{}] {
 	userid, _ := strconv.Atoi(user.UserId)
-	ctx := context.TODO()
 	tx, err := u.topUpRepo.StartACID(ctx)
 	if err != nil {
 		panic(err)

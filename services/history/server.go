@@ -14,18 +14,91 @@ import (
 	controller_http "github.com/syafiqparadisam/paymentku/services/history/controller/http"
 	history_repo "github.com/syafiqparadisam/paymentku/services/history/repository/history"
 	"github.com/syafiqparadisam/paymentku/services/history/usecase"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
+
+func initializeGRPCConnection() (*grpc.ClientConn, error) {
+	grpcServerUrl := os.Getenv("GRPC_SERVER_URL")
+
+	conn, err := grpc.NewClient(grpcServerUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect grpc server %w", err)
+	}
+	return conn, nil
+}
+
+func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (*sdktrace.TracerProvider, error) {
+	res, err := resource.New(ctx, resource.WithAttributes(semconv.ServiceNameKey.String("tracer-history")))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create resource")
+	}
+
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create trace exporter %w", err)
+	}
+
+	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
+	tracerProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithResource(res),
+		sdktrace.WithSpanProcessor(bsp),
+	)
+	otel.SetTracerProvider(tracerProvider)
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+	return tracerProvider, nil
+}
+
+func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.MeterProvider, error) {
+	res, err := resource.New(ctx, resource.WithAttributes(semconv.ServiceNameKey.String("metric-history")))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create tracer provider %w", err)
+	}
+
+	metricExporter, err := otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithGRPCConn(conn))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create meter provider %w", err)
+	}
+
+	meterProvider := sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(metricExporter)),
+		sdkmetric.WithResource(res),
+	)
+	otel.SetMeterProvider(meterProvider)
+
+	return meterProvider, nil
+}
 
 func main() {
 	logZero := config.Log()
 	if err := godotenv.Load(".env"); err != nil {
 		logZero.Fatal().Err(err).Msg("Failed to load env file")
 	}
-	defer func() {
-		if err := recover(); err != nil {
-			os.Exit(20)
-		}
-	}()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	conn, err := initializeGRPCConnection()
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Connect to grpc error")
+	}
+
+	tracerProvider, err := initTracerProvider(ctx, conn)
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Tracer provider error")
+	}
+	meterProvider, err := initMeterProvider(ctx, conn)
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Meter provider error")
+	}
 
 	port := os.Getenv("APP_PORT")
 	user := os.Getenv("DB_USER")
@@ -63,11 +136,20 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		errch <- mysql.Db.Close()
+		fmt.Println("db already closed")
 		errch <- server.Shutdown(ctx)
+		fmt.Println("server already closed")
+		errch <- tracerProvider.Shutdown(ctx)
+		fmt.Println("tracer provider already closed")
+		errch <- meterProvider.Shutdown(ctx)
+		fmt.Println("metric provider already closed")
 
-		
-		<-ctx.Done()
+		select {
+		case <-ctx.Done():
 			fmt.Println("Shutdown successfully")
+		case <-time.After(11 * time.Second):
+			fmt.Println("still has connection, not successfully shutdown")
+		}
 		close(errch)
 	}()
 
@@ -81,9 +163,9 @@ func main() {
 		os.Remove("server")
 	}()
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 
-	if err != nil && err != http.ErrServerClosed{
+	if err != nil && err != http.ErrServerClosed {
 		logZero.Fatal().Err(err).Msg("Server error")
 	}
 

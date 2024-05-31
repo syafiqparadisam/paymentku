@@ -13,6 +13,7 @@ import (
 	"github.com/syafiqparadisam/paymentku/services/history/dto"
 	"github.com/syafiqparadisam/paymentku/services/history/errors"
 	"github.com/syafiqparadisam/paymentku/services/history/usecase"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type ControllerHTTP struct {
@@ -37,10 +38,9 @@ func MakeHTTPHandler(f HandlerFunc, methods ...string) http.HandlerFunc {
 		defer func() {
 			if r := recover(); r != nil {
 				log.WithLevel(zerolog.PanicLevel).Err(r.(error)).Str("Request-id", header.Get("X-Request-Id")).Msg("Server panicing")
-				w.Header().Set("Retry-After", "60")
 				http.Error(w, "", http.StatusInternalServerError)
 			}
-			log.Info().Str("Request-id", header.Get("X-Request-Id")).Str("User-agent", header.Get("User-Agent")).Str("Origin", header.Get("Origin")).Str("Method", r.Method).Dur("Latency (milisecond)", time.Duration(time.Duration(time.Since(start)).Milliseconds())).Str("Path", r.URL.Path).Interface("Query", r.URL.Query()).Int("Status", 200).Str("Ip", r.RemoteAddr).Msg("Request Logs")
+			log.Info().Str("Request-id", header.Get("X-Request-Id")).Str("User-agent", header.Get("User-Agent")).Str("Origin", header.Get("Origin")).Str("Method", r.Method).Dur("Latency (milisecond)", time.Duration(time.Duration(time.Since(start)).Milliseconds())).Str("Path", r.URL.Path).Interface("Query", r.URL.Query()).Str("Ip", r.RemoteAddr).Msg("Request Logs")
 
 		}()
 		if r.Method != methods[0] && r.Method != methods[1] {
@@ -82,11 +82,10 @@ func ExtractIDFromPath(r *http.Request, prefix string) (int, error) {
 
 func (s *ControllerHTTP) Routes() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/transfer", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTransferHistory), http.MethodGet, http.MethodDelete))
-	mux.HandleFunc("/topup", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTopUpHistory), http.MethodGet, http.MethodDelete))
-	mux.HandleFunc("/topup/{id}", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTopUpHistoryById), http.MethodGet, http.MethodDelete))
-
-	mux.HandleFunc("/transfer/{id}", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
+	mux.Handle("/transfer", otelhttp.NewHandler(MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTransferHistory), http.MethodGet, http.MethodDelete), "get / delete all history transfer"))
+	mux.Handle("/topup", otelhttp.NewHandler(MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTopUpHistory), http.MethodGet, http.MethodDelete), "get / delete all history topup"))
+	mux.Handle("/topup/{id}", otelhttp.NewHandler(MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTopUpHistoryById), http.MethodGet, http.MethodDelete), "get / delete history topup by id"))
+	mux.Handle("/transfer/{id}", otelhttp.NewHandler(MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransferHistoryById), http.MethodGet, http.MethodDelete), "get / delete history transfer by id"))
 	fmt.Printf("Server listening on port%s\n", s.cfg.Port)
 
 	return mux

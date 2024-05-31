@@ -25,7 +25,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var serviceName = semconv.ServiceNameKey.String("otlp-user")
 
 // Initialize a gRPC connection to be used by both the tracer and meter
 // providers.
@@ -48,7 +47,7 @@ func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (*sdktrace.T
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
-			serviceName,
+			semconv.ServiceNameKey.String("tracer-user"),
 		),
 	)
 	if err != nil {
@@ -84,7 +83,7 @@ func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.M
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
-			serviceName,
+			semconv.ServiceNameKey.String("metric-user"),
 		),
 	)
 	if err != nil {
@@ -111,7 +110,7 @@ func main() {
 		fmt.Println("Failed to load env file")
 	}
 
-	ctx,cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	logZero := config.Log()
@@ -167,12 +166,20 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		errch <- mysql.Db.Close()
-		errch <- tracerProvider.Shutdown(ctx)
-		errch <- metricProvider.Shutdown(ctx)
+		fmt.Println("db already closed")
 		errch <- app.ShutdownWithContext(ctx)
+		fmt.Println("server already closed")
+		errch <- tracerProvider.Shutdown(ctx)
+		fmt.Println("tracer provider already closed")
+		errch <- metricProvider.Shutdown(ctx)
+		fmt.Println("metric provider already closed")
 
-		<-ctx.Done()
-		fmt.Println("Shutdown successfully")
+		select {
+		case <-ctx.Done():
+			fmt.Println("Shutdown successfully")
+		case <-time.After(11 * time.Second):
+			fmt.Println("still has connection, not successfully shutdown")
+		}
 		close(errch)
 	}()
 

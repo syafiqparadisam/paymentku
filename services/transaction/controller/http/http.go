@@ -63,29 +63,24 @@ func MakeHTTPHandler(f HandlerFunc, method string) http.HandlerFunc {
 			return
 		}
 
-		handler := otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
-			log := config.Log()
-			header := r.Header
-			res := r.Response
-			fmt.Println(res)
+		start := time.Now()
+		log := config.Log()
+		header := r.Header
+		res := r.Response
+		fmt.Println(res)
 
-			defer func() {
-				if rec := recover(); rec != nil {
-					log.WithLevel(zerolog.PanicLevel).Err(rec.(error)).Str("Request-id", header.Get("X-Request-Id")).Msg("Server panicking")
-					w.Header().Set("Retry-After", "60")
-					http.Error(w, "", http.StatusInternalServerError)
-				}
-				log.Info().Str("Request-id", header.Get("X-Request-Id")).Str("User-agent", header.Get("User-Agent")).Str("Origin", header.Get("Origin")).Str("Method", r.Method).Dur("Latency (milisecond)", time.Duration(time.Since(start).Milliseconds())).Str("Path", r.URL.Path).Interface("Query", r.URL.Query()).Int("Status", 200).Str("Ip", r.RemoteAddr).Msg("Request Logs")
-			}()
-
-			if err := f(w, r); err != nil {
-				fmt.Println(err)
-				panic(err)
+		defer func() {
+			if rec := recover(); rec != nil {
+				log.WithLevel(zerolog.PanicLevel).Err(rec.(error)).Str("Request-id", header.Get("X-Request-Id")).Msg("Server paniccing")
+				http.Error(w, "", http.StatusInternalServerError)
 			}
-		}), "user server")
+			log.Info().Str("Request-id", header.Get("X-Request-Id")).Str("User-agent", header.Get("User-Agent")).Str("Origin", header.Get("Origin")).Str("Method", r.Method).Dur("Latency (milisecond)", time.Duration(time.Since(start).Milliseconds())).Str("Path", r.URL.Path).Interface("Query", r.URL.Query()).Str("Ip", r.RemoteAddr).Msg("Request Logs")
+		}()
 
-		handler.ServeHTTP(w, r)
+		if err := f(w, r); err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
 	}
 }
 
@@ -110,9 +105,7 @@ func NewControllerHTTP(usecase usecase.UsecaseInterface) *ControllerHTTP {
 
 func (s *ControllerHTTP) Routes() http.Handler {
 	mux := http.NewServeMux()
-
-	mux.HandleFunc("POST /topup", MakeHTTPHandler(ExstractHeaderXUserData(s.HandlerTopUp), http.MethodPost))
-	mux.HandleFunc("POST /transfer", MakeHTTPHandler(ExstractHeaderXUserData(s.HandleTransfer), http.MethodPost))
-
+	mux.Handle("POST /topup", otelhttp.NewHandler(MakeHTTPHandler(ExstractHeaderXUserData(s.HandlerTopUp), http.MethodPost), "topup controller"))
+	mux.Handle("POST /transfer", otelhttp.NewHandler(MakeHTTPHandler(ExstractHeaderXUserData(s.HandleTransfer), http.MethodPost), "transfer controller"))
 	return mux
 }

@@ -59,7 +59,7 @@ func (s *ControllerHTTP) UpdatePhoneNumber(c *fiber.Ctx, user *dto.XUserData) er
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	tracer := otel.GetTracerProvider()
-	ctx, span := tracer.Tracer("github.com/syafiqparadisam/paymentku/services/user/controller/http").Start(ctx, "get User Profile")
+	ctx, span := tracer.Tracer("github.com/syafiqparadisam/paymentku/services/user/controller/http").Start(ctx, "update phone number")
 	defer span.End()
 	dtoPhoneNumber := &dto.UpdatePhoneNumberDTO{}
 	bodyBytes := c.Body()

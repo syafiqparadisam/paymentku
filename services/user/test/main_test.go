@@ -62,8 +62,6 @@ func TestProfileWeb(t *testing.T) {
 	go func() {
 		app.Listen(httpCfg.Port)
 		<-donech
-		app.Shutdown()
-		mysql.Db.Close()
 	}()
 	pr := NewProfileTestWeb(seeder, t, server, donech)
 	pr.Start()

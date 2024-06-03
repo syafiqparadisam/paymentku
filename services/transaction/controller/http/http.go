@@ -66,8 +66,6 @@ func MakeHTTPHandler(f HandlerFunc, method string) http.HandlerFunc {
 		start := time.Now()
 		log := config.Log()
 		header := r.Header
-		res := r.Response
-		fmt.Println(res)
 
 		defer func() {
 			if rec := recover(); rec != nil {
@@ -78,7 +76,6 @@ func MakeHTTPHandler(f HandlerFunc, method string) http.HandlerFunc {
 		}()
 
 		if err := f(w, r); err != nil {
-			fmt.Println(err)
 			panic(err)
 		}
 	}

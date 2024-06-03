@@ -3,16 +3,17 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/syafiqparadisam/paymentku/services/transaction/config"
 	"github.com/syafiqparadisam/paymentku/services/transaction/domain"
 	"github.com/syafiqparadisam/paymentku/services/transaction/dto"
 	"github.com/syafiqparadisam/paymentku/services/transaction/errors"
 )
 
 func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.TransferRequest, user *dto.XUserData) dto.APIResponse[interface{}] {
+	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
 
 	tx, err := u.TransferRepo.StartTransaction(ctx)
@@ -25,20 +26,25 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		panic(errFoundSender)
 	}
 	if foundSender.Balance < int64(payload.Amount) {
-		return dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrInsufficientBalance.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrInsufficientBalance.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		return response
 	}
 	if payload.AccountNumber == foundSender.AccountNumber {
-		return dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrTransferWithSameAccount.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrTransferWithSameAccount.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		return response
 	}
 	foundReceiver, errFoundReceiver := u.TransferRepo.FindUserByAccNum(tx, ctx, payload.AccountNumber)
 	if errFoundReceiver == sql.ErrNoRows {
-		return dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrUserNoRows.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrUserNoRows.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		return response
 	}
 	if errFoundReceiver != nil {
 		panic(errFoundReceiver)
 	}
 
-	fmt.Println("haii")
 	errDecreaseBalance := u.TransferRepo.DecreaseBalanceById(tx, ctx, payload.Amount, userid)
 	if errDecreaseBalance != nil {
 		tx.Rollback()
@@ -51,7 +57,6 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		panic(errDecreaseBalance)
 	}
 
-	fmt.Println("haii3")
 	errIncreaseBalance := u.TransferRepo.IncreaseBalanceByAccNumber(tx, ctx, payload.Amount, payload.AccountNumber)
 	if errIncreaseBalance != nil {
 		tx.Rollback()
@@ -64,13 +69,11 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		panic(errIncreaseBalance)
 	}
 
-	fmt.Println("okee")
 	if errCommit := tx.Commit(); errCommit != nil {
 		panic(errCommit)
 	}
-	
+
 	transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "SUCCESS", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance-int64(payload.Amount))
-	fmt.Println("haii 4")
 	errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
 	if errInsertHistory != nil {
 		tx.Rollback()
@@ -89,5 +92,7 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		panic(errInsertNotification)
 	}
 
-	return dto.APIResponse[interface{}]{StatusCode: 200, Data: nil, Message: "Successfully transfer"}
+	response := dto.APIResponse[interface{}]{StatusCode: 200, Data: nil, Message: "Successfully transfer"}
+	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message)
+	return response
 }

@@ -68,7 +68,7 @@ func NewTransactionTestWeb(seeder *Seeder, t *testing.T, controller *controllerh
 
 func (tf *TransactionTestWeb) Start() {
 	tf.Test.Run("TransactionTestWeb CreateTopUpTransaction", tf.CreateTopUpTransaction)
-	tf.Test.Run("TransactionTestWeb CreateTopUpTransactionWith0Amount", tf.CreateTopUpTransactionWith0Amount)
+	tf.Test.Run("TransactionTestWeb CreateTopUpTransactionWith0Amount",tf.CreateTopUpTransactionWith0Amount)
 	tf.Test.Run("TransactionTestWeb CreateTransferTransaction", tf.CreateTransferTransaction)
 	tf.Test.Run("TransactionTestWeb CreateTransferTransactionWithLessBalance", tf.CreateTransferTransactionWithLessBalance)
 	tf.Test.Run("TransactionTestWeb CreateTransferTransactionWithSelfAccountNumber", tf.CreateTransferTransactionWithSelfAccountNumber)

@@ -17,7 +17,9 @@ import {
   Patch,
   UseInterceptors,
   UploadedFile,
+  LoggerService,
   HttpStatus,
+  Inject
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -40,12 +42,14 @@ import { allowedFile } from '../config/cloudinary-options';
 import { diskStorage } from 'multer';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Controller('/api/v1')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) { }
 
   @Post('login')

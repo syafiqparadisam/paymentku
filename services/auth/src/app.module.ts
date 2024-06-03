@@ -12,6 +12,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { Notification } from './users/schemas/notification.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-winston';
+// import * as winston from 'winston';
 
 @Module({
   imports: [
@@ -25,6 +27,21 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       password: process.env.DB_PASSWD,
       database: process.env.DB_DBNAME,
       synchronize: true,
+    }),
+    WinstonModule.forRoot({
+      transport: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.ms(),
+            nestWinstonModuleUtilities.format.nestLike('MyApp', {
+              colors: true,
+              prettyPrint: true,
+              processId: true
+            }),
+          ),
+        }),
+      ]
     }),
     UsersModule,
     AuthModule,
@@ -40,4 +57,4 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     CloudinaryModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

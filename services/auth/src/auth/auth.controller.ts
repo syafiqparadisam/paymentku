@@ -42,14 +42,12 @@ import { allowedFile } from '../config/cloudinary-options';
 import { diskStorage } from 'multer';
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Controller('/api/v1')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) { }
 
   @Post('login')
@@ -62,7 +60,6 @@ export class AuthController {
     try {
       const { data, message, statusCode, error } =
         await this.authService.signIn(loginDto, req.cookies, res);
-
       if (statusCode == 200) {
         res.cookie('authToken', data.authToken, {
           expires: new Date(new Date().getTime() + 60 * 24 * 60 * 60 * 1000),
@@ -260,7 +257,6 @@ export class AuthController {
 
     try {
       const result = await this.fetcherService(url, req, body);
-      console.log(result)
       if (result.status == 500) {
         return res.sendStatus(result.status)
       }

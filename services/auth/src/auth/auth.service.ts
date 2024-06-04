@@ -565,7 +565,6 @@ export class AuthService {
       );
 
       // delete from cloudinary if this image already updated, in order to not over storage in cloudinary
-      console.log("public id from auth service", publicIdImg)
       publicIdImg == ''
         ? null
         : await this.cloudinaryService.deleteImage(publicIdImg);

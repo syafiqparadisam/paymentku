@@ -20,7 +20,7 @@ func (s *Usecase) UpdateBio(ctx context.Context, payload *dto.UpdateBioDTO, user
 	err := s.User.UpdateBioProfile(ctx, userId, payload.Bio)
 	if err == errors.ErrAffectedRows {
 		response := dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrAffectedRows.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 
@@ -28,7 +28,7 @@ func (s *Usecase) UpdateBio(ctx context.Context, payload *dto.UpdateBioDTO, user
 		panic(err)
 	}
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Bio already updated"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message)
+	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
 
@@ -36,21 +36,21 @@ func (s *Usecase) UpdateName(ctx context.Context, payload *dto.UpdateNameDTO, us
 	log := config.Log()
 	if len(payload.Name) == 0 {
 		response := dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrEmptyField.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	userId, _ := strconv.Atoi(userid)
 	err := s.User.UpdateNameProfile(ctx, userId, payload.Name)
 	if err == errors.ErrAffectedRows {
 		response := dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrAffectedRows.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	if err != nil {
 		panic(err)
 	}
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Name already updated"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message)
+	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
 
@@ -59,21 +59,21 @@ func (s *Usecase) UpdatePhoneNumber(ctx context.Context, payload *dto.UpdatePhon
 	validateErr := validatePhoneNumber(payload.PhoneNumber)
 	if validateErr != nil {
 		response := dto.APIResponse[interface{}]{StatusCode: 400, Message: validateErr.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	userId, _ := strconv.Atoi(userid)
 	err := s.User.UpdatePhoneNumber(ctx, userId, payload.PhoneNumber)
 	if err == errors.ErrAffectedRows {
 		response := dto.APIResponse[interface{}]{StatusCode: 200, Message: err.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	if err != nil {
 		panic(err)
 	}
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Phone number already updated"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message)
+	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
 

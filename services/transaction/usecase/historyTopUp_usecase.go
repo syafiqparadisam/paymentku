@@ -15,7 +15,7 @@ func (u *Usecase) InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequ
 	log := config.Log()
 	if payload.Amount <= 0 {
 		response := dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrAmountIsLessThanZero.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	// update balance and find user
@@ -53,7 +53,7 @@ func (u *Usecase) InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequ
 	}
 
 	response := dto.APIResponse[interface{}]{StatusCode: http.StatusOK, Message: "Successfully topup"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message)
+	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 
 }

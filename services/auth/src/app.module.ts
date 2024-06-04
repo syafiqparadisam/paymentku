@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module,Logger } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,8 +12,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { Notification } from './users/schemas/notification.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-winston';
-// import * as winston from 'winston';
+import { WinstonModule } from 'nest-winston';
+import { transports } from 'winston';
 
 @Module({
   imports: [
@@ -29,18 +29,8 @@ import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-win
       synchronize: true,
     }),
     WinstonModule.forRoot({
-      transport: [
-        new winston.transports.Console({
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.ms(),
-            nestWinstonModuleUtilities.format.nestLike('MyApp', {
-              colors: true,
-              prettyPrint: true,
-              processId: true
-            }),
-          ),
-        }),
+      transports: [
+        new transports.Console({level: "info"})
       ]
     }),
     UsersModule,
@@ -56,5 +46,6 @@ import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-win
     ]),
     CloudinaryModule,
   ],
+  providers: [Logger]
 })
 export class AppModule { }

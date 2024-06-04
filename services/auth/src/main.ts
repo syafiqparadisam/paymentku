@@ -1,11 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
-import {WINSTON_MODULE_NEST_PROVIDER} from "nest-winston"
+import {WINSTON_MODULE_NEST_PROVIDER, WinstonModule} from "nest-winston"
+import { instance } from './config/winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: console,
+    logger: WinstonModule.createLogger({
+      instance: instance
+    }),
   });
   app.use(cookieParser());
   const urlCors = process.env.FRONTEND;

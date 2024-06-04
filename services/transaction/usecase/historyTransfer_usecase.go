@@ -27,18 +27,18 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 	}
 	if foundSender.Balance < int64(payload.Amount) {
 		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrInsufficientBalance.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	if payload.AccountNumber == foundSender.AccountNumber {
 		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrTransferWithSameAccount.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	foundReceiver, errFoundReceiver := u.TransferRepo.FindUserByAccNum(tx, ctx, payload.AccountNumber)
 	if errFoundReceiver == sql.ErrNoRows {
 		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrUserNoRows.Error()}
-		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message)
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	if errFoundReceiver != nil {
@@ -93,6 +93,6 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 	}
 
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Data: nil, Message: "Successfully transfer"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message)
+	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 }

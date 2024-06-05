@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
-
 	"github.com/syafiqparadisam/paymentku/services/transaction/config"
 	"github.com/syafiqparadisam/paymentku/services/transaction/domain"
 	"github.com/syafiqparadisam/paymentku/services/transaction/dto"
@@ -92,7 +91,7 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		panic(errInsertNotification)
 	}
 
-	response := dto.APIResponse[interface{}]{StatusCode: 200, Data: nil, Message: "Successfully transfer"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
+	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Successfully transfer"}
+	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 	return response
 }

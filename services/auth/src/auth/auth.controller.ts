@@ -19,7 +19,7 @@ import {
   UploadedFile,
   LoggerService,
   HttpStatus,
-  Inject
+  Inject,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -42,13 +42,16 @@ import { allowedFile } from '../config/cloudinary-options';
 import { diskStorage } from 'multer';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Controller('/api/v1')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-  ) { }
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
+  ) {}
 
   @Post('login')
   @UsePipes(new ValidationPipe())
@@ -83,7 +86,7 @@ export class AuthController {
   }
 
   @Get('google')
-  async auth() { }
+  async auth() {}
 
   @Get('auth/login/google')
   @UseGuards(GoogleOauthGuard)
@@ -258,9 +261,9 @@ export class AuthController {
     try {
       const result = await this.fetcherService(url, req, body);
       if (result.status == 500) {
-        return res.sendStatus(result.status)
+        return res.sendStatus(result.status);
       }
-      const data = await result.json()
+      const data = await result.json();
       return res.status(data.statusCode).json(data);
     } catch (error) {
       console.log(error);
@@ -289,12 +292,12 @@ export class AuthController {
     try {
       const result = await this.fetcherService(url, req, body);
       if (result.status == 500) {
-        return res.sendStatus(result.status)
+        return res.sendStatus(result.status);
       }
-      const data = await result.json()
+      const data = await result.json();
       return res.status(data.statusCode).json(data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -371,7 +374,7 @@ export class AuthController {
           body: JSON.stringify(body),
         });
       }
-      return result
+      return result;
     } catch (error) {
       throw error;
     }
@@ -395,13 +398,13 @@ export class AuthController {
       url = usr_svc + '/' + urlAfterProfile + '?userid=' + req.user_id;
     }
     try {
-      const result = await this.fetcherService(url, req, body)
+      const result = await this.fetcherService(url, req, body);
       if (result.status == 500) {
-        return rs.sendStatus(result.status)
+        return rs.sendStatus(result.status);
       }
-      const data = await result.json()
-      console.log(data)
-      return rs.status(data.statusCode).json(data)
+      const data = await result.json();
+      console.log(data);
+      return rs.status(data.statusCode).json(data);
     } catch (error) {
       return rs.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }

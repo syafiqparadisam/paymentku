@@ -494,7 +494,10 @@ export class AuthService {
 
       // updating username
       await this.usersService.updateUsername(userData.user_id, dto.username);
-      return { statusCode: HttpStatus.OK, message: 'Successfully update username' };
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Successfully update username',
+      };
     } catch (error) {
       throw error;
     }
@@ -550,7 +553,6 @@ export class AuthService {
     publicIdImg: string,
   ): Promise<response> {
     try {
-
       // upload file to cloudinary
       const result = await this.cloudinaryService.uploadImage(pathUploadfile);
 

@@ -51,7 +51,6 @@ const Transfer = () => {
       setOpenSnackbar(true)
     }
   }, [errTransfer, successTransfer])
-  console.log("error", errTransfer)
   return (
     <>
 

@@ -16,7 +16,7 @@ import { route } from "../constant/route";
 
 
 const SignUp = () => {
-  const [signUp, { isSuccess, error, data }] = useSignUpMutation()
+  const [signUp, { isSuccess, error }] = useSignUpMutation()
   const { register, handleSubmit, formState: { errors } } = useForm<SignUpInput>()
   const onSubmit: SubmitHandler<SignUpInput> = (data) => {
     signUp(data)

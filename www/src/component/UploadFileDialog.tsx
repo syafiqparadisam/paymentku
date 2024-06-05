@@ -18,7 +18,6 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
     const [update, { data, isLoading, error }] = useUpdatePhotoProfileMutation()
     const user: User = useSelector(state => state.user)
     const [response, setResponse] = useState("")
-    console.log(data, error)
     const previewImage = (e: any) => {
         const fileImg: File[] = e.target.files
         const maxFileSize = 2 * 1024 * 1024
@@ -47,14 +46,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
 
     const updatePhotoProfile = () => {
-        const req = update({ file, publicId: user.photo_public_id ? user.photo_public_id : "" })
-        console.log("start")
-        setTimeout(() => {
-            console.log("aborted")
-            req.abort()
-        }, 20000);
-        // clearTimeout(tm)
-        console.log("finish")
+       update({ file, publicId: user.photo_public_id ? user.photo_public_id : "" })
     }
 
     useEffect(() => {

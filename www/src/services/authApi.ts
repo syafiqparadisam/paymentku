@@ -36,7 +36,7 @@ export const authApi = createApi({
                 body: user
             }),
             invalidatesTags: ["user", "historytopup", "historytransfer"],
-            transformErrorResponse(baseQueryReturnValue, meta) {
+            transformErrorResponse(baseQueryReturnValue) {
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -89,7 +89,7 @@ export const authApi = createApi({
                     email: data.email
                 }
             }),
-            transformErrorResponse(baseQueryReturnValue, meta) {
+            transformErrorResponse(baseQueryReturnValue) {
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -127,7 +127,7 @@ export const authApi = createApi({
                 }
             }),
             invalidatesTags: ["user"],
-            transformErrorResponse(baseQueryReturnValue, meta) {
+            transformErrorResponse(baseQueryReturnValue) {
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }

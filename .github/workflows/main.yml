@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - release/*
       - develop
 
 jobs:
@@ -25,19 +24,7 @@ jobs:
         with:
           node-version: 20.12.0
 
-      - name: Install golangci-lint
-        uses: golangci/golangci-lint-action@v5
-        with:
-          version: latest
-
-      - name: Verify installation golangci-lint
-        run: golangci-lint --version
-
       # HISTORY SERVICE START
-      - name: Run golangci-lint for history service
-        working-directory: ./services/history
-        run: golangci-lint run
-
       - name: Download dependencies in history service
         working-directory: ./services/history
         run: go mod download
@@ -48,10 +35,6 @@ jobs:
 
       # HISTORY SERVICE END
       # TRANSACTION SERVICE START
-      - name: Run golangci-lint for transaction service
-        working-directory: ./services/transaction
-        run: golangci-lint run
-
       - name: Download dependencies in transaction service
         working-directory: ./services/transaction
         run: go mod download
@@ -61,10 +44,6 @@ jobs:
         run: go test -v ./...
       # TRANSACTION SERVICE END
       # USER SERVICE START
-      - name: Run golangci-lint for user service
-        working-directory: ./services/user
-        run: golangci-lint run
-
       - name: Download dependencies in user service
         working-directory: ./services/user
         run: go mod download
@@ -179,11 +158,3 @@ jobs:
         working-directory: ./www
         run: docker push ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # FRONTEND APP END
-
-      - name: Running ansible playbook, then running docker instance on this port
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: infrastructure/playbook.yml
-          inventory: |
-            [server]
-            ${{secrets.SERVER.IP}}

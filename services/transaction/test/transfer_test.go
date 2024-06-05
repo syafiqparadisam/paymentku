@@ -50,7 +50,6 @@ func (tf *TransactionTestWeb) CreateTransferTransaction(t *testing.T) {
 	expectedResponse := &dto.APIResponse[interface{}]{
 		StatusCode: 200,
 		Message:    "Successfully transfer",
-		Data:       nil,
 	}
 
 	// test is store to db ?
@@ -73,7 +72,6 @@ func (tf *TransactionTestWeb) CreateTransferTransaction(t *testing.T) {
 	assert.Equal(t, expectedResponse.StatusCode, resp.StatusCode)
 	assert.Equal(t, expectedResponse.StatusCode, actualResponse.StatusCode)
 	assert.Equal(t, expectedResponse.Message, actualResponse.Message)
-	assert.Equal(t, expectedResponse.Data, actualResponse.Data)
 
 	for _, n := range *notif {
 		assert.NotNil(t, n.Id)

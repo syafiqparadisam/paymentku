@@ -1,4 +1,4 @@
-import { Module,Logger } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -29,9 +29,7 @@ import { transports } from 'winston';
       synchronize: true,
     }),
     WinstonModule.forRoot({
-      transports: [
-        new transports.Console({level: "info"})
-      ]
+      transports: [new transports.Console({ level: 'info' })],
     }),
     UsersModule,
     AuthModule,
@@ -46,6 +44,6 @@ import { transports } from 'winston';
     ]),
     CloudinaryModule,
   ],
-  providers: [Logger]
+  providers: [Logger],
 })
-export class AppModule { }
+export class AppModule {}

@@ -40,11 +40,11 @@ func (u *Usecase) InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequ
 		}
 		panic(err)
 	}
+
 	if err := tx.Commit(); err != nil {
 		panic(err)
 	}
 
-	// insert history info
 	topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance+int64(payload.Amount), balance.Balance, "SUCCESS", userid)
 	errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctx, topUpInfo)
 	if errInsertHistory != nil {

@@ -51,7 +51,7 @@ func (tf *TransactionTestWeb) CreateTopUpTransaction(t *testing.T) {
 	// expected response
 	expected := &dto.APIResponse[interface{}]{
 		StatusCode: 200,
-		Message:    "Succesfully topup",
+		Message:    "succesfully topup",
 	}
 
 	bytesResp, err := io.ReadAll(resp.Body)
@@ -77,8 +77,6 @@ func (tf *TransactionTestWeb) CreateTopUpTransaction(t *testing.T) {
 	assert.Equal(t, expected.StatusCode, actualResponse.StatusCode)
 	assert.Equal(t, expected.Message, actualResponse.Message)
 }
-
-
 
 func (tf *TransactionTestWeb) CreateTopUpTransactionWith0Amount(t *testing.T) {
 	t.Parallel()

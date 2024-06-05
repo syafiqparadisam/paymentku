@@ -28,7 +28,7 @@ func (s *Usecase) UpdateBio(ctx context.Context, payload *dto.UpdateBioDTO, user
 		panic(err)
 	}
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Bio already updated"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
+	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
 
@@ -50,7 +50,7 @@ func (s *Usecase) UpdateName(ctx context.Context, payload *dto.UpdateNameDTO, us
 		panic(err)
 	}
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Name already updated"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
+	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
 
@@ -73,7 +73,7 @@ func (s *Usecase) UpdatePhoneNumber(ctx context.Context, payload *dto.UpdatePhon
 		panic(err)
 	}
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Phone number already updated"}
-	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
+	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
 

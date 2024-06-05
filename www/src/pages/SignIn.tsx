@@ -20,7 +20,7 @@ const SignIn = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<SignInInput>()
     const onSubmit: SubmitHandler<SignInInput> = async (data) => {
         try {
-            const data2 = await signIn(data).unwrap()
+            await signIn(data).unwrap()
         } catch (err) {
             setErr(err)
         }

@@ -46,7 +46,6 @@ export const useValidation = () => {
         setOpen(true)
         setLabel(label)
         setValue(val)
-        console.log(value)
         setTotalInput(1)
     }
 

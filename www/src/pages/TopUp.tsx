@@ -31,7 +31,6 @@ const TopUp = () => {
         return amount + bonus
     }
 
-    console.log("error", error)
 
     useEffect(() => {
         const total = calculatePrice(amount, isChecked, operational, bonus)
@@ -46,7 +45,6 @@ const TopUp = () => {
             setOpenSnackbar(true)
         }
     }, [isSuccess, error])
-    console.log(data)
 
     return (
         <>

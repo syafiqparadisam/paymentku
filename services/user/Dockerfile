@@ -23,7 +23,7 @@ WORKDIR /
 
 COPY --from=build-stage /server /server
 
-EXPOSE 8803
+EXPOSE 8801
 
 USER nonroot:nonroot
 

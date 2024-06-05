@@ -20,7 +20,7 @@ export class UsersService {
     private profileRepo: Repository<Profile>,
     private readonly ds: DataSource,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   generateAccountNumber(): number {
     return Math.floor(Math.random() * 9999999999) + 1;
@@ -84,24 +84,27 @@ export class UsersService {
       const accNumber = await this.createAccountNumber();
 
       // create account with ACID transaction
-      await this.ds.manager.transaction("READ COMMITTED", async (entitymanager) => {
-        // insert into profile
-        const profile = new Profile();
-        const userIcon = this.configService.get<string>('USER_ICON_DEFAULT');
-        profile.name = data.user + generateRandNum().toString();
-        profile.photo_profile = userIcon;
-        await entitymanager.save(profile);
-        // insert into users
-        await entitymanager.insert(Users, {
-          user: data.user,
-          email: data.email,
-          password,
-          accountNumber: accNumber,
-          created_at: new Date().toISOString(),
-          balance: 0,
-          profile,
-        });
-      });
+      await this.ds.manager.transaction(
+        'READ COMMITTED',
+        async (entitymanager) => {
+          // insert into profile
+          const profile = new Profile();
+          const userIcon = this.configService.get<string>('USER_ICON_DEFAULT');
+          profile.name = data.user + generateRandNum().toString();
+          profile.photo_profile = userIcon;
+          await entitymanager.save(profile);
+          // insert into users
+          await entitymanager.insert(Users, {
+            user: data.user,
+            email: data.email,
+            password,
+            accountNumber: accNumber,
+            created_at: new Date().toISOString(),
+            balance: 0,
+            profile,
+          });
+        },
+      );
     } catch (error) {
       throw error;
     }
@@ -154,7 +157,7 @@ export class UsersService {
     try {
       const salt = await bcrypt.genSalt(10);
       const hashPassword = await bcrypt.hash(password, salt);
-      await this.userRepo.update({ id: user_id }, { password: hashPassword })
+      await this.userRepo.update({ id: user_id }, { password: hashPassword });
     } catch (error) {
       throw error;
     }

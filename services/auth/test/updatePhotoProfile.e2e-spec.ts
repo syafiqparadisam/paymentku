@@ -7,15 +7,12 @@ import { UsersModule } from '../src/users/users.module';
 import cookieParser from 'cookie-parser';
 import { RedisService } from '../src/redis/redis.service';
 import { RedisModule } from '../src/redis/redis.module';
-import {
-  loginRequest,
-  registerRequest,
-} from 'src/auth/dtos/request';
+import { loginRequest, registerRequest } from 'src/auth/dtos/request';
 import { response } from 'src/interfaces/response';
 import { parsingCookie } from './utils';
 import crypto from 'crypto';
 import path from 'node:path';
-import fs from "node:fs"
+import fs from 'node:fs';
 
 describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofile', () => {
   let app: INestApplication;
@@ -63,7 +60,7 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
       .send(loginDto)
       .set('Content-type', 'application/json');
 
-    cookies = req.headers["set-cookie"]
+    cookies = req.headers['set-cookie'];
   });
 
   // delete authToken after each test
@@ -98,9 +95,9 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
     }
   });
   async function getPhotoPublicId(): Promise<string> {
-    const user = await userSvc.findUserByUsername(userRegister.user)
-    const joiningUserAndProfile = await userSvc.joiningUserAndProfile(user.id)
-    return joiningUserAndProfile.profile.photo_public_id
+    const user = await userSvc.findUserByUsername(userRegister.user);
+    const joiningUserAndProfile = await userSvc.joiningUserAndProfile(user.id);
+    return joiningUserAndProfile.profile.photo_public_id;
   }
 
   it('should return 200, update photo profile success', async () => {
@@ -108,12 +105,13 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
       statusCode: 200,
       message: 'Photo profile has been changed',
     };
-    const filePath = assetsMockPath + "Mongodb.png"
+    const filePath = assetsMockPath + 'Mongodb.png';
     // check is assets mock exists ?
     if (fs.existsSync(filePath)) {
       const req = await request(app.getHttpServer())
         .patch('/api/v1/profile/photoprofile')
-        .attach('image', filePath).set("x-data-publicid", "")
+        .attach('image', filePath)
+        .set('x-data-publicid', '')
         .set('Cookie', cookies);
       expect(req.statusCode).toBe(response.statusCode);
       expect(req.body).toMatchObject(response);
@@ -125,18 +123,18 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
       statusCode: 415,
       message: 'File type application/postscript not allowed',
     };
-    const filePath = assetsMockPath + "1307837.ai"
+    const filePath = assetsMockPath + '1307837.ai';
 
     // join user and profile table
-    const photoPublicId = await getPhotoPublicId()
+    const photoPublicId = await getPhotoPublicId();
 
     // check is assets mock exists ?
     if (fs.existsSync(filePath)) {
       const req = await request(app.getHttpServer())
         .patch('/api/v1/profile/photoprofile')
-        .attach('image', filePath).set("x-data-publicid", photoPublicId)
+        .attach('image', filePath)
+        .set('x-data-publicid', photoPublicId)
         .set('Cookie', cookies);
-
 
       expect(req.statusCode).toBe(response.statusCode);
       expect(req.body).toMatchObject(response);
@@ -149,19 +147,19 @@ describe('Update photo profile Controller (e2e) PATCH /api/v1/profile/photoprofi
       message: 'Image should be less than 2 mb size',
     };
 
-    const filePath = assetsMockPath + "chooseus_fac0xl.png"
-    const photoPublicId = await getPhotoPublicId()
+    const filePath = assetsMockPath + 'chooseus_fac0xl.png';
+    const photoPublicId = await getPhotoPublicId();
 
     // check is assets mock exists ?
     if (fs.existsSync(filePath)) {
       const req = await request(app.getHttpServer())
         .patch('/api/v1/profile/photoprofile')
-        .attach('image', filePath).set("x-data-publicid", photoPublicId)
+        .attach('image', filePath)
+        .set('x-data-publicid', photoPublicId)
         .set('Cookie', cookies);
 
       expect(req.body).toMatchObject(response);
       expect(req.statusCode).toBe(response.statusCode);
     }
   });
-
 });

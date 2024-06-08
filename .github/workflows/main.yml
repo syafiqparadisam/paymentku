@@ -40,6 +40,9 @@ jobs:
       ORIGIN_URL: ${{secrets.ORIGIN_URL}}
       TF_ICON: ${{secrets.TF_ICON}}
       TRANSFER_SVC_PORT: ${{secrets.TRANSFER_SVC_PORT}}
+      DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+      DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      DOCKER_TAGS_PAYMENTKU: ${{secrets.DOCKER_TAGS_PAYMENTKU}}
       USER_SVC_PORT: ${{secrets.USER_SVC_PORT}}
 
     steps:
@@ -59,8 +62,17 @@ jobs:
       - uses: oNaiPs/secrets-to-env-action@v1
         with:
           secrets: ${{ toJSON(secrets) }}
-      - run: |
-          echo "Value of MY_SECRET1: $DOCKER_PASSWORD"
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
       # HISTORY SERVICE START
       - name: Download dependencies in history service
@@ -118,78 +130,63 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install Docker
-        uses: docker/setup-buildx-action@v1
-
       - name: Login into docker hub
-        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+        uses: docker/login-action@v3
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
         # HISTORY SERVICE START
-      - name: Build history service application
-        working-directory: ./services/history
-        run: docker build -t history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag history service
-        working-directory: ./services/history
-        run: docker tag history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy history service to dockerhub
-        working-directory: ./services/history
-        run: docker push ${{secrets.DOCKER_USERNAME}}/history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./services/history/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+
         # HISTORY SERVICE END
 
         # TRANSACTION SERVICE START
-      - name: Build transaction service application
-        working-directory: ./services/transaction
-        run: docker build -t transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag transaction service
-        working-directory: ./services/transaction
-        run: docker tag transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy transaction service to dockerhub
-        working-directory: ./services/transaction
-        run: docker push ${{secrets.DOCKER_USERNAME}}/transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./services/transaction/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+
         # TRANSACTION SERVICE END
 
         # USER SERVICE START
-      - name: Build user service application
-        working-directory: ./services/user
-        run: docker build -t user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag user service
-        working-directory: ./services/user
-        run: docker tag user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy user service to dockerhub
-        working-directory: ./services/user
-        run: docker push ${{secrets.DOCKER_USERNAME}}/user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./services/user/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # USER SERVICE END
 
         # AUTH SERVICE START
-      - name: Build auth service application
-        working-directory: ./services/auth
-        run: docker build -t auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag auth service
-        working-directory: ./services/auth
-        run: docker tag auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy auth service to dockerhub
-        working-directory: ./services/auth
-        run: docker push ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./services/auth/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # AUTH SERVICE END
 
         # FRONTEND APP START
-      - name: Build frontend service application
-        working-directory: ./www
-        run: docker build -t frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag frontend service
-        working-directory: ./www
-        run: docker tag frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy frontend service to dockerhub
-        working-directory: ./www
-        run: docker push ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./www/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # FRONTEND APP END

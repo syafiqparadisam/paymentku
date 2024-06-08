@@ -28,9 +28,8 @@ type Seeder struct {
 
 func TestHistory(t *testing.T) {
 	envFilePath := "../.env"
-	if err := godotenv.Load(envFilePath); err != nil {
-		log.Fatal("Failed to load env file")
-	}
+	godotenv.Load(envFilePath)
+	
 	appPort := os.Getenv("APP_PORT")
 	t.Log(appPort)
 	user := os.Getenv("DB_USER")

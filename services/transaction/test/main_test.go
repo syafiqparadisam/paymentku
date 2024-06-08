@@ -29,9 +29,9 @@ type TransactionTestWeb struct {
 
 func TestTransactionWeb(t *testing.T) {
 	envFilePath := "../.env"
-	if err := godotenv.Load(envFilePath); err != nil {
-		fmt.Println("Failed to load env file")
-	}
+	
+	godotenv.Load(envFilePath)
+	
 	user := os.Getenv("DB_USER")
 	pass := os.Getenv("DB_PASS")
 	host := os.Getenv("DB_HOST")

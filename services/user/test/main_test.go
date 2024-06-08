@@ -36,9 +36,9 @@ func NewServer(mysql *config.MySqlStore, routes *controllerhttp.ControllerHTTP) 
 
 func TestProfileWeb(t *testing.T) {
 	envFilePath := "../.env"
-	if err := godotenv.Load(envFilePath); err != nil {
-		log.Fatal("Failed to load env file")
-	}
+	
+	godotenv.Load(envFilePath)
+
 	appPort := os.Getenv("APP_PORT")
 	httpCfg := config.NewHTTPConfig().WithPort(appPort)
 	user := os.Getenv("DB_USER")

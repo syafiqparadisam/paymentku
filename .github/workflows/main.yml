@@ -61,7 +61,7 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
       - run: |
-          echo "Value of MY_SECRET1: $CLIENT_ID"
+          echo "Value of MY_SECRET1: $DOCKER_PASSWORD"
         
       # HISTORY SERVICE START
       - name: Download dependencies in history service

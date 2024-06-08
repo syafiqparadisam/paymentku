@@ -36,7 +36,7 @@ func NewServer(mysql *config.MySqlStore, routes *controllerhttp.ControllerHTTP) 
 
 func TestProfileWeb(t *testing.T) {
 	envFilePath := "../.env"
-	
+
 	godotenv.Load(envFilePath)
 
 	appPort := os.Getenv("APP_PORT")
@@ -51,7 +51,7 @@ func TestProfileWeb(t *testing.T) {
 
 	mysql, errConnMySQL := config.NewMySqlStore(url)
 	if errConnMySQL != nil {
-		t.Error(errConnMySQL.Error())
+		log.Fatal(errConnMySQL)
 	}
 	donech := make(chan bool)
 	seeder := seeder.NewUserSeeder(mysql)

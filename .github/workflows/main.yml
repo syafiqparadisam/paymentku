@@ -42,7 +42,6 @@ jobs:
       TRANSFER_SVC_PORT: ${{secrets.TRANSFER_SVC_PORT}}
       USER_SVC_PORT: ${{secrets.USER_SVC_PORT}}
 
-       
     steps:
       - name: Check Repository
         uses: actions/checkout@v4
@@ -62,7 +61,7 @@ jobs:
           secrets: ${{ toJSON(secrets) }}
       - run: |
           echo "Value of MY_SECRET1: $DOCKER_PASSWORD"
-        
+
       # HISTORY SERVICE START
       - name: Download dependencies in history service
         working-directory: ./services/history
@@ -114,8 +113,6 @@ jobs:
   cd:
     name: CD processes
     runs-on: ubuntu-22.04
-    environment: 
-      name: staging
     if: github.ref == 'refs/heads/develop' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository

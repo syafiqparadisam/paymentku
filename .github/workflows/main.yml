@@ -44,6 +44,7 @@ jobs:
       DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       DOCKER_TAGS_PAYMENTKU: ${{secrets.DOCKER_TAGS_PAYMENTKU}}
       USER_SVC_PORT: ${{secrets.USER_SVC_PORT}}
+      MYSQL_DATABASE: ${{secrets.MYSQL_DATABASE}}
 
     steps:
       - name: Check Repository
@@ -72,6 +73,7 @@ jobs:
 
       - name: Check logs mysql
         run: |
+          echo $MYSQL_DATABASE
           docker logs mysqldb
 
       # HISTORY SERVICE START

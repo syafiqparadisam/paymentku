@@ -31,9 +31,9 @@ func TestTransactionWeb(t *testing.T) {
 	envFilePath := "../.env"
 	
 	godotenv.Load(envFilePath)
-	
+
 	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
+	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")

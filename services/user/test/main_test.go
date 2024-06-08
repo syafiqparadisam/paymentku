@@ -39,10 +39,10 @@ func TestProfileWeb(t *testing.T) {
 
 	godotenv.Load(envFilePath)
 
-	appPort := os.Getenv("APP_PORT")
+	appPort := os.Getenv("USER_SVC_PORT")
 	httpCfg := config.NewHTTPConfig().WithPort(appPort)
 	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
+	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")

@@ -29,11 +29,11 @@ type Seeder struct {
 func TestHistory(t *testing.T) {
 	envFilePath := "../.env"
 	godotenv.Load(envFilePath)
-	
-	appPort := os.Getenv("APP_PORT")
+
+	appPort := os.Getenv("HISTORY_SVC_PORT")
 	t.Log(appPort)
 	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
+	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")

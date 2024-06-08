@@ -100,9 +100,9 @@ func main() {
 		logZero.Fatal().Err(err).Msg("Meter provider error")
 	}
 
-	port := os.Getenv("APP_PORT")
+	port := os.Getenv("HISTORY_SVC_PORT")
 	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
+	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")

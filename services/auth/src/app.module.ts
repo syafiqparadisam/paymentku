@@ -25,7 +25,7 @@ import { transports } from 'winston';
       port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USER,
       password: process.env.DB_PASSWD,
-      database: process.env.DB_DBNAME,
+      database: process.env.DB_NAME,
       synchronize: true,
     }),
     WinstonModule.forRoot({

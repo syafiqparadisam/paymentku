@@ -102,10 +102,10 @@ func main() {
 		logZero.Fatal().Err(err).Msg("Meter provider error")
 	}
 
-	appPort := os.Getenv("APP_PORT")
+	appPort := os.Getenv("TRANSFER_SVC_PORT")
 	httpCfg := config.NewHTTPConfig().WithPort(appPort)
 	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
+	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")

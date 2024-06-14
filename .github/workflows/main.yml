@@ -73,13 +73,14 @@ jobs:
 
       - name: Download dependencies in auth service
         working-directory: ./services/auth
-        run: npm install
+        run: |
+          npm install
 
       - name: Migrate table on database
-        run: |         
+        working-directory: ./services/auth
+        run: |
           npm i -g typeorm
-          make migrate-run
-
+          npm run migrate-run
 
       # HISTORY SERVICE START
       - name: Download dependencies in history service

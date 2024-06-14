@@ -18,9 +18,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json --detectOpenHandles",
-    "migrate-run": "npx typeorm-ts-node-esm  migration:run -d ./src/dataSource/ormconfig.ts",
-    "migrate-revert": "npx typeorm-ts-node-esm  migration:revert -d ./src/dataSource/ormconfig.ts",
-    "migrate-generate": "npx typeorm-ts-node-esm migration:generate ./src/migration/Migration -d src/dataSource/ormconfig.ts"
+    "migrate-run": "typeorm-ts-node-esm  migration:run -d ./src/dataSource/ormconfig.ts",
+    "migrate-revert": "typeorm-ts-node-esm  migration:revert -d ./src/dataSource/ormconfig.ts",
+    "migrate-generate": "typeorm-ts-node-esm migration:generate ./src/migration/Migration -d src/dataSource/ormconfig.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.10.3",

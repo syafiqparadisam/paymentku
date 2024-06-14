@@ -71,8 +71,12 @@ jobs:
         run: |
           make
 
+      - name: Download dependencies in auth service
+        working-directory: ./services/auth
+        run: npm install
+
       - name: Migrate table on database
-        run: |
+        run: |         
           make migrate-run
 
 
@@ -103,10 +107,6 @@ jobs:
         run: make test-user
       # USER SERVICE END
       # AUTH SERVICE START
-      - name: Download dependencies in auth service
-        working-directory: ./services/auth
-        run: npm install
-
       - name: Run eslint for auth service
         working-directory: ./services/auth
         run: npm run lint

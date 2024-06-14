@@ -8,8 +8,8 @@ on:
       - features*
 
 jobs:
-  ci:
-    name: CI processes
+  develop:
+    name: Development processes
     runs-on: ubuntu-22.04
     env:
       CLIENT_ID: ${{secrets.CLIENT_ID}}
@@ -71,6 +71,7 @@ jobs:
         run: |
           make
 
+        # AUTH SERVICE START     
       - name: Download dependencies in auth service
         working-directory: ./services/auth
         run: |
@@ -87,6 +88,9 @@ jobs:
           npm i -g typeorm
           npm run migrate-run
 
+      - name: Test auth service
+        run: make test-auth
+      # AUTH SERVICE END
       # HISTORY SERVICE START
       - name: Download dependencies in history service
         working-directory: ./services/history
@@ -113,12 +117,7 @@ jobs:
       - name: Test user service
         run: make test-user
       # USER SERVICE END
-      # AUTH SERVICE START
      
-
-      - name: Test auth service
-        run: make test-auth
-      # AUTH SERVICE END
       # FRONTEND START
       - name: Download dependencies in frontend app
         working-directory: ./www
@@ -133,8 +132,8 @@ jobs:
         run: |
           make migrate-revert
 
-  cd:
-    name: CD processes
+  staging:
+    name: Staging
     runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/develop' && github.ref == 'refs/heads/main'
     steps:
@@ -149,6 +148,7 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      
 
         # HISTORY SERVICE START
       - name: Deploy history service to dockerhub
@@ -201,3 +201,5 @@ jobs:
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # FRONTEND APP END
+
+      

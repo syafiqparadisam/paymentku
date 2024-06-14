@@ -5,7 +5,7 @@ dotenv.config();
 
 const mysqlOptionProd: MysqlConnectionOptions = {
   type: 'mysql',
-  entities: ['./src/**/**/*.entity.{ts,js}'],
+  entities: ['./dist/**/**/*.entity.{ts,js}'],
   host: process.env.DB_HOST,
   poolSize: 10,
   port: parseInt(process.env.DB_PORT),

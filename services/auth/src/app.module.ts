@@ -8,9 +8,12 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { WinstonModule } from 'nest-winston';
 import { transports } from 'winston';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import {mysqlOptionDev} from "./dataSource/ormconfig"
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot(mysqlOptionDev),
     WinstonModule.forRoot({
       transports: [new transports.Console({ level: 'info' })],
     }),

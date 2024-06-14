@@ -71,10 +71,10 @@ jobs:
         run: |
           make
 
-      - name: Check logs mysql
+      - name: Migrate table on database
         run: |
-          echo $MYSQL_DATABASE
-          docker logs mysqldb
+          make migrate-run
+
 
       # HISTORY SERVICE START
       - name: Download dependencies in history service
@@ -123,6 +123,10 @@ jobs:
         working-directory: ./www
         run: npm run lint
       # FRONTEND ENV
+
+      - name: Revert migration
+        run: |
+          make migrate-revert
 
   cd:
     name: CD processes

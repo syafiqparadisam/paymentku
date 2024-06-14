@@ -10,7 +10,6 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_PASSWORD: password
-      MYSQL_ROOT_USER: root
     healthcheck:
       test:
         [

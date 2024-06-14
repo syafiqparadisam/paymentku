@@ -19,7 +19,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const port = process.env.NEST_APP_PORT
+  const port = process.env.NEST_APP_PORT;
   app.listen(port);
 }
 bootstrap();

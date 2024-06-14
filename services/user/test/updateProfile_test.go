@@ -110,7 +110,7 @@ func (pr *ProfileTestWeb) UpdateBio(t *testing.T) {
 		StatusCode: http.StatusOK,
 		Message:    "Bio already updated",
 	}
-
+	t.Log(findUser)
 	assert.Equal(t, findUser.Bio, bioDto)
 
 	bodyResp, _ := io.ReadAll(resp.Body)

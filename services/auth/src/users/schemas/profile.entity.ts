@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Profile {
+export class Profile extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   bio: string;
 

@@ -1,9 +1,15 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Users } from './users.entity';
 import { Status } from './enum';
 
 @Entity()
-export class HistoryTopup {
+export class HistoryTopup extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

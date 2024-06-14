@@ -55,5 +55,12 @@ run-fe:
 # ALL
 test: test-user test-transaction test-history test-auth 
 
+# MIGRATE
+migrate-run: docker-compose
+	cd services/auth && npm run migrate-run
+
+migrate-revert: docker-compose
+	cd services/auth && npm run migrate-revert
+
 down: 
 	docker compose -f ${COMPOSE_PATH}/compose.yml down

@@ -41,6 +41,7 @@ func TestProfileWeb(t *testing.T) {
 
 	appPort := os.Getenv("USER_SVC_PORT")
 	httpCfg := config.NewHTTPConfig().WithPort(appPort)
+	fmt.Println(httpCfg)
 	user := os.Getenv("DB_USER")
 	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
@@ -63,13 +64,12 @@ func TestProfileWeb(t *testing.T) {
 		app.Listen(httpCfg.Port)
 		<-donech
 	}()
-	pr := NewProfileTestWeb(seeder, t, server, donech)
+	pr := NewProfileTestWeb(seeder, t, server, donech, appPort)
 	pr.Start()
 
 }
 
-func NewProfileTestWeb(seeder *seeder.UserSeeder, t *testing.T, controller *controllerhttp.ControllerHTTP, donech chan bool) *ProfileTestWeb {
-	appPort := os.Getenv("APP_PORT")
+func NewProfileTestWeb(seeder *seeder.UserSeeder, t *testing.T, controller *controllerhttp.ControllerHTTP, donech chan bool, appPort string) *ProfileTestWeb {
 	return &ProfileTestWeb{
 		Seeder:     seeder,
 		Controller: controller,

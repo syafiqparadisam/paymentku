@@ -1,5 +1,5 @@
 # Use original image golang as build stage
-FROM golang-1.22:alpine
+FROM golang:1.22-alpine
 
 RUN apk update && apk add --no-cache git
 

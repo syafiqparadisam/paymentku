@@ -32,8 +32,5 @@ COPY . .
 # Build the app
 RUN npm run build
 
-# Expose the port
-EXPOSE 4173
-
 # Run the app
 CMD ["npm", "run", "preview"]

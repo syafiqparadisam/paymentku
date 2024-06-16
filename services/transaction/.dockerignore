@@ -1,3 +1,4 @@
-test
+test/*
+*_test.go
 .golangci.yml
 env.example

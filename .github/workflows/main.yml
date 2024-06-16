@@ -158,8 +158,7 @@ jobs:
       - name: Deploy history service to dockerhub
         uses: docker/build-push-action@v5
         with:
-          context: ./services/history
-          file: Dockerfile
+          context: "{{defaultContext}}:services/history"
           push: true
           build-args: |
             DB_PORT=${{secrets.DB_PORT}}
@@ -179,8 +178,7 @@ jobs:
       - name: Deploy transaction service to dockerhub
         uses: docker/build-push-action@v5
         with:
-          context: ./services/transaction
-          file: Dockerfile
+          context: "{{defaultContext}}:services/transaction"
           push: true
           build-args: |
             DB_PORT=${{secrets.DB_PORT}}
@@ -202,8 +200,7 @@ jobs:
       - name: Deploy user service to dockerhub
         uses: docker/build-push-action@v5
         with:
-          context: ./services/user
-          file: Dockerfile
+          context: "{{defaultContext}}:services/user"
           push: true
           build-args: |
             DB_PORT=${{secrets.DB_PORT}}
@@ -222,8 +219,7 @@ jobs:
       - name: Deploy auth service to dockerhub
         uses: docker/build-push-action@v5
         with:
-          context: ./services/auth
-          file: Dockerfile
+          context: "{{defaultContext}}:services/auth"
           push: true
           build-args: |
             CLIENT_ID=${{secrets.CLIENT_ID}}
@@ -256,8 +252,7 @@ jobs:
       - name: Deploy frontend service to dockerhub
         uses: docker/build-push-action@v5
         with:
-          context: ./www
-          file: Dockerfile
+          context: "{{defaultContext}}:www"
           push: true
           build-args: |
             VITE_API_URL=${{secrets.VITE_API_URL}}

@@ -4,11 +4,6 @@ FROM node:18.17.1-alpine
 # Create app directory
 WORKDIR /usr/src/app
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
-
-# Install app dependencies
-RUN npm install
 
 # VARIABEL SET WHEN BUILD TIME
 ARG CLIENT_ID
@@ -58,13 +53,16 @@ ENV CLOUDINARY_APISECRET=${CLOUDINARY_APISECRET}
 ENV CLOUDINARY_CLOUDNAME=${CLOUDINARY_CLOUDNAME}
 ENV CLOUDINARY_APIKEY=${CLOUDINARY_APIKEY}
 
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+COPY package*.json ./
+
+# Install app dependencies
+RUN npm install
+
 COPY . .
 
 # Creates a "dist" folder with the production build
 RUN npm run build
-
-# Expose the port on which the app will run
-EXPOSE ${NEST_APP_PORT}
 
 # Start the server using the production build
 CMD ["npm", "run", "start:prod"]

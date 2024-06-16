@@ -3,15 +3,6 @@ FROM node:18.17.1-alpine
 # Set the working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files
-COPY package*.json ./
-
-# Install the dependencies
-RUN npm install
-
-# Copy the app files
-COPY . .
-
 # SET ARGS WHEN BUILD
 ARG VITE_API_URL
 ARG VITE_FRONTEND_URL
@@ -28,6 +19,15 @@ ENV VITE_CLIENT_ID=${VITE_CLIENT_ID}
 ENV VITE_SERVICE_ID_EMAILJS=${VITE_SERVICE_ID_EMAILJS}
 ENV VITE_TEMPLATE_ID_HELPING_EMAILJS=${VITE_TEMPLATE_ID_HELPING_EMAILJS}
 ENV VITE_PUBLIC_KEY_EMAILJS=${VITE_PUBLIC_KEY_EMAILJS}
+
+# Copy the package.json and package-lock.json files
+COPY package*.json ./
+
+# Install the dependencies
+RUN npm install
+
+# Copy the app files
+COPY . .
 
 # Build the app
 RUN npm run build

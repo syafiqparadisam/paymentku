@@ -81,10 +81,10 @@ const profileApi = authApi.injectEndpoints({
 
             },
         }),
-        updatePhotoProfile: builder.mutation<Response<null>, { file: File, publicId: string }>({
+        updatePhotoProfile: builder.mutation<Response<null>, { file: File | undefined, publicId: string }>({
             query: (payload) => {
                 const file = new FormData()
-                file.append("image", payload.file)
+                file.append("image", payload?.file ? payload?.file : "")
                 return {
                     url: "profile/photoprofile",
                     method: "PATCH",

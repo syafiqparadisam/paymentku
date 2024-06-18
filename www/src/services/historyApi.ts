@@ -87,7 +87,7 @@ const historyApi = authApi.injectEndpoints({
                 return baseQueryReturnValue
             },
         }),
-        deleteHistoryTopUpById: build.mutation<Response<null>, string>({
+        deleteHistoryTopUpById: build.mutation<Response<null>, number>({
             query: (arg) => ({
                 url: `history/topup/${arg}`,
                 credentials: "include",
@@ -105,7 +105,7 @@ const historyApi = authApi.injectEndpoints({
 
             },
         }),
-        getHistoryTransferById: build.query<Response<HistoryTransfer>, string>({
+        getHistoryTransferById: build.query<Response<HistoryTransfer>, number>({
             query: (arg) => ({
                 url: `history/transfer/${arg}`,
                 credentials: "include"
@@ -121,7 +121,7 @@ const historyApi = authApi.injectEndpoints({
 
             },
         }),
-        deleteHistoryTransferById: build.mutation<Response<null>, string>({
+        deleteHistoryTransferById: build.mutation<Response<null>, number>({
             query: (arg) => ({
                 url: `history/transfer/${arg}`,
                 credentials: "include",

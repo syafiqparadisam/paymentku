@@ -6,16 +6,15 @@ import { setUser } from "../features/user/userSlice"
 import { route } from "../constant/route"
 
 const PersistentLogin = () => {
-    const { data, error } = useGetUserQuery()
-    const navigate = useNavigate()
+    const { data } = useGetUserQuery()
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     useEffect(() => {
-        if (error?.originalStatus == 500) {
-            navigate(route["home"])
-        }
         if (data?.statusCode == 200) {
             data?.data ? dispatch(setUser(data?.data)) : null
+            return
         }
+        navigate(route["home"])
     })
     return <Outlet />
 }

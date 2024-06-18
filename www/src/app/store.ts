@@ -3,7 +3,7 @@ import { authApi } from "../services/authApi";
 import userSlice from "../features/user/userSlice";
 import darkModeSlice from "../features/web/darkMode";
 
-export const store = configureStore({
+const store = configureStore({
     reducer: {
         [authApi.reducerPath]: authApi.reducer,
         user: userSlice,
@@ -13,3 +13,8 @@ export const store = configureStore({
         return getDefaultMiddleware().concat(authApi.middleware)
     }
 })
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export default store

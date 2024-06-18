@@ -32,7 +32,7 @@ const SignUp = () => {
         <Box paddingBlock={"30px"} paddingInline={"60px"} flexDirection={"column"} width={"40%"} borderRadius={"20px"}>
           <Box textAlign={"center"} width={"100%"} display={"flex"} flexDirection={"column"} justifyContent={"center"} padding={"10px"}>
             <Typography fontSize={"30px"} fontWeight={"bold"}>Signup</Typography>
-            {error?.data && <Typography color={"red"}>{error?.data?.message}</Typography>}
+            {error && <Typography color={"red"}>{(error as any).data?.message}</Typography>}
           </Box>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box py={2} display={"flex"} width={"100%"} flexDirection={"column"} >

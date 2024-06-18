@@ -5,6 +5,7 @@ import { useDeleteHistoryTransferByIdMutation, useGetHistoryTransferByIdQuery } 
 import timeStampToLocaleString from '../utils/timeStampToClient'
 import TimeAgoComponent from '../component/TimeAgoComponent'
 import { ArrowBack, Delete } from '@mui/icons-material'
+// @ts-ignore
 import toRupiah from '@develoka/angka-rupiah-js';
 import { useState } from 'react'
 
@@ -19,7 +20,7 @@ const HistoryTransferById = () => {
     if (idNum == null) {
         navigate("/notfound")
     }
-    const { data, isSuccess } = useGetHistoryTransferByIdQuery(id)
+    const { data, isSuccess } = useGetHistoryTransferByIdQuery(parseInt(id ? id : "0"))
     const [deleteHistory, { data: dataDeleteHistory }] = useDeleteHistoryTransferByIdMutation()
 
     if (err?.data?.statusCode == 500) {
@@ -46,7 +47,7 @@ const HistoryTransferById = () => {
                     <Button onClick={() => setOpen(false)} variant="contained" color="error">No</Button>
                     <Button variant="contained" color="success" onClick={async () => {
                         try {
-                            await deleteHistory(id).unwrap()
+                            await deleteHistory(parseInt(id ? id : "0")).unwrap()
                             setOpen(false)
                             navigate(-1)
                         } catch (error) {
@@ -64,7 +65,7 @@ const HistoryTransferById = () => {
                         Back
                     </Box>
                     <Box display={"flex"} width={"100%"} justifyContent={"center"}>
-                        {dataDeleteHistory && <Typography fontWeight={"bold"} fontSize={"20px"}>{dataDeleteHistory?.data?.message}</Typography>}
+                        {dataDeleteHistory && <Typography fontWeight={"bold"} fontSize={"20px"}>{(dataDeleteHistory as any).data?.message}</Typography>}
                     </Box>
                     {
                         isSuccess ? (
@@ -86,9 +87,9 @@ const HistoryTransferById = () => {
                                     <Typography fontSize={"15x"} fontWeight={"bold"}>{"Amount : " + toRupiah(data?.data?.amount == null ? 0 : data.data.amount, { dot: ",", floatingPoint: 0 })}</Typography>
                                     <Typography fontSize={"15x"} fontWeight={"bold"}>{"Current Balance : " + toRupiah(data?.data?.balance == null ? 0 : data.data.balance, { dot: ",", floatingPoint: 0 })}</Typography>
                                     <Typography fontSize={"15x"} fontWeight={"bold"}>{"Previous Balance : " + toRupiah(data?.data?.previousBalance == null ? 0 : data.data.previousBalance, { dot: ",", floatingPoint: 0 })}</Typography>
-                                    <Typography fontSize={"15x"} fontWeight={"bold"}>Notes : {data.data.notes == "" ? "Nothing" : data.data.notes}</Typography>
-                                    <Typography fontSize={"15x"} fontWeight={"bold"}>{"Created at : " + timeStampToLocaleString(data?.data?.createdAt)}</Typography>
-                                    <TimeAgoComponent timestamp={data?.data?.createdAt} color={data?.data?.status === "SUCCESS" && data.data.status != null ? "black" : "white"} />
+                                    <Typography fontSize={"15x"} fontWeight={"bold"}>Notes : {data?.data?.notes == "" ? "Nothing" : data?.data?.notes}</Typography>
+                                    <Typography fontSize={"15x"} fontWeight={"bold"}>{"Created at : " + timeStampToLocaleString(data?.data?.createdAt ? data?.data?.createdAt : "")}</Typography>
+                                    <TimeAgoComponent timestamp={data?.data?.createdAt ? data?.data?.createdAt : ""} color={data?.data?.status === "SUCCESS" && data?.data?.status != null ? "black" : "white"} />
                                 </Box>
                             </Box>
                         ) : (

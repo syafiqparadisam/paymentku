@@ -13,7 +13,7 @@ import { HistoryTransfer } from './history_transfer.entity';
 import { Notification } from './notification.entity';
 
 @Entity()
-export class Users extends BaseEntity {
+export class Users{
   @PrimaryGeneratedColumn()
   id: number;
 

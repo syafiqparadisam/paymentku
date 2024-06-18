@@ -46,6 +46,16 @@ services:
     networks:
       - mysql-phpmyadmin
 
+  nginx:
+    image: nginx:latest
+    container_name: nginx-webserver
+    volumes:
+      - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8000:80
+    depends_on: 
+      - phpmyadmin
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.91.0
     container_name: otel-collector

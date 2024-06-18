@@ -10,13 +10,13 @@ const Help = () => {
     const [value, setValue] = useState<string>("")
     const [open, setOpen] = useState<boolean>(false)
     const [err, setErr] = useState<string>()
-    const form = useRef()
+    const form = useRef<HTMLFormElement>(null)
     const navigate = useNavigate()
 
     const submittedForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         try {
-            await emailjs.sendForm(import.meta.env.VITE_SERVICE_ID_EMAILJS, import.meta.env.VITE_TEMPLATE_ID_HELPING_EMAILJS, form.current, import.meta.env.VITE_PUBLIC_KEY_EMAILJS)
+            await emailjs.sendForm(import.meta.env.VITE_SERVICE_ID_EMAILJS, import.meta.env.VITE_TEMPLATE_ID_HELPING_EMAILJS, form?.current ? form?.current : "", import.meta.env.VITE_PUBLIC_KEY_EMAILJS)
             setValue("")
         } catch (error: any) {
             setOpen(true)

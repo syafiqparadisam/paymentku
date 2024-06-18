@@ -1,5 +1,4 @@
 import {
-  BaseEntity,
   Column,
   Entity,
   ManyToOne,
@@ -9,7 +8,7 @@ import { Users } from './users.entity';
 import { Status } from './enum';
 
 @Entity()
-export class HistoryTopup extends BaseEntity {
+export class HistoryTopup {
   @PrimaryGeneratedColumn()
   id: number;
 

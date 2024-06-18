@@ -7,6 +7,7 @@ import UserProfile from './UserProfile';
 import { route } from '../constant/route';
 import { Help, Settings } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
+import { RootState } from '../app/store';
 
 interface Props {
     children: ReactNode | ReactElement
@@ -14,7 +15,7 @@ interface Props {
 
 const User: React.FC<Props> = ({ children }) => {
     const navigate = useNavigate()
-    const darkMode = useSelector(state => state.darkMode)
+    const darkMode = useSelector((state: RootState) => state.darkMode)
 
     return (
         <>

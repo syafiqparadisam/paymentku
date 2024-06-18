@@ -5,6 +5,7 @@ import { useDeleteHistoryTopUpByIdMutation, useGetHistoryTopUpByIdQuery } from '
 import timeStampToLocaleString from '../utils/timeStampToClient'
 import TimeAgoComponent from '../component/TimeAgoComponent'
 import { ArrowBack, Delete } from '@mui/icons-material'
+// @ts-ignore
 import toRupiah from '@develoka/angka-rupiah-js';
 
 const HistoryTopupById = () => {
@@ -15,12 +16,12 @@ const HistoryTopupById = () => {
         navigate("/notfound")
     }
 
-    const { data: data, isSuccess, error } = useGetHistoryTopUpByIdQuery(parseInt(id))
+    const { data: data, isSuccess, error } = useGetHistoryTopUpByIdQuery(parseInt(id ? id : "0"))
     const [deleteHistory] = useDeleteHistoryTopUpByIdMutation()
-    if (error?.data?.statusCode === 404) {
+    if ((error as any).data?.statusCode === 404) {
         navigate("/notfound")
     }
-    
+
 
     return (
         <>
@@ -35,11 +36,11 @@ const HistoryTopupById = () => {
 
                             <Box p={4} display={"flex"} bgcolor={data?.data?.status === "SUCCESS" && data.data.status != null ? "lightgreen" : "red"} flexDirection={"column"} borderRadius={"20px"} width={"100%"} position={"relative"}>
                                 <Box position={"absolute"} sx={{ cursor: "pointer" }} textAlign={"center"} top={"10px"} right={"10px"} p={1} onClick={() => {
-                                    deleteHistory(id)
+                                    deleteHistory(parseInt(id ? id : "0"))
                                     navigate(-1)
                                 }
                                 }>
-                                    <Delete fontSize="medium" sx={{color: data?.data?.status == "SUCCESS" ? "black" : "white"}}/>
+                                    <Delete fontSize="medium" sx={{ color: data?.data?.status == "SUCCESS" ? "black" : "white" }} />
                                 </Box>
                                 <Box display={"flex"}>
                                     <Typography fontSize={"20px"} fontWeight={"bold"} color={data?.data?.status === "SUCCESS" && data.data.status != null ? "green" : "white"}>{data?.data?.status}</Typography>
@@ -48,8 +49,8 @@ const HistoryTopupById = () => {
                                     <Typography fontSize={"15x"} fontWeight={"bold"}>{"Amount : " + toRupiah(data?.data?.amount == null ? 0 : data.data.amount, { dot: ",", floatingPoint: 0 })}</Typography>
                                     <Typography fontSize={"15x"} fontWeight={"bold"}>{"Current Balance : " + toRupiah(data?.data?.balance == null ? 0 : data.data.balance, { dot: ",", floatingPoint: 0 })}</Typography>
                                     <Typography fontSize={"15x"} fontWeight={"bold"}>{"Previous Balance : " + toRupiah(data?.data?.previousBalance == null ? 0 : data.data.previousBalance, { dot: ",", floatingPoint: 0 })}</Typography>
-                                    <Typography fontSize={"15x"} fontWeight={"bold"}>{"Created at : " + timeStampToLocaleString(data?.data?.createdAt)}</Typography>
-                                    <TimeAgoComponent timestamp={data?.data?.createdAt} color={data?.data?.status === "SUCCESS" && data.data.status != null ? "black" : "white"} />
+                                    <Typography fontSize={"15x"} fontWeight={"bold"}>{"Created at : " + timeStampToLocaleString(data?.data?.createdAt ? data?.data?.createdAt : "")}</Typography>
+                                    <TimeAgoComponent timestamp={data?.data?.createdAt ? data?.data?.createdAt : ""} color={data?.data?.status === "SUCCESS" && data.data.status != null ? "black" : "white"} />
                                 </Box>
                             </Box>
                         ) : (

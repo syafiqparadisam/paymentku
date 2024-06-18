@@ -18,5 +18,8 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'off',
     'no-case-declarations': 'off',
     '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
   },
 }

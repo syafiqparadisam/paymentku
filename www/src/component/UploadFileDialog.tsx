@@ -4,8 +4,7 @@ import React, { useEffect, useState } from "react"
 import { useUpdatePhotoProfileMutation } from "../services/profileApi"
 import { useSelector } from "react-redux"
 import { User } from "../types/response"
-
-// type openFn = (state: React.Dispatch<React.SetStateAction<boolean>>) => void
+import { RootState } from "../app/store"
 
 type UploadFileProps = {
     open: boolean,
@@ -14,9 +13,9 @@ type UploadFileProps = {
 
 const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
     const [sourceImg, setSourceImg] = useState<string | null | undefined | ArrayBuffer>("")
-    const [file, setFile] = useState<File | null>(null)
+    const [file, setFile] = useState<File | undefined>(undefined)
     const [update, { data, isLoading, error }] = useUpdatePhotoProfileMutation()
-    const user: User = useSelector(state => state.user)
+    const user: User = useSelector((state: RootState) => state.user)
     const [response, setResponse] = useState("")
     const previewImage = (e: any) => {
         const fileImg: File[] = e.target.files
@@ -46,7 +45,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
 
     const updatePhotoProfile = () => {
-       update({ file, publicId: user.photo_public_id ? user.photo_public_id : "" })
+        update({ file, publicId: user.photo_public_id ? user.photo_public_id : "" })
     }
 
     useEffect(() => {
@@ -56,7 +55,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
     useEffect(() => {
         setSourceImg("")
-        setFile(null)
+        setFile(undefined)
         setResponse(data?.message ? data?.message : "")
     }, [data])
 
@@ -75,7 +74,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
     return (
         <>
-            {error?.message == "Aborted" && (
+            {error && (error as any).message == "Aborted" && (
                 <Snackbar
                     autoHideDuration={3000}
                     color="red"

@@ -136,7 +136,7 @@ jobs:
   staging:
     name: Staging
     runs-on: ubuntu-22.04
-    if: ${{github.ref == 'refs/heads/develop'}} || ${{github.ref == 'refs/heads/main'}}
+    if: ${{github.ref == 'refs/heads/develop'}}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -160,7 +160,7 @@ jobs:
         with:
           context: "{{defaultContext}}:services/history"
           push: true
-          build-args: |
+          secret-env: |
             DB_PORT=${{secrets.DB_PORT}}
             DB_NAME=${{secrets.DB_NAME}}
             DB_HOST=${{secrets.DB_HOST}}

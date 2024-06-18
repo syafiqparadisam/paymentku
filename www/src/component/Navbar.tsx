@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { Button, Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { route } from '../constant/route';
+import { RootState } from '../app/store';
 
 
 const settings: Array<{ name: string, link: string }> = [
@@ -39,7 +40,7 @@ const settings: Array<{ name: string, link: string }> = [
 ];
 
 function Navbar() {
-    const user = useSelector((state) => state.user)
+    const user = useSelector((state: RootState) => state.user)
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -51,12 +52,12 @@ function Navbar() {
         setAnchorElUser(null);
     };
 
-    const handleHoverNav = (e) => {
+    const handleHoverNav = (e: any) => {
         e.target.style.backgroundColor = "green"
     }
 
 
-    const handleHoverOutNav = (e) => {
+    const handleHoverOutNav = (e: any) => {
         e.target.style.backgroundColor = "transparent"
     }
 

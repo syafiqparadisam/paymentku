@@ -9,7 +9,7 @@ import { Users } from './users.entity';
 import { Status } from './enum';
 
 @Entity()
-export class HistoryTransfer extends BaseEntity {
+export class HistoryTransfer {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -1,5 +1,6 @@
 import { Box, Typography, List, ListItem } from "@mui/material"
 import React from "react"
+// @ts-ignore
 import toRupiah from '@develoka/angka-rupiah-js';
 
 interface listRequirement {

@@ -4,13 +4,16 @@ import { useEffect, useState } from "react"
 import { ArrowBack } from "@mui/icons-material";
 import timeStampToLocaleString from '../utils/timeStampToClient';
 import { useSelector } from "react-redux";
+// @ts-ignore
 import toRupiah from '@develoka/angka-rupiah-js';
 import { useTransferMutation } from "../services/transactionApi";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "../app/store";
+import { User } from "../types/response";
 
 const Transfer = () => {
   const [accNum, setAccNum] = useState<string>("")
-  const user = useSelector(state => state.user)
+  const user: User = useSelector((state: RootState) => state.user)
   const [err, setErr] = useState<any>({ data: { message: "" } })
   const [errAmount, setErrAmount] = useState<any>()
   const [amount, setAmount] = useState<string>("")
@@ -47,10 +50,8 @@ const Transfer = () => {
     if (successTransfer) {
       setOpenSnackbar(true)
     }
-    if (errTransfer?.originalStatus == 500) {
-      setOpenSnackbar(true)
-    }
   }, [errTransfer, successTransfer])
+
   return (
     <>
 
@@ -60,7 +61,7 @@ const Transfer = () => {
         key={"top" + "center"}
         autoHideDuration={3000}
         color="success"
-        message={errTransfer?.originalStatus == 500 ? "Ups something went wrong" : dataTransfer?.message}
+        message={dataTransfer?.message}
       />}
       {/* {errTransfer?.} */}
       <Backdrop
@@ -97,7 +98,7 @@ const Transfer = () => {
         </Box>
         <Box width={"100%"} justifyContent={"center"} alignItems={"center"} p={3} display={"flex"} flexDirection={"column"}>
           <Typography fontWeight={"bold"} fontSize={"30px"}>Transfer</Typography>
-          {errTransfer?.data && <Typography color={"red"} fontSize={"20px"} fontWeight={"bold"}>{errTransfer?.data?.message}</Typography>}
+          {errTransfer && <Typography color={"red"} fontSize={"20px"} fontWeight={"bold"}>{(errTransfer as any).data.message}</Typography>}
         </Box>
         <Box width={"100%"} p={3} display={"flex"} justifyContent={"center"} alignItems={"flex-start"}>
           <Box width={"50%"} flexDirection={"column"} display={"flex"} justifyContent={"center"}>

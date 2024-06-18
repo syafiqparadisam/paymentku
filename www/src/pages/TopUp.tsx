@@ -4,14 +4,16 @@ import { useSelector } from "react-redux"
 import { User } from "../types/response"
 import { useTopupMutation } from "../services/transactionApi"
 import { ArrowBack, BoltRounded, CloseOutlined, Done } from "@mui/icons-material"
+// @ts-ignore
 import toRupiah from "@develoka/angka-rupiah-js"
 import FastTransferBox from "../component/FastTransferBox"
 import { useNavigate } from "react-router-dom"
+import { RootState } from "../app/store"
 
 const TopUp = () => {
     const [amount, setAmount] = useState<number>(0)
     const [err, setErr] = useState<any>("")
-    const user: User = useSelector(state => state.user)
+    const user: User = useSelector((state: RootState) => state.user)
     const [totalPrice, setTotalPrice] = useState<number>(0)
     const [isChecked, setIsChecked] = useState<boolean>(false)
     const [topup, { data, isSuccess, error, isLoading }] = useTopupMutation()
@@ -41,9 +43,6 @@ const TopUp = () => {
         if (isSuccess) {
             setOpenSnackbar(true)
         }
-        if (error?.originalStatus == 500) {
-            setOpenSnackbar(true)
-        }
     }, [isSuccess, error])
 
     return (
@@ -53,7 +52,7 @@ const TopUp = () => {
                 onClose={() => setOpenSnackbar(false)}
                 autoHideDuration={3000}
                 color="success"
-                message={error?.originalStatus == 500 ? "Ups something went wrong" : data.message}
+                message={data?.message}
             />}
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}

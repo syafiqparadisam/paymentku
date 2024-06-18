@@ -9,10 +9,12 @@ import timeStampToLocaleString from '../utils/timeStampToClient';
 import { useValidation } from '../hooks/useValidation';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+// @ts-ignore
 import toRupiah from '@develoka/angka-rupiah-js';
 import UploadFileDialog from '../component/UploadFileDialog';
 import useAlert from '../hooks/useAlert';
 import Alert from '../component/Alert';
+import { RootState } from '../app/store';
 
 const UserProfile = () => {
     const [updateName, { isSuccess: successUpdateName }] = useUpdateNameMutation()
@@ -25,7 +27,7 @@ const UserProfile = () => {
     const { open: openAlert, handleOpen, handleClose } = useAlert()
     const [openUploadFile, setOpenUploadFile] = useState<boolean>(false)
     const { handleUpdateUsername, setValueForUsername, validateInput, cleanUp, label, open, value, valueForUsername, updateVal, totalInput, openModal, validatePhoneNumber, valueForPassword, setValueForPassword } = useValidation()
-    const user = useSelector(state => state.user)
+    const user = useSelector((state: RootState) => state.user)
     const navigate = useNavigate()
 
     useEffect(() => {

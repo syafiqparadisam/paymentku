@@ -51,7 +51,7 @@ const HistoryTopup = () => {
                     </Box>
                     <Box width={"90%"} display={"flex"} justifyContent={"space-between"}>
                         <Category firstItem={"Topup"} menuItem={[{ categories: "Topup", redirect: "/dashboard/user/history/topup" }, { categories: "Transfer", redirect: "/dashboard/user/history/transfer" }]} />
-                        {errDeleteAllHistory && <Typography fontWeight={"bold"} color={"red"} fontSize={"20px"}>{errDeleteAllHistory?.data?.message}</Typography>}
+                        {errDeleteAllHistory && <Typography fontWeight={"bold"} color={"red"} fontSize={"20px"}>{(errDeleteAllHistory as any).data?.message}</Typography>}
                         <Box display={"flex"} gap={2} width={"30%"}>
                             <Button color="success" variant="contained" startIcon={<Loop />} onClick={refetch}>Reload</Button>
                             <Button color="error" variant="contained" startIcon={<Delete />} onClick={() => {

@@ -41,6 +41,7 @@ export class AccessTokenGuardGuard implements CanActivate {
       request.user_id = userid;
       return true;
     } catch (error) {
+      console.log(error)
       if (
         error instanceof ForbiddenException ||
         error instanceof UnauthorizedException

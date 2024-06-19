@@ -6,7 +6,7 @@ import { setUser } from "../features/user/userSlice"
 import { route } from "../constant/route"
 
 const PersistentLogin = () => {
-    const { data, error } = useGetUserQuery()
+    const { data, error, isSuccess } = useGetUserQuery()
     const dispatch = useDispatch()
     const navigate = useNavigate()
     useEffect(() => {
@@ -18,7 +18,7 @@ const PersistentLogin = () => {
             navigate(route["home"])
         }
     })
-    return <Outlet />
+    return data?.statusCode == 200 && isSuccess ? <Outlet /> : <p>Loading...</p>
 }
 
 export default PersistentLogin

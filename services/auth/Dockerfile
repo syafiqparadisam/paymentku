@@ -16,4 +16,4 @@ COPY . .
 RUN npm run build
 
 # Start the server using the production build
-CMD ["npm", "run", "start:prod"]
+CMD npm run migrate-run && npm run start:prod

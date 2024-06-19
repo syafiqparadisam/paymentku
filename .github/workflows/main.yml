@@ -71,7 +71,7 @@ jobs:
         run: |
           make
 
-        # AUTH SERVICE START     
+        # AUTH SERVICE START
       - name: Download dependencies in auth service
         working-directory: ./services/auth
         run: |
@@ -118,7 +118,7 @@ jobs:
       - name: Test user service
         run: make test-user
       # USER SERVICE END
-     
+
       # FRONTEND START
       - name: Download dependencies in frontend app
         working-directory: ./www
@@ -139,20 +139,19 @@ jobs:
     if: ${{github.ref == 'refs/heads/develop'}}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-          
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Login into docker hub
         uses: docker/login-action@v3
         with:
           username: ${{secrets.DOCKER_USERNAME}}
           password: ${{secrets.DOCKER_PASSWORD}}
-
 
         # HISTORY SERVICE START
       - name: Deploy history service to dockerhub
@@ -201,5 +200,3 @@ jobs:
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # FRONTEND APP END
-
-      

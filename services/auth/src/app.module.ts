@@ -11,19 +11,19 @@ import { transports } from 'winston';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import mysqlOptionDev from "./dataSource/ormconfig"
 
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
       entities: ['./src/**/**/*.entity.{ts,js}'],
-      host: process.env.DB_HOST,
+      host: "localhost",
       poolSize: 10,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWD,
-      database: process.env.DB_NAME,
+      port: parseInt("3306"),
+      username: "root",
+      password: "root",
+      database: "paymentku",
       logging: true,
-      migrations: ['./src/migration/*.ts'],
     }),
     WinstonModule.forRoot({
       transports: [new transports.Console({ level: 'info' })],

@@ -160,16 +160,6 @@ jobs:
         with:
           context: "{{defaultContext}}:services/history"
           push: true
-          build-args: |
-            DB_PORT=${{secrets.DB_PORT}}
-            DB_NAME=${{secrets.DB_NAME}}
-            DB_HOST=${{secrets.DB_HOST}}
-            DB_USER=${{secrets.DB_USER}}
-            DB_PASSWD=${{secrets.DB_PASSWD}}
-            HISTORY_SVC_PORT=${{secrets.HISTORY_SVC_PORT}}
-            GRPC_SERVER_URL=${{secrets.GRPC_SERVER_URL}}
-            DB_PARAM=${{secrets.DB_PARAM}}
-            ORIGIN_URL=${{secrets.ORIGIN_URL}}
           tags: ${{secrets.DOCKER_USERNAME}}/history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
 
         # HISTORY SERVICE END
@@ -180,18 +170,6 @@ jobs:
         with:
           context: "{{defaultContext}}:services/transaction"
           push: true
-          build-args: |
-            DB_PORT=${{secrets.DB_PORT}}
-            DB_NAME=${{secrets.DB_NAME}}
-            TF_ICON=${{secrets.TF_ICON}}
-            DB_HOST=${{secrets.DB_HOST}}
-            DB_USER=${{secrets.DB_USER}}
-            DB_PASSWD=${{secrets.DB_PASSWD}}
-            TRANSFER_SVC_PORT=${{secrets.TRANSFER_SVC_PORT}}
-            GRPC_SERVER_URL=${{secrets.GRPC_SERVER_URL}}
-            DB_PARAM=${{secrets.DB_PARAM}}
-            ORIGIN_URL=${{secrets.ORIGIN_URL}}
-
           tags: ${{secrets.DOCKER_USERNAME}}/transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
 
         # TRANSACTION SERVICE END
@@ -202,16 +180,6 @@ jobs:
         with:
           context: "{{defaultContext}}:services/user"
           push: true
-          build-args: |
-            DB_PORT=${{secrets.DB_PORT}}
-            DB_NAME=${{secrets.DB_NAME}}
-            DB_HOST=${{secrets.DB_HOST}}
-            DB_USER=${{secrets.DB_USER}}
-            DB_PASSWD=${{secrets.DB_PASSWD}}
-            USER_SVC_PORT=${{secrets.USER_SVC_PORT}}
-            GRPC_SERVER_URL=${{secrets.GRPC_SERVER_URL}}
-            DB_PARAM=${{secrets.DB_PARAM}}
-            ORIGIN_URL=${{secrets.ORIGIN_URL}}
           tags: ${{secrets.DOCKER_USERNAME}}/user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # USER SERVICE END
 
@@ -221,29 +189,6 @@ jobs:
         with:
           context: "{{defaultContext}}:services/auth"
           push: true
-          build-args: |
-            CLIENT_ID=${{secrets.CLIENT_ID}}
-            CLIENT_SECRET=${{secrets.CLIENT_SECRET}}
-            CALLBACK_URL_GOOGLE=${{secrets.CALLBACK_URL_GOOGLE}}
-            FRONTEND=${{secrets.FRONTEND}}
-            SMTP_KEY=${{secrets.SMTP_KEY}}
-            SMTP_LOGIN=${{secrets.SMTP_LOGIN}}
-            AUTH_SVC=${{secrets.AUTH_SVC}}
-            USER_ICON_DEFAULT=${{secrets.USER_ICON_DEFAULT}}
-            USER_SVC=${{secrets.USER_SVC}}
-            TF_SVC=${{secrets.TF_SVC}}
-            HISTORY_SVC=${{secrets.HISTORY_SVC}}
-            NEST_APP_PORT=${{secrets.NEST_APP_PORT}}
-            REDIS_HOST=${{secrets.REDIS_HOST}}
-            DB_PORT=${{secrets.DB_PORT}}
-            DB_HOST=${{secrets.DB_HOST}}
-            DB_USER=${{secrets.DB_USER}}
-            DB_PASSWD=${{secrets.DB_PASSWD}}
-            DB_NAME=${{secrets.DB_NAME}}
-            REDIS_PORT=${{secrets.REDIS_PORT}}
-            CLOUDINARY_APISECRET=${{secrets.CLOUDINARY_APISECRET}}
-            CLOUDINARY_CLOUDNAME=${{secrets.CLOUDINARY_CLOUDNAME}}
-            CLOUDINARY_APIKEY=${{secrets.CLOUDINARY_APIKEY}}
           tags: ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
 
         # AUTH SERVICE END
@@ -254,13 +199,6 @@ jobs:
         with:
           context: "{{defaultContext}}:www"
           push: true
-          build-args: |
-            VITE_API_URL=${{secrets.VITE_API_URL}}
-            VITE_FRONTEND_URL=${{secrets.VITE_FRONTEND_URL}}
-            VITE_CLIENT_ID=${{secrets.VITE_CLIENT_ID}}
-            VITE_SERVICE_ID_EMAILJS=${{secrets.VITE_SERVICE_ID_EMAILJS}}
-            VITE_TEMPLATE_ID_HELPING_EMAILJS=${{secrets.VITE_TEMPLATE_ID_HELPING_EMAILJS}}
-            VITE_PUBLIC_KEY_EMAILJS=${{secrets.VITE_PUBLIC_KEY_EMAILJS}}
           tags: ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # FRONTEND APP END
 

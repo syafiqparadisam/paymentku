@@ -32,7 +32,7 @@ const Category: React.FC<Header> = ({ firstItem, menuItem }) => {
                         onChange={handleChange}
                     >
                         {menuItem.map((menu) => (
-                            <MenuItem onClick={() => navigate(menu.redirect)} value={menu.categories}>{menu.categories}</MenuItem>
+                            <MenuItem key={menu.categories} onClick={() => navigate(menu.redirect)} value={menu.categories}>{menu.categories}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>

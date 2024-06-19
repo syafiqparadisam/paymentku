@@ -9,22 +9,11 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { WinstonModule } from 'nest-winston';
 import { transports } from 'winston';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import mysqlOptionDev from "./dataSource/ormconfig"
-
+import { mysqlOptionRunner } from './dataSource/ormconfig';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      entities: ['./src/**/**/*.entity.{ts,js}'],
-      host: "localhost",
-      poolSize: 10,
-      port: parseInt("3306"),
-      username: "root",
-      password: "root",
-      database: "paymentku",
-      logging: true,
-    }),
+    TypeOrmModule.forRoot(mysqlOptionRunner),
     WinstonModule.forRoot({
       transports: [new transports.Console({ level: 'info' })],
     }),

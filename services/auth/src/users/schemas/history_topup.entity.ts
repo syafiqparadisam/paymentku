@@ -4,7 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from  "typeorm";
+} from 'typeorm';
 import { Users } from './users.entity';
 import { Status } from './enum';
 

@@ -7,7 +7,6 @@ import { HistoryTransfer } from './schemas/history_transfer.entity';
 import { Profile } from './schemas/profile.entity';
 import { Notification } from './schemas/notification.entity';
 import { ConfigModule } from '@nestjs/config';
-import mysqlOptionProd from 'src/dataSource/ormconfig';
 
 @Module({
   imports: [
@@ -17,7 +16,7 @@ import mysqlOptionProd from 'src/dataSource/ormconfig';
       HistoryTopup,
       HistoryTransfer,
       Notification,
-    ], mysqlOptionProd),
+    ]),
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   providers: [UsersService],

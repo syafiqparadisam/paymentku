@@ -1,11 +1,18 @@
 import { DataSource } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 import dotenv from 'dotenv';
+import { Users } from '../users/schemas/users.entity';
+import { Profile } from '../users/schemas/profile.entity';
+import { Notification } from '../users/schemas/notification.entity';
+import { HistoryTopup } from '../users/schemas/history_topup.entity';
+import { HistoryTransfer } from '../users/schemas/history_transfer.entity';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Migration1718333322243 } from '../migration/1718333322243-Migration';
 dotenv.config();
 
-const mysqlOptionProd: MysqlConnectionOptions = {
+const mysqlOptionMigrate: MysqlConnectionOptions = {
   type: 'mysql',
-  entities: ['./src/**/**/*.entity.{ts,js}'],
+  entities: ['./src/users/schemas/*.entity{.ts,.js}'],
   host: process.env.DB_HOST,
   poolSize: 10,
   port: parseInt(process.env.DB_PORT),
@@ -17,11 +24,9 @@ const mysqlOptionProd: MysqlConnectionOptions = {
   migrations: ['**/migration/*.ts'],
 };
 
-
-
-export const mysqlOptionDev = {
+export const mysqlOptionRunner: TypeOrmModuleOptions = {
   type: 'mysql',
-  entities: ['./src/**/**/*.entity.{ts,js}'],
+  entities: [Users, Profile, Notification, HistoryTopup, HistoryTransfer],
   host: process.env.DB_HOST,
   poolSize: 10,
   port: parseInt(process.env.DB_PORT),
@@ -29,10 +34,7 @@ export const mysqlOptionDev = {
   password: process.env.DB_PASSWD,
   database: process.env.DB_NAME,
   logging: true,
-  migrations: ['**/migration/*.ts'],
-}
+  migrations: [Migration1718333322243],
+};
 
-console.log(mysqlOptionProd)
-
-
-export default new DataSource(mysqlOptionProd);
+export default new DataSource(mysqlOptionMigrate);

@@ -46,6 +46,10 @@ function Navbar() {
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
+
+    const element = document.getElementById('aboutUs');
+    const elementPosition = element ? element.getBoundingClientRect().top + window.scrollY : null
+
     const navigate = useNavigate()
 
     const handleCloseUserMenu = () => {
@@ -107,7 +111,7 @@ function Navbar() {
                                 onClose={handleCloseUserMenu}
                             >
                                 {settings.map((setting) => (
-                                    <RouterLink style={{ textDecoration: "none", color: "black" }} to={setting.link}>
+                                    <RouterLink key={setting.name} style={{ textDecoration: "none", color: "black" }} to={setting.link}>
                                         <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
                                             <Typography textAlign="center" width={"100%"}>{setting.name}</Typography>
                                         </MenuItem>
@@ -120,7 +124,7 @@ function Navbar() {
                 ) : (
                     <Box width="60%" display={"flex"} justifyContent={"space-between"}>
                         <Box display={"flex"} gap={2}>
-                            <Link sx={{ textDecoration: "none", cursor: "pointer", color: "white", transition: "background-color 0.1s ease-in-out", backgroundColor: "transparent" }} p={1} borderRadius={"6px"} fontSize={"18px"} onClick={() => window.open("https://syafiqparadisam.netlify.app", "_blank")} onMouseOver={handleHoverNav} onMouseOut={handleHoverOutNav}>About us</Link>
+                            <Link sx={{ textDecoration: "none", cursor: "pointer", color: "white", transition: "background-color 0.1s ease-in-out", backgroundColor: "transparent" }} p={1} borderRadius={"6px"} fontSize={"18px"} onClick={() => window.scrollTo({ top: elementPosition ? elementPosition : - 1000, left: 0, behavior: "smooth" })} onMouseOver={handleHoverNav} onMouseOut={handleHoverOutNav}>About us</Link>
                             <Link sx={{ textDecoration: "none", cursor: "pointer", color: "white", transition: "background-color 0.1s ease-in-out" }} p={1} onMouseOut={handleHoverOutNav} borderRadius={"6px"} className="blog" fontSize={"18px"} onClick={() => window.open("https://syafiqparadisam.netlify.app", "_blank")} onMouseOver={handleHoverNav}>Blog</Link>
                             <Link sx={{ textDecoration: "none", cursor: "pointer", color: "white", transition: "background-color 0.1s ease-in-out" }} p={1} borderRadius={"6px"} onMouseOut={handleHoverOutNav} fontSize={"18px"} className="testimoni" onClick={() => window.open("https://syafiqparadisam.netlify.app", "_blank")} onMouseOver={handleHoverNav}>Testimonial</Link>
 

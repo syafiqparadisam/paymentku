@@ -52,7 +52,7 @@ const Home = () => {
           </List>
         </Box>
       </Box>
-      <Box display={"flex"} justifyContent={"space-around"} width={"100%"} mx={10} alignItems={"center"} p={5} height={"100vh"} bgcolor={"#f5ffaa"}>
+      <Box display={"flex"} id="aboutUs" justifyContent={"space-around"} width={"100%"} mx={10} alignItems={"center"} p={5} height={"100vh"} bgcolor={"#f5ffaa"}>
         <Box width={"50%"}>
           <Typography fontWeight={"bold"} fontSize={"25px"}>Why Choose Us?</Typography>
           <List>

@@ -23,7 +23,7 @@ const UserProfile = () => {
     const [updateUser, { isSuccess: successUpdateUser }] = useUpdateUsernameMutation()
     const [logout] = useLogoutMutation()
     const [deleteAccount, { isSuccess: successDeleteAccount }] = useDeleteAccountMutation()
-    const [err, setErr] = useState<any>(null)
+    const [err, setErr] = useState<any>("")
     const { open: openAlert, handleOpen, handleClose } = useAlert()
     const [openUploadFile, setOpenUploadFile] = useState<boolean>(false)
     const { handleUpdateUsername, setValueForUsername, validateInput, cleanUp, label, open, value, valueForUsername, updateVal, totalInput, openModal, validatePhoneNumber, valueForPassword, setValueForPassword } = useValidation()
@@ -108,7 +108,7 @@ const UserProfile = () => {
                         {err && <Typography color={"red"} textAlign={"center"} fontWeight={"bold"} fontSize={"15px"}>{err?.data?.message}</Typography>}
                     </Box>
                     <Box display={"flex"} flexDirection={"column"} justifyContent={"center"}>
-                        <Typography fontWeight={"bold"}>{label === "username" || label === "delete account" ? "If you're login with google, Please don't fill password field" : null}</Typography>
+                        <Typography fontWeight={"bold"}>{label === "username" || label === "delete account" ? "If you're login with google, Please don't fill password field" : ""}</Typography>
                         <InputLabel htmlFor={label === "delete account" ? "password" : label}>{label === "delete account" ? "password" : label} :</InputLabel >
                         {
                             label != "Bio" ? <TextField sx={{ fontWeight: "bold", fontSize: "15px" }} defaultValue={label === "username" ? valueForUsername : value} onChange={(e) => {

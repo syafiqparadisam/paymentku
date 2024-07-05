@@ -190,7 +190,7 @@ func main() {
 				logZero.Err(e).Msg("error shutdowning app")
 			}
 		}
-		os.Remove("server")
+		os.Remove("server.out")
 	}()
 	err = app.Listen(httpCfg.Port)
 	if err != nil {

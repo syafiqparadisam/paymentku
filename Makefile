@@ -11,7 +11,7 @@ docker-compose:
 
 # USER START
 run-user: docker-compose
-	cd ${USER_SVC_PATH} && go build -o server server.go && ./server
+	cd ${USER_SVC_PATH} && go build -o server.out server.go && ./server
 
 test-user: docker-compose
 	cd ${USER_SVC_PATH}/test && go test -v ./... --count=1
@@ -23,7 +23,7 @@ install-user:
 
 # TRANSACTION START
 run-transaction: docker-compose	
-	cd ${TRANSACTION_SVC_PATH} && go build -o server server.go && ./server
+	cd ${TRANSACTION_SVC_PATH} && go build -o server.out server.go && ./server
 
 test-transaction:
 	cd ${TRANSACTION_SVC_PATH}/test && go test -v ./... --count=1
@@ -31,7 +31,7 @@ test-transaction:
 
 # HISTORY START
 run-history: docker-compose
-	cd ${HISTORY_SVC_PATH} && go build -o server server.go && ./server
+	cd ${HISTORY_SVC_PATH} && go build -o server.out server.go && ./server
 	
 
 test-history: docker-compose
@@ -50,7 +50,6 @@ test-auth: docker-compose
 #FRONTEND 
 run-fe:
 	cd www && npm run dev
-
 
 # ALL
 test: test-user test-transaction test-history test-auth 

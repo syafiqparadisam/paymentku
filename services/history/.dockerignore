@@ -1,3 +1,4 @@
 test
 .golangci.yml
-env.example
+*.out
+*.env.*

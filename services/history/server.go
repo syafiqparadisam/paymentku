@@ -160,7 +160,7 @@ func main() {
 				panic(e)
 			}
 		}
-		os.Remove("server")
+		os.Remove("server.out")
 	}()
 
 	err = server.ListenAndServe()

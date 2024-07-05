@@ -38,7 +38,7 @@ import jwtPayload from '../interfaces/jwtPayload';
 import { GoogleStrategy } from './strategies/google.strategy';
 import crypto from 'crypto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { allowedFile } from '../config/cloudinary-options';
+import { allowedFile } from '../config/cloudinary-config';
 import { diskStorage } from 'multer';
 import path from 'node:path';
 import fs from 'node:fs/promises';

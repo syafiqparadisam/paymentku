@@ -2,7 +2,7 @@
 FROM node:18.17.1-alpine
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
@@ -12,8 +12,5 @@ RUN npm install
 
 COPY . .
 
-# Creates a "dist" folder with the production build
-RUN npm run build
-
 # Start the server using the production build
-CMD npm run migrate-run && npm run start:prod
+CMD npm run migrate-run && npm run build && npm run start:prod

@@ -1,4 +1,7 @@
 *test/*
 *.e2e*
 node_modules
-dist
+dist/*
+*.env.*
+.eslintrc.js
+.prettierrc

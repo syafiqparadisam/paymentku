@@ -54,10 +54,16 @@ func TestProfileWeb(t *testing.T) {
 	if errConnMySQL != nil {
 		log.Fatal(errConnMySQL)
 	}
+
+	client, err := config.NewRedisStore()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	donech := make(chan bool)
 	seeder := seeder.NewUserSeeder(mysql)
 	userRepo := user_repo.NewUserRepository(mysql)
-	usecase := usecase.NewUserUsecase(userRepo)
+	usecase := usecase.NewUserUsecase(userRepo, client)
 	server := controllerhttp.NewControllerHTTP(usecase)
 	app := server.Routes()
 	go func() {

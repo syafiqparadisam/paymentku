@@ -25,7 +25,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-
 // Initialize a gRPC connection to be used by both the tracer and meter
 // providers.
 func initConn() (*grpc.ClientConn, error) {
@@ -147,8 +146,13 @@ func main() {
 
 	fmt.Println("Connected to mysql on port ", dbPort)
 
+	client, err := config.NewRedisStore()
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Redis connection error")
+	}
+
 	userRepo := user_repo.NewUserRepository(mysql)
-	usecase := usecase.NewUserUsecase(userRepo)
+	usecase := usecase.NewUserUsecase(userRepo, client)
 
 	server := controllerhttp.NewControllerHTTP(usecase)
 	app := server.Routes()

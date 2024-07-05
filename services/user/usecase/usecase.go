@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/syafiqparadisam/paymentku/services/user/domain"
 	"github.com/syafiqparadisam/paymentku/services/user/dto"
 	user_repo "github.com/syafiqparadisam/paymentku/services/user/repository/user"
@@ -10,11 +11,13 @@ import (
 
 type Usecase struct {
 	User *user_repo.UserRepository
+	Redis *redis.Client
 }
 
-func NewUserUsecase(User *user_repo.UserRepository) *Usecase {
+func NewUserUsecase(User *user_repo.UserRepository, redisClient *redis.Client) *Usecase {
 	return &Usecase{
 		User: User,
+		Redis: redisClient,
 	}
 }
 

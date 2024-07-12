@@ -4,6 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { SendEmail } from "../types/dto"
 import { useSendEmailForgotPasswordMutation } from "../services/authApi"
 import { useEffect, useState } from "react"
+
 type sendEmail = {
   email: string
 }

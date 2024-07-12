@@ -7,7 +7,7 @@ type menuItem = {
     categories: string,
 }
 
-interface Header {
+type Header = {
     firstItem: string,
     menuItem: menuItem[]
 }

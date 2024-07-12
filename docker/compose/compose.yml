@@ -27,8 +27,8 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - ../../DB:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/initsql
+      - ../../database/DB:/var/lib/mysql
+      - ../../database/init.sql:/docker-entrypoint-initdb.d/initsql
     networks:
       - mysql-phpmyadmin
 
@@ -46,22 +46,12 @@ services:
     networks:
       - mysql-phpmyadmin
 
-  nginx:
-    image: nginx:latest
-    container_name: nginx-webserver
-    volumes:
-      - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - 8000:80
-    depends_on: 
-      - phpmyadmin
-
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.91.0
     container_name: otel-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
-      - ../../otelCollector/otel-collector.yaml:/etc/otel-collector-config.yaml
+      - ../../observability/otel-collector.yaml:/etc/otel-collector-config.yaml
     ports:
       - "1888:1888" # pprof extension
       - "8888:8888" # Prometheus metrics exposed by the collector
@@ -76,7 +66,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ../../otelCollector/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ../../observability/prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
     depends_on:
@@ -90,15 +80,6 @@ services:
       - "14268"
       - "14250"
 
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: nginx-paymentku
-  #   restart: always
-  #   ports:
-  #     - 8880:80
-  #   volumes:
-  #     - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
-
   redis:
     image: redis:latest
     container_name: redis
@@ -106,8 +87,8 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - ../../redis/data:/data
-      - ../../redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ../../database/redis/data:/data
+      - ../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf
 
 networks:
   mysql-phpmyadmin:

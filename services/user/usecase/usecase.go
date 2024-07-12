@@ -3,21 +3,21 @@ package usecase
 import (
 	"context"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/syafiqparadisam/paymentku/services/user/domain"
 	"github.com/syafiqparadisam/paymentku/services/user/dto"
+	caching_repo "github.com/syafiqparadisam/paymentku/services/user/repository/caching"
 	user_repo "github.com/syafiqparadisam/paymentku/services/user/repository/user"
 )
 
 type Usecase struct {
-	User *user_repo.UserRepository
-	Redis *redis.Client
+	User user_repo.UserInterface
+	Cache caching_repo.CachingInterface
 }
 
-func NewUserUsecase(User *user_repo.UserRepository, redisClient *redis.Client) *Usecase {
+func NewUserUsecase(User user_repo.UserInterface, cache caching_repo.CachingInterface) *Usecase {
 	return &Usecase{
 		User: User,
-		Redis: redisClient,
+		Cache: cache,
 	}
 }
 

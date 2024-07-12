@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { route } from "../constant/route"
 
-interface Email {
+type Email = {
     email: string
 }
 

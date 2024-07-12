@@ -3,7 +3,7 @@ import React from "react"
 // @ts-ignore
 import toRupiah from '@develoka/angka-rupiah-js';
 
-interface listRequirement {
+type listRequirement = {
     name: string
     icon: React.ReactNode,
 
@@ -11,7 +11,7 @@ interface listRequirement {
 
 type fn = () => void;
 
-interface props {
+type props = {
     amount: number,
     requirement: listRequirement[],
     onClick: fn

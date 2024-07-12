@@ -21,7 +21,7 @@ func NewUserRepository(mysql *config.MySqlStore) *UserRepository {
 type UserInterface interface {
 	StartACID(ctx context.Context) (*sql.Tx, error)
 	GetProfile(ctx context.Context, userid int) (*domain.Profile, error)
-	GetUserProfileByAccNumber(ctx context.Context, accNumber uint64) (*domain.Profile, error)
+	GetUserProfileByAccNumber(ctx context.Context, accNumber uint64) (*domain.ProfileForFindWithAccount, error)
 	UpdateBioProfile(ctx context.Context, userid int, bio string) error
 	UpdateNameProfile(ctx context.Context, userid int, name string) error
 	UpdatePhoneNumber(ctx context.Context, userid int, phoneNumber string) error

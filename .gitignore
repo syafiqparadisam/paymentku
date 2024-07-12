@@ -3,8 +3,8 @@
 *.env
 infrastructure/DB
 *.vagrant*
-infrastructure/DB*
-infrastructure/redis
+database/DB*
+database/redis
 
 # Logs
 logs

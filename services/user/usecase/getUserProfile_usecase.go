@@ -15,10 +15,33 @@ import (
 func (s *Usecase) GetUserProfile(ctx context.Context, userid string) dto.APIResponse[*domain.Profile] {
 	log := config.Log()
 	userId, _ := strconv.Atoi(userid)
+	var result *domain.Profile
+
+	// check cache
+	result, errCache := s.Cache.GetProfile(ctx, userId)
+	if errCache != nil {
+		panic(errCache)
+	}
+
+	// cache exist
+	if result != nil {
+		response := dto.APIResponse[*domain.Profile]{StatusCode: http.StatusOK, Data: result, Message: "Ok"}
+		log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
+		return response
+	}
+
+	// cache isn't exist get from database
 	result, err := s.User.GetProfile(ctx, userId)
 	if err != nil {
 		panic(err)
 	}
+
+	// set cache
+	err = s.Cache.InsertProfile(ctx, result)
+	if err != nil {
+		panic(err)
+	}
+
 	response := dto.APIResponse[*domain.Profile]{StatusCode: http.StatusOK, Data: result, Message: "Ok"}
 	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response

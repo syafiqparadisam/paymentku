@@ -1,6 +1,0 @@
-# - name: Update and upgrade system, then install neofetch
-#   hosts: all
-#   # become: true
-
-#   tasks:
-    

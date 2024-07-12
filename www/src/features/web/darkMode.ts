@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-interface state {
+type state = {
     isDark: boolean
 }
 

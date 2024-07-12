@@ -9,7 +9,7 @@ import { Help, Settings } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { RootState } from '../app/store';
 
-interface Props {
+type Props = {
     children: ReactNode | ReactElement
 }
 

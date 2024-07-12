@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/syafiqparadisam/paymentku/services/user/config"
 	controllerhttp "github.com/syafiqparadisam/paymentku/services/user/controller/http"
+	caching_repo "github.com/syafiqparadisam/paymentku/services/user/repository/caching"
 	user_repo "github.com/syafiqparadisam/paymentku/services/user/repository/user"
 	"github.com/syafiqparadisam/paymentku/services/user/test/seeder"
 	"github.com/syafiqparadisam/paymentku/services/user/usecase"
@@ -55,7 +56,7 @@ func TestProfileWeb(t *testing.T) {
 		log.Fatal(errConnMySQL)
 	}
 
-	client, err := config.NewRedisStore()
+	redClient, redSync, err := config.NewRedisStore()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +64,8 @@ func TestProfileWeb(t *testing.T) {
 	donech := make(chan bool)
 	seeder := seeder.NewUserSeeder(mysql)
 	userRepo := user_repo.NewUserRepository(mysql)
-	usecase := usecase.NewUserUsecase(userRepo, client)
+	cachingRepo := caching_repo.NewCacheRepo(redSync, redClient)
+	usecase := usecase.NewUserUsecase(userRepo, cachingRepo)
 	server := controllerhttp.NewControllerHTTP(usecase)
 	app := server.Routes()
 	go func() {

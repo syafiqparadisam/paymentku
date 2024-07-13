@@ -27,6 +27,10 @@ func (s *Usecase) UpdateBio(ctx context.Context, payload *dto.UpdateBioDTO, user
 	if err != nil {
 		panic(err)
 	}
+	err = s.Cache.DeleteProfile(ctx, userId)
+	if err != nil {
+		panic(err)
+	}
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Bio already updated"}
 	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 	return response
@@ -46,6 +50,10 @@ func (s *Usecase) UpdateName(ctx context.Context, payload *dto.UpdateNameDTO, us
 		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
+	if err != nil {
+		panic(err)
+	}
+	err = s.Cache.DeleteProfile(ctx, userId)
 	if err != nil {
 		panic(err)
 	}
@@ -72,6 +80,12 @@ func (s *Usecase) UpdatePhoneNumber(ctx context.Context, payload *dto.UpdatePhon
 	if err != nil {
 		panic(err)
 	}
+
+	err = s.Cache.DeleteProfile(ctx, userId)
+	if err != nil {
+		panic(err)
+	}
+	
 	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Phone number already updated"}
 	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 	return response

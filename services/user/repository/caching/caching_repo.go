@@ -12,6 +12,7 @@ import (
 type CachingInterface interface {
 	GetProfile(ctx context.Context, userid int) (*domain.Profile, error)
 	InsertProfile(ctx context.Context, profile *domain.Profile) error
+	DeleteProfile(ctx context.Context, userid int) error
 }
 
 type Cache struct {
@@ -48,6 +49,27 @@ func (c *Cache) InsertProfile(ctx context.Context, profile *domain.Profile) erro
 	}
 
 	// set cache
+
+	// unlock redis
+	if ok, err := mutex.Unlock(); !ok || err != nil {
+		return fmt.Errorf("unlock failed %+v", err)
+	}
+
+	return nil
+}
+
+func (c *Cache) DeleteProfile(ctx context.Context, userid int) error {
+	// lock redis
+	mutex := c.RedisSync.NewMutex("user-mutex")
+	if err := mutex.Lock(); err != nil {
+		return err
+	}
+
+	// delete cache
+	_, err := c.RedisClient.Del(ctx, fmt.Sprintf("userprofile:%d", userid)).Result()
+	if err != nil {
+		return err
+	}
 
 	// unlock redis
 	if ok, err := mutex.Unlock(); !ok || err != nil {

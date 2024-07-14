@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -20,9 +21,10 @@ func (s *Usecase) GetUserProfile(ctx context.Context, userid string) dto.APIResp
 	// check cache
 	result, errCache := s.Cache.GetProfile(ctx, userId)
 	if errCache != nil {
+		fmt.Println(errCache)
 		panic(errCache)
 	}
-
+	fmt.Println(result)
 	// cache exist
 	if result != nil {
 		response := dto.APIResponse[*domain.Profile]{StatusCode: http.StatusOK, Data: result, Message: "Ok"}
@@ -37,7 +39,7 @@ func (s *Usecase) GetUserProfile(ctx context.Context, userid string) dto.APIResp
 	}
 
 	// set cache
-	err = s.Cache.InsertProfile(ctx, result)
+	err = s.Cache.InsertProfile(ctx, result, userId)
 	if err != nil {
 		panic(err)
 	}

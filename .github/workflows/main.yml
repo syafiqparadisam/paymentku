@@ -4,13 +4,48 @@ on:
   push:
     branches:
       - main
-      - release/*
       - develop
+      - features*
 
 jobs:
-  ci:
-    name: CI processes
+  develop:
+    name: Development processes
     runs-on: ubuntu-22.04
+    env:
+      CLIENT_ID: ${{secrets.CLIENT_ID}}
+      CLIENT_SECRET: ${{secrets.CLIENT_SECRET}}
+      CALLBACK_URL_GOOGLE: ${{secrets.CALLBACK_URL_GOOGLE}}
+      FRONTEND: ${{secrets.FRONTEND}}
+      SMTP_KEY: ${{secrets.SMTP_KEY}}
+      SMTP_LOGIN: ${{secrets.SMTP_LOGIN}}
+      AUTH_SVC: ${{secrets.AUTH_SVC}}
+      USER_ICON_DEFAULT: ${{secrets.USER_ICON_DEFAULT}}
+      USER_SVC: ${{secrets.USER_SVC}}
+      TF_SVC: ${{secrets.TF_SVC}}
+      HISTORY_SVC: ${{secrets.HISTORY_SVC}}
+      NEST_APP_PORT: ${{secrets.NEST_APP_PORT}}
+      REDIS_HOST: ${{secrets.REDIS_HOST}}
+      DB_PORT: ${{secrets.DB_PORT}}
+      DB_USER: ${{secrets.DB_USER}}
+      DB_NAME: ${{secrets.DB_NAME}}
+      DB_PARAM: ${{secrets.DB_PARAM}}
+      DB_PASSWD: ${{secrets.DB_PASSWD}}
+      DB_HOST: ${{secrets.DB_HOST}}
+      REDIS_PORT: ${{secrets.REDIS_PORT}}
+      CLOUDINARY_APISECRET: ${{secrets.CLOUDINARY_APISECRET}}
+      CLOUDINARY_CLOUDNAME: ${{secrets.CLOUDINARY_CLOUDNAME}}
+      CLOUDINARY_APIKEY: ${{secrets.CLOUDINARY_APIKEY}}
+      GRPC_SERVER_URL: ${{secrets.GRPC_SERVER_URL}}
+      HISTORY_SVC_PORT: ${{secrets.HISTORY_SVC_PORT}}
+      ORIGIN_URL: ${{secrets.ORIGIN_URL}}
+      TF_ICON: ${{secrets.TF_ICON}}
+      TRANSFER_SVC_PORT: ${{secrets.TRANSFER_SVC_PORT}}
+      DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+      DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      DOCKER_TAGS_PAYMENTKU: ${{secrets.DOCKER_TAGS_PAYMENTKU}}
+      USER_SVC_PORT: ${{secrets.USER_SVC_PORT}}
+      MYSQL_DATABASE: ${{secrets.MYSQL_DATABASE}}
+
     steps:
       - name: Check Repository
         uses: actions/checkout@v4
@@ -23,69 +58,67 @@ jobs:
       - name: Setup nodejs
         uses: actions/setup-node@v4
         with:
-          node-version: 20.12.0
+          node-version: 18.17.1
 
-      - name: Install golangci-lint
-        uses: golangci/golangci-lint-action@v5
+      - uses: oNaiPs/secrets-to-env-action@v1
         with:
-          version: latest
+          secrets: ${{ toJSON(secrets) }}
 
-      - name: Verify installation golangci-lint
-        run: golangci-lint --version
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
+      - name: Run docker compose
+        run: |
+          make
+
+        # AUTH SERVICE START
+      - name: Download dependencies in auth service
+        working-directory: ./services/auth
+        run: |
+          npm install
+
+      - name: Run eslint for auth service
+        working-directory: ./services/auth
+        run: |
+          npm run lint
+
+      - name: Migrate table on database
+        working-directory: ./services/auth
+        run: |
+          npm i -g typeorm
+          npm run migrate-run
+
+      - name: Test auth service
+        run: |
+          make test-auth
+      # AUTH SERVICE END
       # HISTORY SERVICE START
-      - name: Run golangci-lint for history service
-        working-directory: ./services/history
-        run: golangci-lint run
-
       - name: Download dependencies in history service
         working-directory: ./services/history
         run: go mod download
 
       - name: Test history service
-        working-directory: ./services/history/test
-        run: go test -v ./...
+        working-directory: .
+        run: make test-history
 
       # HISTORY SERVICE END
       # TRANSACTION SERVICE START
-      - name: Run golangci-lint for transaction service
-        working-directory: ./services/transaction
-        run: golangci-lint run
-
       - name: Download dependencies in transaction service
         working-directory: ./services/transaction
         run: go mod download
 
       - name: Test transaction service
-        working-directory: ./services/transaction/test
-        run: go test -v ./...
+        run: make test-transaction
       # TRANSACTION SERVICE END
       # USER SERVICE START
-      - name: Run golangci-lint for user service
-        working-directory: ./services/user
-        run: golangci-lint run
-
       - name: Download dependencies in user service
         working-directory: ./services/user
         run: go mod download
 
       - name: Test user service
-        working-directory: ./services/user/test
-        run: go test -v ./...
+        run: make test-user
       # USER SERVICE END
-      # AUTH SERVICE START
-      - name: Download dependencies in auth service
-        working-directory: ./services/auth
-        run: npm install
 
-      - name: Run eslint for auth service
-        working-directory: ./services/auth
-        run: npm run lint
-
-      - name: Test auth service
-        working-directory: ./services/auth
-        run: npm run test:e2e
-      # AUTH SERVICE END
       # FRONTEND START
       - name: Download dependencies in frontend app
         working-directory: ./www
@@ -96,94 +129,74 @@ jobs:
         run: npm run lint
       # FRONTEND ENV
 
-  cd:
-    name: CD processes
+      - name: Revert migration
+        run: |
+          make migrate-revert
+
+  staging:
+    name: Staging
     runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/develop' && github.ref == 'refs/heads/main'
+    if: ${{github.ref == 'refs/heads/develop'}}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Install Docker
-        uses: docker/setup-buildx-action@v1
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login into docker hub
-        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+        uses: docker/login-action@v3
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
 
         # HISTORY SERVICE START
-      - name: Build history service application
-        working-directory: ./services/history
-        run: docker build -t history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag history service
-        working-directory: ./services/history
-        run: docker tag history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy history service to dockerhub
-        working-directory: ./services/history
-        run: docker push ${{secrets.DOCKER_USERNAME}}/history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:services/history"
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+
         # HISTORY SERVICE END
 
         # TRANSACTION SERVICE START
-      - name: Build transaction service application
-        working-directory: ./services/transaction
-        run: docker build -t transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag transaction service
-        working-directory: ./services/transaction
-        run: docker tag transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy transaction service to dockerhub
-        working-directory: ./services/transaction
-        run: docker push ${{secrets.DOCKER_USERNAME}}/transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:services/transaction"
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+
         # TRANSACTION SERVICE END
 
         # USER SERVICE START
-      - name: Build user service application
-        working-directory: ./services/user
-        run: docker build -t user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag user service
-        working-directory: ./services/user
-        run: docker tag user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy user service to dockerhub
-        working-directory: ./services/user
-        run: docker push ${{secrets.DOCKER_USERNAME}}/user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:services/user"
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
         # USER SERVICE END
 
         # AUTH SERVICE START
-      - name: Build auth service application
-        working-directory: ./services/auth
-        run: docker build -t auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag auth service
-        working-directory: ./services/auth
-        run: docker tag auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy auth service to dockerhub
-        working-directory: ./services/auth
-        run: docker push ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:services/auth"
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+
         # AUTH SERVICE END
 
         # FRONTEND APP START
-      - name: Build frontend service application
-        working-directory: ./www
-        run: docker build -t frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} .
-
-      - name: Update docker tag frontend service
-        working-directory: ./www
-        run: docker tag frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}} ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-
       - name: Deploy frontend service to dockerhub
-        working-directory: ./www
-        run: docker push ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-        # FRONTEND APP END
-
-      - name: Running ansible playbook, then running docker instance on this port
-        uses: dawidd6/action-ansible-playbook@v2
+        uses: docker/build-push-action@v5
         with:
-          playbook: infrastructure/playbook.yml
-          inventory: |
-            [server]
-            ${{secrets.SERVER.IP}}
+          context: "{{defaultContext}}:www"
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
+        # FRONTEND APP END

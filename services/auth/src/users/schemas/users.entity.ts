@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Column,
   Entity,
   JoinColumn,
@@ -12,7 +13,7 @@ import { HistoryTransfer } from './history_transfer.entity';
 import { Notification } from './notification.entity';
 
 @Entity()
-export class Users {
+export class Users extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

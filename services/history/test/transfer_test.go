@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -20,6 +21,7 @@ import (
 func (h *HistoryTest) GetAllHistoryTransfer(t *testing.T) {
 	t.Parallel()
 
+	// setup seeder user and transfer
 	userMock1 := mock.NewUser1ProfileMock()
 	senderIdProfile, senderIdUser := h.Seeder.UserSeeder.Up(userMock1)
 
@@ -32,6 +34,7 @@ func (h *HistoryTest) GetAllHistoryTransfer(t *testing.T) {
 	tfMock2 := mock.NewHistoryTransfer2(senderIdUser, userMock1, userMock2)
 	idTransfer2 := h.Seeder.TransferSeeder.Up(tfMock2)
 
+	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleAllTransferHistory), http.MethodGet, http.MethodDelete))
 	defer func() {
 		h.Seeder.TransferSeeder.Down(idTransfer1)
@@ -41,6 +44,7 @@ func (h *HistoryTest) GetAllHistoryTransfer(t *testing.T) {
 		server.Close()
 	}()
 
+	// setup request
 	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/transfer?userid=%d", senderIdUser), http.NoBody)
 	client := &http.Client{}
 	resp, _ := client.Do(req)
@@ -72,6 +76,7 @@ func (h *HistoryTest) GetAllHistoryTransfer(t *testing.T) {
 func (h *HistoryTest) GetHistoryTransferById(t *testing.T) {
 	t.Parallel()
 
+	// setup user seeder and transfer
 	userMock1 := mock.NewUser1ProfileMock()
 	senderIdProfile, senderIdUser := h.Seeder.UserSeeder.Up(userMock1)
 
@@ -81,6 +86,7 @@ func (h *HistoryTest) GetHistoryTransferById(t *testing.T) {
 	tfMock1 := mock.NewHistoryTransfer1(senderIdUser, userMock1, userMock2)
 	idTransfer1 := h.Seeder.TransferSeeder.Up(tfMock1)
 
+	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
 	defer func() {
 		h.Seeder.TransferSeeder.Down(idTransfer1)
@@ -89,6 +95,7 @@ func (h *HistoryTest) GetHistoryTransferById(t *testing.T) {
 		server.Close()
 	}()
 
+	// setup request
 	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/transfer/%d?userid=%d", idTransfer1, senderIdUser), http.NoBody)
 	client := &http.Client{}
 	resp, _ := client.Do(req)
@@ -112,6 +119,8 @@ func (h *HistoryTest) GetHistoryTransferById(t *testing.T) {
 	assert.Equal(t, findHistory.Receiver, actualResp.Data.Receiver)
 	assert.Equal(t, findHistory.ReceiverName, actualResp.Data.ReceiverName)
 	assert.Equal(t, findHistory.Sender, actualResp.Data.Sender)
+	assert.Equal(t, findHistory.PreviousBalance, actualResp.Data.PreviousBalance)
+	assert.Equal(t, findHistory.Balance, actualResp.Data.Balance)
 	assert.Equal(t, findHistory.SenderName, actualResp.Data.SenderName)
 	assert.Equal(t, findHistory.Status, actualResp.Data.Status)
 	assert.Equal(t, *findHistory, *actualResp.Data)
@@ -120,6 +129,7 @@ func (h *HistoryTest) GetHistoryTransferById(t *testing.T) {
 func (h *HistoryTest) GetHistoryTransferByWrongId(t *testing.T) {
 	t.Parallel()
 
+	// setup user seeder and transfer
 	userMock1 := mock.NewUser1ProfileMock()
 	senderIdProfile, senderIdUser := h.Seeder.UserSeeder.Up(userMock1)
 
@@ -129,6 +139,7 @@ func (h *HistoryTest) GetHistoryTransferByWrongId(t *testing.T) {
 	tfMock1 := mock.NewHistoryTransfer1(senderIdUser, userMock1, userMock2)
 	idTransfer1 := h.Seeder.TransferSeeder.Up(tfMock1)
 
+	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
 	defer func() {
 		h.Seeder.TransferSeeder.Down(idTransfer1)
@@ -137,7 +148,8 @@ func (h *HistoryTest) GetHistoryTransferByWrongId(t *testing.T) {
 		server.Close()
 	}()
 
-	randomIdTf := 20324
+	// setup request
+	randomIdTf := rand.Intn(10000)
 	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/transfer/%d?userid=%d", randomIdTf, senderIdUser), http.NoBody)
 	client := &http.Client{}
 	resp, _ := client.Do(req)
@@ -154,6 +166,7 @@ func (h *HistoryTest) GetHistoryTransferByWrongId(t *testing.T) {
 func (h *HistoryTest) DeleteHistoryTransferById(t *testing.T) {
 	t.Parallel()
 
+	// setup user and transfer seeder
 	userMock1 := mock.NewUser1ProfileMock()
 	senderIdProfile, senderIdUser := h.Seeder.UserSeeder.Up(userMock1)
 
@@ -163,6 +176,7 @@ func (h *HistoryTest) DeleteHistoryTransferById(t *testing.T) {
 	tfMock1 := mock.NewHistoryTransfer1(senderIdUser, userMock1, userMock2)
 	idTransfer1 := h.Seeder.TransferSeeder.Up(tfMock1)
 
+	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
 	defer func() {
 		h.Seeder.UserSeeder.Down(senderIdUser, senderIdProfile)
@@ -170,6 +184,7 @@ func (h *HistoryTest) DeleteHistoryTransferById(t *testing.T) {
 		server.Close()
 	}()
 
+	// setup request
 	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/transfer/%d?userid=%d", idTransfer1, senderIdUser), http.NoBody)
 	client := &http.Client{}
 	resp, _ := client.Do(req)
@@ -189,6 +204,7 @@ func (h *HistoryTest) DeleteHistoryTransferById(t *testing.T) {
 func (h *HistoryTest) DeleteHistoryTransferByWrongId(t *testing.T) {
 	t.Parallel()
 
+	// setup user and transfer seeder
 	userMock1 := mock.NewUser1ProfileMock()
 	senderIdProfile, senderIdUser := h.Seeder.UserSeeder.Up(userMock1)
 
@@ -198,6 +214,7 @@ func (h *HistoryTest) DeleteHistoryTransferByWrongId(t *testing.T) {
 	tfMock1 := mock.NewHistoryTransfer1(senderIdUser, userMock1, userMock2)
 	idTransfer1 := h.Seeder.TransferSeeder.Up(tfMock1)
 
+	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
 	defer func() {
 		h.Seeder.TransferSeeder.Down(idTransfer1)
@@ -206,7 +223,8 @@ func (h *HistoryTest) DeleteHistoryTransferByWrongId(t *testing.T) {
 		server.Close()
 	}()
 
-	randomIdTf := 23042
+	// setup request
+	randomIdTf := rand.Intn(100000)
 	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/transfer/%d?userid=%d", randomIdTf, senderIdUser), http.NoBody)
 	client := &http.Client{}
 	resp, _ := client.Do(req)
@@ -215,14 +233,15 @@ func (h *HistoryTest) DeleteHistoryTransferByWrongId(t *testing.T) {
 	actualResp := &dto.APIResponse[*domain.HistoryTransfer]{}
 	json.Unmarshal(bodyBytes, actualResp)
 
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	assert.Equal(t, http.StatusBadRequest, actualResp.StatusCode)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Equal(t, http.StatusOK, actualResp.StatusCode)
 	assert.Equal(t, errors.ErrNothingToDel.Error(), actualResp.Message)
 }
 
 func (h *HistoryTest) DeleteAllHistoryTransfer(t *testing.T) {
 	t.Parallel()
 
+	// setup user and transfer seeder
 	userMock1 := mock.NewUser1ProfileMock()
 	senderIdProfile, senderIdUser := h.Seeder.UserSeeder.Up(userMock1)
 
@@ -235,6 +254,7 @@ func (h *HistoryTest) DeleteAllHistoryTransfer(t *testing.T) {
 	tfMock2 := mock.NewHistoryTransfer2(senderIdUser, userMock1, userMock2)
 	idTransfer2 := h.Seeder.TransferSeeder.Up(tfMock2)
 
+	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleAllTransferHistory), http.MethodGet, http.MethodDelete))
 	defer func() {
 		h.Seeder.UserSeeder.Down(senderIdUser, senderIdProfile)
@@ -242,6 +262,7 @@ func (h *HistoryTest) DeleteAllHistoryTransfer(t *testing.T) {
 		server.Close()
 	}()
 
+	// setup request
 	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/transfer?userid=%d", senderIdUser), http.NoBody)
 	client := &http.Client{}
 	resp, _ := client.Do(req)

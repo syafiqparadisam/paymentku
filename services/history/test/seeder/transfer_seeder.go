@@ -35,7 +35,8 @@ type HistoryTransfer struct {
 }
 
 func (transferSeeder *TransferSeeder) Up(payload *mock.HistoryTransfer) int64 {
-	result, err := transferSeeder.MySql.Db.Exec("INSERT INTO history_transfer (userId, sender, sender_name,receiver, receiver_name,status,notes,amount,created_at) VALUES (?,?,?,?,?,?,?,?,?)", payload.UserId, payload.Sender, payload.SenderName, payload.Receiver, payload.ReceiverName, payload.Status, payload.Notes, payload.Amount, payload.CreatedAt)
+
+	result, err := transferSeeder.MySql.Db.Exec("INSERT INTO history_transfer (userId, sender, sender_name,receiver, receiver_name,status,notes,amount,created_at,previous_balance,balance) VALUES (?,?,?,?,?,?,?,?,?,?,?)", payload.UserId, payload.Sender, payload.SenderName, payload.Receiver, payload.ReceiverName, payload.Status, payload.Notes, payload.Amount, payload.CreatedAt, payload.PreviousBalance, payload.PreviousBalance-int64(payload.Amount))
 	if err != nil {
 		panic(err)
 	}
@@ -45,7 +46,7 @@ func (transferSeeder *TransferSeeder) Up(payload *mock.HistoryTransfer) int64 {
 }
 
 func (transferSeeder *TransferSeeder) FindAll(userid int) (*[]domain.HistoryTransferForGetAll, error) {
-	rowsHistory, err := transferSeeder.MySql.Db.Query("SELECT id, sender, receiver, amount, isRead, status, created_at FROM history_transfer WHERE userId = ?;", userid)
+	rowsHistory, err := transferSeeder.MySql.Db.Query("SELECT id, sender, receiver, amount, isRead, status, created_at FROM history_transfer WHERE userId = ? ORDER BY created_at DESC;", userid)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +71,7 @@ func (transferSeeder *TransferSeeder) FindAll(userid int) (*[]domain.HistoryTran
 }
 
 func (transferSeeder *TransferSeeder) FindById(id int, userid int) (*domain.HistoryTransfer, error) {
-	rowsHistory, err := transferSeeder.MySql.Db.Query("SELECT id, sender, receiver, notes, amount, isRead, status, sender_name, receiver_name, created_at FROM history_transfer WHERE id = ? AND userId = ?", id, userid)
+	rowsHistory, err := transferSeeder.MySql.Db.Query("SELECT id, sender, receiver, notes, amount, isRead, status, sender_name, receiver_name, previous_balance,balance, created_at FROM history_transfer WHERE id = ? AND userId = ?", id, userid)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +88,8 @@ func (transferSeeder *TransferSeeder) FindById(id int, userid int) (*domain.Hist
 			&history.Status,
 			&history.SenderName,
 			&history.ReceiverName,
+			&history.PreviousBalance,
+			&history.Balance,
 			&history.CreatedAt,
 		); err != nil {
 			return nil, err

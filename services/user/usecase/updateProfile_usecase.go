@@ -1,9 +1,11 @@
 package usecase
 
 import (
+	"context"
 	"strconv"
 	"unicode"
 
+	"github.com/syafiqparadisam/paymentku/services/user/config"
 	"github.com/syafiqparadisam/paymentku/services/user/dto"
 	"github.com/syafiqparadisam/paymentku/services/user/errors"
 )
@@ -12,50 +14,81 @@ type DataImageResp struct {
 	PublicId string `json:"publicId"`
 }
 
-func (s *Usecase) UpdateBio(payload *dto.UpdateBioDTO, userid string) dto.APIResponse[interface{}] {
-
+func (s *Usecase) UpdateBio(ctx context.Context, payload *dto.UpdateBioDTO, userid string) dto.APIResponse[interface{}] {
+	log := config.Log()
 	userId, _ := strconv.Atoi(userid)
-	err := s.User.UpdateBioProfile(userId, payload.Bio)
+	err := s.User.UpdateBioProfile(ctx, userId, payload.Bio)
 	if err == errors.ErrAffectedRows {
-		return dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrAffectedRows.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrAffectedRows.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+		return response
 	}
 
 	if err != nil {
 		panic(err)
 	}
-	return dto.APIResponse[interface{}]{StatusCode: 200, Message: "Bio already updated"}
+	err = s.Cache.DeleteProfile(ctx, userId)
+	if err != nil {
+		panic(err)
+	}
+	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Bio already updated"}
+	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+	return response
 }
 
-func (s *Usecase) UpdateName(payload *dto.UpdateNameDTO, userid string) dto.APIResponse[interface{}] {
+func (s *Usecase) UpdateName(ctx context.Context, payload *dto.UpdateNameDTO, userid string) dto.APIResponse[interface{}] {
+	log := config.Log()
 	if len(payload.Name) == 0 {
-		return dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrEmptyField.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrEmptyField.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+		return response
 	}
 	userId, _ := strconv.Atoi(userid)
-	err := s.User.UpdateNameProfile(userId, payload.Name)
+	err := s.User.UpdateNameProfile(ctx, userId, payload.Name)
 	if err == errors.ErrAffectedRows {
-		return dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrAffectedRows.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: 200, Message: errors.ErrAffectedRows.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+		return response
 	}
 	if err != nil {
 		panic(err)
 	}
-	return dto.APIResponse[interface{}]{StatusCode: 200, Message: "Name already updated"}
+	err = s.Cache.DeleteProfile(ctx, userId)
+	if err != nil {
+		panic(err)
+	}
+	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Name already updated"}
+	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+	return response
 }
 
-func (s *Usecase) UpdatePhoneNumber(payload *dto.UpdatePhoneNumberDTO, userid string) dto.APIResponse[interface{}] {
-
+func (s *Usecase) UpdatePhoneNumber(ctx context.Context, payload *dto.UpdatePhoneNumberDTO, userid string) dto.APIResponse[interface{}] {
+	log := config.Log()
 	validateErr := validatePhoneNumber(payload.PhoneNumber)
 	if validateErr != nil {
-		return dto.APIResponse[interface{}]{StatusCode: 400, Message: validateErr.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: 400, Message: validateErr.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+		return response
 	}
 	userId, _ := strconv.Atoi(userid)
-	err := s.User.UpdatePhoneNumber(userId, payload.PhoneNumber)
+	err := s.User.UpdatePhoneNumber(ctx, userId, payload.PhoneNumber)
 	if err == errors.ErrAffectedRows {
-		return dto.APIResponse[interface{}]{StatusCode: 200, Message: err.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: 200, Message: err.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+		return response
 	}
 	if err != nil {
 		panic(err)
 	}
-	return dto.APIResponse[interface{}]{StatusCode: 200, Message: "Phone number already updated"}
+
+	err = s.Cache.DeleteProfile(ctx, userId)
+	if err != nil {
+		panic(err)
+	}
+	
+	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Phone number already updated"}
+	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+	return response
 }
 
 func validatePhoneNumber(phoneNumber string) error {

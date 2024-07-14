@@ -1,20 +1,18 @@
-# Gunakan image resmi Golang sebagai base image
-FROM golang:1.22 AS builder
+# Use original image golang as build stage
+FROM golang:1.22-alpine
 
-# Set working directory di dalam container
+# Set working directory inside container
 WORKDIR /app
 
-# Copy semua file dari direktori proyek Anda ke dalam direktori kerja di dalam container
+# Copy source code
 COPY . .
 
+# Download dependencies
+RUN go mod tidy
+
 # Compile aplikasi Go
-RUN go build server.go
+RUN go build -o server server.go
 
-# Buat image akhir yang lebih kecil dengan menggunakan image Alpine Linux
-FROM alpine:latest
+USER nonroot:nonroot
 
-# Set working directory di dalam container
-WORKDIR /app
-
-# Salin executable yang telah dikompilasi dari builder stage
-COPY --from=builder /app/server .
+ENTRYPOINT ["./server"]

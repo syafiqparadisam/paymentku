@@ -4,18 +4,19 @@ import CloseIcon from '@mui/icons-material/Close';
 import { SendEmail } from "../types/dto"
 import { useSendEmailForgotPasswordMutation } from "../services/authApi"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom";
 
+type sendEmail = {
+  email: string
+}
 
 const ForgotPassword = () => {
   const [err, setErr] = useState<any>(null)
   const [sendEmail, { data, isLoading, isSuccess }] = useSendEmailForgotPasswordMutation()
   const [open, setOpen] = useState<boolean>(false)
   const { register, handleSubmit, formState: { errors } } = useForm<SendEmail>()
-  const onSubmit = async (dataForm) => {
+  const onSubmit = async (dataForm: sendEmail) => {
     try {
       await sendEmail({ email: dataForm.email }).unwrap()
-      console.log(open)
     } catch (error) {
       setErr(error)
     }
@@ -26,7 +27,7 @@ const ForgotPassword = () => {
       setOpen(true)
     }
   }, [isSuccess])
-  
+
   return (
     <>
       <Backdrop

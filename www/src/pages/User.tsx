@@ -7,19 +7,20 @@ import UserProfile from './UserProfile';
 import { route } from '../constant/route';
 import { Help, Settings } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
+import { RootState } from '../app/store';
 
-interface Props {
+type Props = {
     children: ReactNode | ReactElement
 }
 
 const User: React.FC<Props> = ({ children }) => {
     const navigate = useNavigate()
-    const darkMode = useSelector(state => state.darkMode)
+    const darkMode = useSelector((state: RootState) => state.darkMode)
 
     return (
         <>
             <Box display={"flex"} height={"100%"}>
-                <Box display={"flex"} width={"15%"} bgcolor={darkMode.isDark ? "#222" : "white"} mr={3} height={"180vh"} flexDirection={"column"} alignItems={"center"}>
+                <Box display={"flex"} width={"20%"} bgcolor={darkMode.isDark ? "#222" : "white"} mr={3} height={"180vh"} flexDirection={"column"} alignItems={"center"}>
                     <List sx={{ width: "100%" }}>
                         <ListItem disablePadding onClick={() => navigate(route["user"])} sx={{ width: "100%" }}>
                             <ListItemButton>

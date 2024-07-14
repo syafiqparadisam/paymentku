@@ -4,25 +4,27 @@ import { useEffect, useState } from "react"
 import { ArrowBack } from "@mui/icons-material";
 import timeStampToLocaleString from '../utils/timeStampToClient';
 import { useSelector } from "react-redux";
+// @ts-ignore
 import toRupiah from '@develoka/angka-rupiah-js';
 import { useTransferMutation } from "../services/transactionApi";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "../app/store";
+import { User } from "../types/response";
 
 const Transfer = () => {
   const [accNum, setAccNum] = useState<string>("")
-  const user = useSelector(state => state.user)
+  const user: User = useSelector((state: RootState) => state.user)
   const [err, setErr] = useState<any>({ data: { message: "" } })
   const [errAmount, setErrAmount] = useState<any>()
   const [amount, setAmount] = useState<string>("")
   const [open, setOpen] = useState<boolean>(false)
   const [notes, setNotes] = useState<string>("")
-  const [transfer, { data: dataTransfer, error: errTransfer, isSuccess: successTransfer }] = useTransferMutation()
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false)
+  const [transfer, { data: dataTransfer, error: errTransfer, isSuccess: successTransfer, isLoading }] = useTransferMutation()
   const [accountNumber, { data, isSuccess }] = useFindAccountMutation()
-  console.log(dataTransfer)
   useEffect(() => {
     if (accNum.length == 0) return
     if (!(/^\d+$/.test(accNum))) {
-      console.log("this is not number")
       setErr({ data: { message: "Please fill right account number" } })
       return
     }
@@ -41,19 +43,27 @@ const Transfer = () => {
       setErrAmount({ data: { message: "Cannot transfer larger than billion" } })
       return
     }
-    console.log("lahh")
     setErrAmount({ data: { message: "" } })
   }, [amount])
 
+  useEffect(() => {
+    if (successTransfer) {
+      setOpenSnackbar(true)
+    }
+  }, [errTransfer, successTransfer])
+
   return (
     <>
-      {successTransfer && <Snackbar
-        open={successTransfer}
+
+      {openSnackbar && <Snackbar
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
         key={"top" + "center"}
         autoHideDuration={3000}
         color="success"
-        message="Successfully transfer"
+        message={dataTransfer?.message}
       />}
+      {/* {errTransfer?.} */}
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -75,9 +85,8 @@ const Transfer = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} variant="contained" color="error">No</Button>
-          <Button variant="contained" color="success" onClick={() => {
+          <Button variant="contained" disabled={isLoading == false ? false : true} color="success" onClick={() => {
             transfer({ accountNumber: Number(accNum), notes, amount: Number(amount) })
-            setOpen(false)
           }}>
             Yes
           </Button>
@@ -89,7 +98,7 @@ const Transfer = () => {
         </Box>
         <Box width={"100%"} justifyContent={"center"} alignItems={"center"} p={3} display={"flex"} flexDirection={"column"}>
           <Typography fontWeight={"bold"} fontSize={"30px"}>Transfer</Typography>
-          {errTransfer?.data && <Typography color={"red"} fontSize={"20px"} fontWeight={"bold"}>{errTransfer?.data?.message}</Typography>}
+          {errTransfer && <Typography color={"red"} fontSize={"20px"} fontWeight={"bold"}>{(errTransfer as any).data.message}</Typography>}
         </Box>
         <Box width={"100%"} p={3} display={"flex"} justifyContent={"center"} alignItems={"flex-start"}>
           <Box width={"50%"} flexDirection={"column"} display={"flex"} justifyContent={"center"}>
@@ -100,8 +109,7 @@ const Transfer = () => {
                 <TextField placeholder="0123456789" fullWidth onChange={(e) => setAccNum(e.target.value)} />
                 <Button variant="contained" color="primary" onClick={async () => {
                   try {
-                    await accountNumber({ accountNumber: Number(accNum) }).unwrap()
-
+                    accNum.length == 0 ? null : await accountNumber({ accountNumber: Number(accNum) }).unwrap()
                   } catch (error) {
                     setErr(error)
                   }

@@ -19,16 +19,30 @@ import (
 
 func (tf *TransactionTestWeb) CreateTransferTransaction(t *testing.T) {
 	t.Parallel()
+
+	// setup server
 	server := httptest.NewServer(controllerhttp.MakeHTTPHandler(controllerhttp.ExstractHeaderXUserData(tf.ControllerHTTP.HandleTransfer), http.MethodPost))
 	defer server.Close()
+
+	// create 2 user
 	sendermock := transaction_mock.NewUser1ProfileMock()
 	receivermock := transaction_mock.NewUser2ProfileMock()
 	idSenderProfile, idSenderUser := tf.Seeder.UserSeeder.Up(sendermock)
 	idReceiverProfile, idReceiverUser := tf.Seeder.UserSeeder.Up(receivermock)
+
+	defer func() {
+		tf.Seeder.TransferSeeder.Down(idSenderUser)
+		tf.Seeder.NotifSeeder.Down(idReceiverUser)
+		tf.Seeder.UserSeeder.Down(idSenderUser, idSenderProfile)
+		tf.Seeder.UserSeeder.Down(idReceiverUser, idReceiverProfile)
+	}()
+
+	// setup request
 	payload := &dto.TransferRequest{AccountNumber: receivermock.AccountNumber, Notes: "", Amount: 1000}
 	byteofDto, _ := json.Marshal(payload)
 	req, _ := http.NewRequest(http.MethodPost, server.URL+fmt.Sprintf("?userid=%d", idSenderUser), bytes.NewReader(byteofDto))
 
+	// do request
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 	t.Log(resp)
@@ -36,10 +50,9 @@ func (tf *TransactionTestWeb) CreateTransferTransaction(t *testing.T) {
 	expectedResponse := &dto.APIResponse[interface{}]{
 		StatusCode: 200,
 		Message:    "Successfully transfer",
-		Data:       nil,
 	}
 
-	// check is store to db ?
+	// test is store to db ?
 	notif := tf.Seeder.NotifSeeder.Find(idReceiverUser)
 	history := tf.Seeder.TransferSeeder.Find(idSenderUser)
 
@@ -49,12 +62,18 @@ func (tf *TransactionTestWeb) CreateTransferTransaction(t *testing.T) {
 	}
 	actualResponse := &dto.APIResponse[interface{}]{}
 	json.Unmarshal(bytesResp, actualResponse)
-	desc := fmt.Sprintf("You got transfer from %s, Amount: %d, Sender: %s,  Sendername: %s , Notes: %s , Yourbalance: %d", sendermock.User, payload.Amount, sendermock.User, sendermock.Name, payload.Notes, receivermock.Balance+int64(payload.Amount))
 
+	// data from notification table
+	desc := fmt.Sprintf("You got transfer from %s, Amount: %d, Sender: %s,  Sendername: %s , Notes: %s , Yourbalance: %d", sendermock.User, payload.Amount, sendermock.User, sendermock.Name, payload.Notes, receivermock.Balance+int64(payload.Amount))
 	title := fmt.Sprintf("Congratulalation, you got transfer from %s", sendermock.User)
 	icon := os.Getenv("TF_ICON")
+
+	// compare test
+	assert.Equal(t, expectedResponse.StatusCode, resp.StatusCode)
+	assert.Equal(t, expectedResponse.StatusCode, actualResponse.StatusCode)
+	assert.Equal(t, expectedResponse.Message, actualResponse.Message)
+
 	for _, n := range *notif {
-		t.Log(n.CreatedAt, n.UserId)
 		assert.NotNil(t, n.Id)
 		assert.Equal(t, n.Icon, icon)
 		assert.Equal(t, n.IsRead, int8(0))
@@ -79,35 +98,34 @@ func (tf *TransactionTestWeb) CreateTransferTransaction(t *testing.T) {
 		assert.Equal(t, h.UserId, idSenderUser)
 	}
 
-	defer func() {
-		tf.Seeder.TransferSeeder.Down(idSenderUser)
-		tf.Seeder.NotifSeeder.Down(idReceiverUser)
-		tf.Seeder.UserSeeder.Down(idSenderUser, idSenderProfile)
-		tf.Seeder.UserSeeder.Down(idReceiverUser, idReceiverProfile)
-	}()
-
-	assert.Equal(t, expectedResponse.StatusCode, resp.StatusCode)
-	assert.Equal(t, expectedResponse.StatusCode, actualResponse.StatusCode)
-	assert.Equal(t, expectedResponse.Message, actualResponse.Message)
-	assert.Equal(t, expectedResponse.Data, actualResponse.Data)
+	
 }
 
 func (tf *TransactionTestWeb) CreateTransferTransactionWithLessBalance(t *testing.T) {
 	t.Parallel()
+
+	// setup server
 	server := httptest.NewServer(controllerhttp.MakeHTTPHandler(controllerhttp.ExstractHeaderXUserData(tf.ControllerHTTP.HandleTransfer), http.MethodPost))
 	defer server.Close()
 
+	// create 2 user
 	sendermock := transaction_mock.NewUser1ProfileMock()
 	receivermock := transaction_mock.NewUser2ProfileMock()
 	idSenderProfile, idSenderUser := tf.Seeder.UserSeeder.Up(sendermock)
 	idReceiverProfile, idReceiverUser := tf.Seeder.UserSeeder.Up(receivermock)
+	defer func() {
+		tf.Seeder.UserSeeder.Down(idSenderUser, idSenderProfile)
+		tf.Seeder.UserSeeder.Down(idReceiverUser, idReceiverProfile)
+	}()
+
+	// setup request
 	payload := &dto.TransferRequest{AccountNumber: receivermock.AccountNumber, Notes: "", Amount: 1000000}
 	byteofDto, _ := json.Marshal(payload)
 	req, _ := http.NewRequest(http.MethodPost, server.URL+fmt.Sprintf("?userid=%d", idSenderUser), bytes.NewReader(byteofDto))
 
+	// do request
 	client := &http.Client{}
 	resp, _ := client.Do(req)
-	t.Log(resp)
 
 	expectedResponse := &dto.APIResponse[interface{}]{
 		StatusCode: 400,
@@ -121,13 +139,8 @@ func (tf *TransactionTestWeb) CreateTransferTransactionWithLessBalance(t *testin
 
 	actualResponse := &dto.APIResponse[interface{}]{}
 	json.Unmarshal(bytesResp, actualResponse)
-	defer func() {
-		tf.Seeder.UserSeeder.Down(idSenderUser, idSenderProfile)
-		tf.Seeder.UserSeeder.Down(idReceiverUser, idReceiverProfile)
-	}()
-
-	t.Log(*actualResponse)
-
+	
+	// test
 	assert.Equal(t, expectedResponse.StatusCode, resp.StatusCode)
 	assert.Equal(t, expectedResponse.StatusCode, actualResponse.StatusCode)
 	assert.Equal(t, expectedResponse.Message, actualResponse.Message)

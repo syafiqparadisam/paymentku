@@ -25,7 +25,6 @@ export class AccessTokenGuardGuard implements CanActivate {
     const request = http.getRequest();
     const authToken: string = request.cookies.authToken;
     try {
-      console.log(request.cookies);
       const randomLockKey = crypto.randomUUID();
       if (!authToken) {
         throw new UnauthorizedException("User haven't yet signin");
@@ -36,14 +35,13 @@ export class AccessTokenGuardGuard implements CanActivate {
       if (!userid) {
         throw new ForbiddenException('User not found');
       }
-      console.log(userid);
       await this.redisService.decreaseExpireAuthToken(authToken, [
         randomLockKey,
       ]);
-      console.log('userid = ', userid);
       request.user_id = userid;
       return true;
     } catch (error) {
+      console.log(error)
       if (
         error instanceof ForbiddenException ||
         error instanceof UnauthorizedException

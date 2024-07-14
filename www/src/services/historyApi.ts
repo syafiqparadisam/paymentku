@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { HistoryTopUp, HistoryTopUps, HistoryTransfer, HistoryTransfers, Response } from "../types/response";
 import { authApi } from "./authApi";
 
@@ -13,9 +12,6 @@ const historyApi = authApi.injectEndpoints({
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
@@ -35,9 +31,6 @@ const historyApi = authApi.injectEndpoints({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -54,9 +47,6 @@ const historyApi = authApi.injectEndpoints({
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
@@ -75,9 +65,6 @@ const historyApi = authApi.injectEndpoints({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.replace(import.meta.env.VITE_FRONTEND_URL)
                 }
@@ -94,16 +81,13 @@ const historyApi = authApi.injectEndpoints({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
                 return baseQueryReturnValue
             },
         }),
-        deleteHistoryTopUpById: build.mutation<Response<null>, string>({
+        deleteHistoryTopUpById: build.mutation<Response<null>, number>({
             query: (arg) => ({
                 url: `history/topup/${arg}`,
                 credentials: "include",
@@ -114,9 +98,6 @@ const historyApi = authApi.injectEndpoints({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -124,7 +105,7 @@ const historyApi = authApi.injectEndpoints({
 
             },
         }),
-        getHistoryTransferById: build.query<Response<HistoryTransfer>, string>({
+        getHistoryTransferById: build.query<Response<HistoryTransfer>, number>({
             query: (arg) => ({
                 url: `history/transfer/${arg}`,
                 credentials: "include"
@@ -133,9 +114,6 @@ const historyApi = authApi.injectEndpoints({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -143,7 +121,7 @@ const historyApi = authApi.injectEndpoints({
 
             },
         }),
-        deleteHistoryTransferById: build.mutation<Response<null>, string>({
+        deleteHistoryTransferById: build.mutation<Response<null>, number>({
             query: (arg) => ({
                 url: `history/transfer/${arg}`,
                 credentials: "include",
@@ -153,9 +131,6 @@ const historyApi = authApi.injectEndpoints({
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL

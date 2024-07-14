@@ -10,11 +10,8 @@ const profileApi = authApi.injectEndpoints({
             }),
             providesTags: ["user"],
             transformErrorResponse(baseQueryReturnValue, meta) {
-                if (meta?.response?.status === 401 || meta?.response?.status == 403) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
+                if (meta?.response?.status === 401 || meta?.response?.status === 403) {
+                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"   
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
@@ -37,9 +34,6 @@ const profileApi = authApi.injectEndpoints({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -59,9 +53,6 @@ const profileApi = authApi.injectEndpoints({
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
@@ -83,9 +74,6 @@ const profileApi = authApi.injectEndpoints({
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
                 }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
-                }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
                 }
@@ -93,10 +81,10 @@ const profileApi = authApi.injectEndpoints({
 
             },
         }),
-        updatePhotoProfile: builder.mutation<Response<null>, { file: File, publicId: string }>({
+        updatePhotoProfile: builder.mutation<Response<null>, { file: File | undefined, publicId: string }>({
             query: (payload) => {
                 const file = new FormData()
-                file.append("image", payload.file)
+                file.append("image", payload?.file ? payload?.file : "")
                 return {
                     url: "profile/photoprofile",
                     method: "PATCH",
@@ -104,16 +92,13 @@ const profileApi = authApi.injectEndpoints({
                     headers: {
                         'x-data-publicid': payload.publicId
                     },
-                    timeout: 1000 * 20
+                    // timeout: 1000 * 20
                 }
             },
             invalidatesTags: ["user"],
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL
@@ -135,9 +120,6 @@ const profileApi = authApi.injectEndpoints({
             transformErrorResponse(baseQueryReturnValue, meta) {
                 if (meta?.response?.status === 401 || meta?.response?.status == 403) {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin"
-                }
-                if (meta?.response?.status === 500) {
-                    window.location.href = import.meta.env.VITE_FRONTEND_URL + "/maintenance"
                 }
                 if (baseQueryReturnValue.status == "FETCH_ERROR") {
                     window.location.href = import.meta.env.VITE_FRONTEND_URL

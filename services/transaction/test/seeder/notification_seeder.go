@@ -35,7 +35,7 @@ func (n *NotifSeeder) Find(idUser int64) *[]Notification {
 	arrNotif := []Notification{}
 	for rows.Next() {
 		notif := &Notification{}
-		if err := rows.Scan(&notif.Id, &notif.Icon, &notif.IsRead, &notif.Title, &notif.CreatedAt, &notif.Type, &notif.UserId, &notif.Description); err != nil {
+		if err := rows.Scan(&notif.Id, &notif.Icon, &notif.IsRead, &notif.Title, &notif.Description, &notif.CreatedAt, &notif.Type, &notif.UserId); err != nil {
 			panic(err)
 		}
 		arrNotif = append(arrNotif, *notif)

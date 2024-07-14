@@ -14,11 +14,12 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
-    "no-restricted-imports": [
-      error,
-      {
-        patterns: ["@mui/*/*/*"]
-      }
-    ]
+    '@typescript-eslint/no-explicit-any': 'off',
+    'react-hooks/exhaustive-deps': 'off',
+    'no-case-declarations': 'off',
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
   },
 }

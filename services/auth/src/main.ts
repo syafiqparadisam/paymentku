@@ -1,18 +1,25 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
+import { WINSTON_MODULE_NEST_PROVIDER, WinstonModule } from 'nest-winston';
+import { instance } from './config/winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: console,
+    logger: WinstonModule.createLogger({
+      instance: instance,
+    }),
   });
   app.use(cookieParser());
-  const urlCors = process.env.FRONTEND
+  const urlCors = process.env.FRONTEND;
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.enableCors({
-    origin: ['https://d070-114-79-21-145.ngrok-free.app', urlCors],
+    origin: [urlCors],
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     credentials: true,
   });
-  app.listen(8800);
+
+  const port = process.env.NEST_APP_PORT;
+  app.listen(port);
 }
 bootstrap();

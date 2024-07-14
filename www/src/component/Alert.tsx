@@ -1,9 +1,11 @@
-import { Dialog, DialogActions, DialogTitle, DialogContentText, Button,DialogContent } from "@mui/material"
+import { Dialog, DialogActions, DialogTitle, DialogContentText, Button, DialogContent } from "@mui/material"
+
+type Fn = () => void
 
 type Alert = {
     open: boolean,
-    handleClose: Function
-    actions: Function
+    handleClose: Fn
+    actions: Fn
     title: string
     desc: string
 }

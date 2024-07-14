@@ -21,11 +21,11 @@ func NewUserRepository(mysql *config.MySqlStore) *UserRepository {
 type UserInterface interface {
 	StartACID(ctx context.Context) (*sql.Tx, error)
 	GetProfile(ctx context.Context, userid int) (*domain.Profile, error)
-	GetUserProfileByAccNumber(accNumber uint64) (*domain.Profile, error)
-	UpdateBioProfile(userid int, bio string) error
-	UpdateNameProfile(userid int, name string) error
-	UpdatePhoneNumber(userid int, phoneNumber string) error
-	GetPhotoProfile(userid int) (*domain.PhotoProfile, error)
+	GetUserProfileByAccNumber(ctx context.Context, accNumber uint64) (*domain.ProfileForFindWithAccount, error)
+	UpdateBioProfile(ctx context.Context, userid int, bio string) error
+	UpdateNameProfile(ctx context.Context, userid int, name string) error
+	UpdatePhoneNumber(ctx context.Context, userid int, phoneNumber string) error
+	GetPhotoProfile(ctx context.Context, userid int) (*domain.PhotoProfile, error)
 }
 
 func (s *UserRepository) StartACID(ctx context.Context) (*sql.Tx, error) {
@@ -52,8 +52,7 @@ func (s *UserRepository) GetProfile(ctx context.Context, userid int) (*domain.Pr
 	return nil, sql.ErrNoRows
 }
 
-func (s *UserRepository) GetUserProfileByAccNumber(accNumber uint64) (*domain.ProfileForFindWithAccount, error) {
-	ctx := context.TODO()
+func (s *UserRepository) GetUserProfileByAccNumber(ctx context.Context, accNumber uint64) (*domain.ProfileForFindWithAccount, error) {
 	row, err := s.mysql.Db.QueryContext(ctx, "SELECT user, accountNumber, created_at, name, photo_profile FROM users INNER JOIN profile ON users.profileId = profile.id WHERE users.accountNumber = ?", accNumber)
 	if err != nil {
 		return nil, err
@@ -72,8 +71,7 @@ func (s *UserRepository) GetUserProfileByAccNumber(accNumber uint64) (*domain.Pr
 	return nil, sql.ErrNoRows
 }
 
-func (s *UserRepository) UpdateBioProfile(userid int, bio string) error {
-	ctx := context.TODO()
+func (s *UserRepository) UpdateBioProfile(ctx context.Context, userid int, bio string) error {
 	result, err := s.mysql.Db.ExecContext(ctx, "UPDATE profile SET bio = ?	WHERE id = (SELECT profileId FROM users WHERE id = ?);", bio, userid)
 	if err != nil {
 		return err
@@ -85,8 +83,7 @@ func (s *UserRepository) UpdateBioProfile(userid int, bio string) error {
 	return nil
 }
 
-func (s *UserRepository) UpdateNameProfile(userid int, name string) error {
-	ctx := context.TODO()
+func (s *UserRepository) UpdateNameProfile(ctx context.Context, userid int, name string) error {
 	query := fmt.Sprintf(`UPDATE profile
     SET name = "%s"
     WHERE id = (SELECT profileId FROM users WHERE id = %d);`, name, userid)
@@ -101,8 +98,7 @@ func (s *UserRepository) UpdateNameProfile(userid int, name string) error {
 	return nil
 }
 
-func (s *UserRepository) UpdatePhoneNumber(userid int, phoneNumber string) error {
-	ctx := context.TODO()
+func (s *UserRepository) UpdatePhoneNumber(ctx context.Context, userid int, phoneNumber string) error {
 	query := fmt.Sprintf(`UPDATE profile
     SET phone_number = "%s"
     WHERE id = (SELECT profileId FROM users WHERE id = %d);`, phoneNumber, userid)
@@ -117,9 +113,7 @@ func (s *UserRepository) UpdatePhoneNumber(userid int, phoneNumber string) error
 	return nil
 }
 
-
-func (s *UserRepository) GetPhotoProfile(userid int) (*domain.PhotoProfile, error) {
-	ctx := context.TODO()
+func (s *UserRepository) GetPhotoProfile(ctx context.Context, userid int) (*domain.PhotoProfile, error) {
 	query := fmt.Sprintf(`SELECT photo_profile FROM users INNER JOIN profile ON users.profileId = profile.id WHERE users.id = %d`, userid)
 	row, err := s.mysql.Db.QueryContext(ctx, query)
 	if err != nil {

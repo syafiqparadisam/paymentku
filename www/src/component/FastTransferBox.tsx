@@ -1,17 +1,20 @@
 import { Box, Typography, List, ListItem } from "@mui/material"
 import React from "react"
+// @ts-ignore
 import toRupiah from '@develoka/angka-rupiah-js';
 
-interface listRequirement {
+type listRequirement = {
     name: string
     icon: React.ReactNode,
 
 }
 
-interface props {
+type fn = () => void;
+
+type props = {
     amount: number,
     requirement: listRequirement[],
-    onClick: Function
+    onClick: fn
 }
 
 const FastTransferBox: React.FC<props> = ({ amount, requirement, onClick}) => {

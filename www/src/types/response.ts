@@ -1,10 +1,10 @@
-export interface Response<T> {
+export type Response<T> = {
     statusCode: number,
     data: T | null,
     message: string
 }
 
-export interface User {
+export type User = {
     user: string
     email: string
     balance: number
@@ -17,7 +17,7 @@ export interface User {
     phoneNumber: string
 }
 
-export interface FindUserByAccount {
+export type FindUserByAccount = {
     user: string,
     photo_profile: string,
     accountNumber: number,
@@ -25,7 +25,7 @@ export interface FindUserByAccount {
     name: string,
 }
 
-export interface UserFound {
+export type UserFound = {
     user: string,
     accountNumber: number,
     created_at: string,
@@ -34,7 +34,7 @@ export interface UserFound {
     photo_profile: string,
 }
 
-export interface HistoryTopUps {
+export type HistoryTopUps = {
     id: number,
     amount: number,
     isRead: boolean,
@@ -43,7 +43,7 @@ export interface HistoryTopUps {
 }
 
 
-export interface HistoryTopUp {
+export type HistoryTopUp = {
     id: number,
     amount: number,
     balance: number,
@@ -53,7 +53,7 @@ export interface HistoryTopUp {
     createdAt: string
 }
 
-export interface HistoryTransfers {
+export type HistoryTransfers = {
     id: number,
     sender: string,
     receiver: string,
@@ -63,7 +63,7 @@ export interface HistoryTransfers {
     createdAt: string
 }
 
-export interface HistoryTransfer {
+export type HistoryTransfer = {
     id: number,
     sender: string,
     receiver: string,

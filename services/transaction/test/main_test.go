@@ -29,11 +29,11 @@ type TransactionTestWeb struct {
 
 func TestTransactionWeb(t *testing.T) {
 	envFilePath := "../.env"
-	if err := godotenv.Load(envFilePath); err != nil {
-		fmt.Println("Failed to load env file")
-	}
+	
+	godotenv.Load(envFilePath)
+
 	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
+	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
@@ -68,7 +68,7 @@ func NewTransactionTestWeb(seeder *Seeder, t *testing.T, controller *controllerh
 
 func (tf *TransactionTestWeb) Start() {
 	tf.Test.Run("TransactionTestWeb CreateTopUpTransaction", tf.CreateTopUpTransaction)
-	tf.Test.Run("TransactionTestWeb CreateTopUpTransactionWith0Amount", tf.CreateTopUpTransactionWith0Amount)
+	tf.Test.Run("TransactionTestWeb CreateTopUpTransactionWith0Amount",tf.CreateTopUpTransactionWith0Amount)
 	tf.Test.Run("TransactionTestWeb CreateTransferTransaction", tf.CreateTransferTransaction)
 	tf.Test.Run("TransactionTestWeb CreateTransferTransactionWithLessBalance", tf.CreateTransferTransactionWithLessBalance)
 	tf.Test.Run("TransactionTestWeb CreateTransferTransactionWithSelfAccountNumber", tf.CreateTransferTransactionWithSelfAccountNumber)

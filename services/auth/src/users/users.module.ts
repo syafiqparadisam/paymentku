@@ -17,7 +17,7 @@ import { ConfigModule } from '@nestjs/config';
       HistoryTransfer,
       Notification,
     ]),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   providers: [UsersService],
   exports: [UsersService],

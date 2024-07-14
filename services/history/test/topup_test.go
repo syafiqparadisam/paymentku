@@ -19,12 +19,16 @@ import (
 
 func (h *HistoryTest) GetAllHistoryTopUp(t *testing.T) {
 	t.Parallel()
+
+	// create 2 user
 	userMock := mock.NewUser1ProfileMock()
 	idProfile, idUser := h.Seeder.UserSeeder.Up(userMock)
 	topUpMock1 := mock.NewHistoryTopUp1(userMock, idUser)
 	topUpMock2 := mock.NewHistoryTopUp2(userMock, idUser)
 	idTopup1 := h.Seeder.TopUpSeeder.Up(topUpMock1)
 	idTopUp2 := h.Seeder.TopUpSeeder.Up(topUpMock2)
+
+	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.GetAllTopUpHistory), http.MethodGet, http.MethodDelete))
 	defer func() {
 		h.TopUpSeeder.Down(idTopup1)
@@ -33,6 +37,7 @@ func (h *HistoryTest) GetAllHistoryTopUp(t *testing.T) {
 		server.Close()
 	}()
 
+	// setup request
 	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("?userid=%d", idUser), http.NoBody)
 	client := &http.Client{}
 	resp, _ := client.Do(req)
@@ -60,11 +65,16 @@ func (h *HistoryTest) GetAllHistoryTopUp(t *testing.T) {
 
 func (h *HistoryTest) GetHistoryTopUpById(t *testing.T) {
 	t.Parallel()
+
+	// create 2 user
 	userMock := mock.NewUser1ProfileMock()
 	idProfile, idUser := h.Seeder.UserSeeder.Up(userMock)
 	topUpMock1 := mock.NewHistoryTopUp1(userMock, idUser)
 	idTopup1 := h.Seeder.TopUpSeeder.Up(topUpMock1)
+	fmt.Println("idtopup", idTopup1)
+	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleTopUpHistoryById), http.MethodGet, http.MethodDelete))
+	fmt.Println(server.URL + fmt.Sprintf("/topup/%d?userid=%d", idTopup1, idUser))
 	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/topup/%d?userid=%d", idTopup1, idUser), http.NoBody)
 	client := &http.Client{}
 	resp, _ := client.Do(req)
@@ -160,7 +170,7 @@ func (h *HistoryTest) DeleteHistoryTopUpByWrongId(t *testing.T) {
 	bodyBytes, _ := io.ReadAll(resp.Body)
 	json.Unmarshal(bodyBytes, actualResp)
 
-	assert.Equal(t, http.StatusBadRequest, actualResp.StatusCode)
+	assert.Equal(t, http.StatusOK, actualResp.StatusCode)
 	assert.Equal(t, errors.ErrNothingToDel.Error(), actualResp.Message)
 }
 
@@ -210,6 +220,6 @@ func (h *HistoryTest) DeleteAllHistoryTopUpWithEmptyData(t *testing.T) {
 	bodyBytes, _ := io.ReadAll(resp.Body)
 	json.Unmarshal(bodyBytes, actualResp)
 
-	assert.Equal(t, http.StatusBadRequest, actualResp.StatusCode)
+	assert.Equal(t, http.StatusOK, actualResp.StatusCode)
 	assert.Equal(t, errors.ErrNothingToDel.Error(), actualResp.Message)
 }

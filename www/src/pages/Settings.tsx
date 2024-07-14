@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
 import User from './User'
-import { Box, Switch, ToggleButton, Typography } from '@mui/material'
+import { Box, Switch, Typography } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import { setDarkMode } from '../features/web/darkMode'
 import { ArrowBack } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
+import { RootState } from '../app/store'
 
 const Settings = () => {
     const dispatch = useDispatch()
-    const darkMode = useSelector(state => state.darkMode)
+    const darkMode = useSelector((state: RootState) => state.darkMode)
     const navigate = useNavigate()
 
     return (

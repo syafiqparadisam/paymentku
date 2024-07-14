@@ -1,8 +1,14 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Users } from './users.entity';
 
 @Entity()
-export class Notification {
+export class Notification extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

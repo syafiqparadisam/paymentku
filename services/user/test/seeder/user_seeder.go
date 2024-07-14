@@ -26,6 +26,7 @@ type User struct {
 	Bio           string
 	PhotoProfile  string
 	PhoneNumber   string
+	PhotoPublicId *string
 }
 
 func NewUserSeeder(mysql *user_config.MySqlStore) *UserSeeder {
@@ -43,18 +44,19 @@ func (userSeeder *UserSeeder) Find(idUser int64) *User {
 	if rows.Next() {
 		if err := rows.Scan(
 			&user.Id,
+			&user.User,
 			&user.Pass,
 			&user.Email,
-			&user.User,
-			&user.ProfileId,
-			&user.AccountNumber,
 			&user.Balance,
+			&user.AccountNumber,
 			&user.CreatedAt,
-			&user.IdProfile,
-			&user.Name,
+			&user.ProfileId,
 			&user.Bio,
+			&user.Name,
+			&user.PhotoPublicId,
 			&user.PhotoProfile,
 			&user.PhoneNumber,
+			&user.IdProfile,
 		); err != nil {
 			panic(err)
 		}

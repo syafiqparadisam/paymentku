@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com/syafiqparadisam/paymentku/services/transaction/dto"
 	transaction_repo "github.com/syafiqparadisam/paymentku/services/transaction/repository/transaction"
 )
@@ -11,8 +13,8 @@ type Usecase struct {
 }
 
 type UsecaseInterface interface {
-	InsertHistoryTopUp(dto *dto.TopUpRequest, user *dto.XUserData) dto.APIResponse[interface{}]
-	InsertHistoryTransfer(dto *dto.TransferRequest, user *dto.XUserData) dto.APIResponse[interface{}]
+	InsertHistoryTopUp(ctx context.Context,dto *dto.TopUpRequest, user *dto.XUserData) dto.APIResponse[interface{}]
+	InsertHistoryTransfer(ctx context.Context,dto *dto.TransferRequest, user *dto.XUserData) dto.APIResponse[interface{}]
 }
 
 func NewTransactionUsecase(tfRepo transaction_repo.TransferInterface, topUpRepo transaction_repo.TopUpInterface) *Usecase {

@@ -6,7 +6,6 @@ import { loginWithGoogle, registerRequest } from '../auth/dtos/request';
 import * as bcrypt from 'bcrypt';
 import generateRandNum from './utils/randNum';
 import { Profile } from './schemas/profile.entity';
-import { result } from '../interfaces/result';
 import { HistoryTopup } from './schemas/history_topup.entity';
 import { Notification } from './schemas/notification.entity';
 import { HistoryTransfer } from './schemas/history_transfer.entity';
@@ -21,22 +20,37 @@ export class UsersService {
     private profileRepo: Repository<Profile>,
     private readonly ds: DataSource,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   generateAccountNumber(): number {
     return Math.floor(Math.random() * 9999999999) + 1;
   }
 
-  async updatePhotoProfile(photoProfileUrl: string, profileId: number,publicId: string) {
+  async updatePhotoProfile(
+    photoProfileUrl: string,
+    profileId: number,
+    publicId: string,
+  ) {
     try {
-      await this.ds.manager.transaction("READ COMMITTED", async (entityManager: EntityManager) => {
-        await entityManager.update<Profile>(Profile, {id: profileId}, {
-          photo_profile: photoProfileUrl
-        })
-        await entityManager.update<Profile>(Profile, { id: profileId }, { photo_public_id: publicId })
-      })
+      await this.ds.manager.transaction(
+        'READ COMMITTED',
+        async (entityManager: EntityManager) => {
+          await entityManager.update<Profile>(
+            Profile,
+            { id: profileId },
+            {
+              photo_profile: photoProfileUrl,
+            },
+          );
+          await entityManager.update<Profile>(
+            Profile,
+            { id: profileId },
+            { photo_public_id: publicId },
+          );
+        },
+      );
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -70,25 +84,27 @@ export class UsersService {
       const accNumber = await this.createAccountNumber();
 
       // create account with ACID transaction
-      await this.ds.transaction(async (entitymanager) => {
-        // insert into profile
-        const profile = new Profile();
-        const userIcon = this.configService.get<string>('USER_ICON_DEFAULT');
-        profile.name = data.user + generateRandNum().toString();
-        profile.photo_profile = userIcon;
-        await entitymanager.save(profile);
-
-        // insert into users
-        await entitymanager.insert(Users, {
-          user: data.user,
-          email: data.email,
-          password,
-          accountNumber: accNumber,
-          created_at: new Date().toISOString(),
-          balance: 0,
-          profile,
-        });
-      });
+      await this.ds.manager.transaction(
+        'READ COMMITTED',
+        async (entitymanager) => {
+          // insert into profile
+          const profile = new Profile();
+          const userIcon = this.configService.get<string>('USER_ICON_DEFAULT');
+          profile.name = data.user + generateRandNum().toString();
+          profile.photo_profile = userIcon;
+          await entitymanager.save(profile);
+          // insert into users
+          await entitymanager.insert(Users, {
+            user: data.user,
+            email: data.email,
+            password,
+            accountNumber: accNumber,
+            created_at: new Date().toISOString(),
+            balance: 0,
+            profile,
+          });
+        },
+      );
     } catch (error) {
       throw error;
     }
@@ -141,14 +157,13 @@ export class UsersService {
     try {
       const salt = await bcrypt.genSalt(10);
       const hashPassword = await bcrypt.hash(password, salt);
-      console.log(hashPassword, user_id)
-      console.log(await this.userRepo.update({ id: user_id }, { password: hashPassword }))
+      await this.userRepo.update({ id: user_id }, { password: hashPassword });
     } catch (error) {
       throw error;
     }
   }
 
-  async joiningUserAndProfile(userId: number): Promise<result> {
+  async joiningUserAndProfile(userId: number): Promise<Users> {
     try {
       // join table users and profile
       const JoininguserAndProfile = await this.userRepo
@@ -156,7 +171,7 @@ export class UsersService {
         .leftJoinAndSelect('users.profile', 'profile')
         .where('users.id = :id', { id: userId })
         .getOne();
-      return { success: true, data: JoininguserAndProfile };
+      return JoininguserAndProfile;
     } catch (error) {
       throw error;
     }

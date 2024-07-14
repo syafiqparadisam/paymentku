@@ -48,7 +48,7 @@ describe('Signin Controller with manual input (e2e) POST /api/v1/login', () => {
     try {
       const user = await userSvc.findUserByUsername(userRegister.user);
       const userAndProfile = await userSvc.joiningUserAndProfile(user.id);
-      await userSvc.deleteAccount(user.id, userAndProfile.data.profile.id);
+      await userSvc.deleteAccount(user.id, userAndProfile.profile.id);
 
       cookies as Array<string>;
       if (Array.isArray(cookies)) {

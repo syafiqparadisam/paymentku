@@ -41,6 +41,11 @@ export class RedisService {
       throw error;
     }
   }
+  async deleteCacheProfile(lockKey: string[], userid: number) {
+    const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
+    await this.redisStore.del(`userprofile:${userid}`)
+    await locking.release();
+  }
 
   async isAuthTokenAlreadyExist(
     key: string,
@@ -69,7 +74,6 @@ export class RedisService {
     try {
       const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
       const remainingTimeToken = await this.redisStore.ttl('auth:' + key);
-      console.log(remainingTimeToken);
       // turunkan ttl - 10 menit
       const decrease30minutes = 10 * 60;
       const exp = await this.redisStore.expire(

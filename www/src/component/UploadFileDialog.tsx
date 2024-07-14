@@ -1,27 +1,26 @@
 import { UploadFile } from "@mui/icons-material"
-import { Dialog, DialogTitle, DialogContent, Box, Typography, DialogActions, Button, styled, Backdrop, CircularProgress } from "@mui/material"
+import { Dialog, DialogTitle, DialogContent, Box, Typography, DialogActions, Button, styled, Backdrop, CircularProgress, Snackbar } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { useUpdatePhotoProfileMutation } from "../services/profileApi"
 import { useSelector } from "react-redux"
 import { User } from "../types/response"
+import { RootState } from "../app/store"
 
 type UploadFileProps = {
     open: boolean,
-    setOpen: Function
+    setOpen: Function,
 }
 
 const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
-    const [sourceImg, setSourceImg] = useState("")
-    const [file, setFile] = useState<File>(null)
-    const [update, { data, isLoading }] = useUpdatePhotoProfileMutation()
-    const user: User = useSelector(state => state.user)
+    const [sourceImg, setSourceImg] = useState<string | null | undefined | ArrayBuffer>("")
+    const [file, setFile] = useState<File | undefined>(undefined)
+    const [update, { data, isLoading, error }] = useUpdatePhotoProfileMutation()
+    const user: User = useSelector((state: RootState) => state.user)
     const [response, setResponse] = useState("")
-
     const previewImage = (e: any) => {
         const fileImg: File[] = e.target.files
         const maxFileSize = 2 * 1024 * 1024
         const allowedFile = ["image/jpeg", "image/png", "image/bmp", "image/webp"];
-        console.log(fileImg)
         if (!allowedFile.includes(fileImg[0].type)) {
             setResponse(`File ${fileImg[0].type} is not allowed`)
             return
@@ -33,10 +32,11 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
         }
 
         if (fileImg && fileImg[0]) {
+            setResponse("")
             const reader = new FileReader()
             reader.addEventListener("load", (eventFR: ProgressEvent<FileReader>) => {
                 setResponse("")
-                setSourceImg(eventFR.target.result)
+                setSourceImg(() => eventFR.target?.result)
             })
             reader.readAsDataURL(fileImg[0])
             setFile(fileImg[0])
@@ -55,6 +55,7 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
     useEffect(() => {
         setSourceImg("")
+        setFile(undefined)
         setResponse(data?.message ? data?.message : "")
     }, [data])
 
@@ -73,12 +74,19 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
 
     return (
         <>
-
+            {error && (error as any).message == "Aborted" && (
+                <Snackbar
+                    autoHideDuration={3000}
+                    color="red"
+                    open={true}
+                    message="Sorry your request was cancelled"
+                />
+            )}
             <Dialog
                 open={open}
 
                 onClose={() => {
-                    setOpen(false)
+                    setOpen(() => false)
                 }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
@@ -104,8 +112,8 @@ const UploadFileDialog: React.FC<UploadFileProps> = ({ open, setOpen }) => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="contained" color="error" onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button variant="contained" color="primary" onClick={() => {
+                    <Button variant="contained" color="error" onClick={() => setOpen(() => false)}>Cancel</Button>
+                    <Button variant="contained" color="primary" disabled={file == null ? true : false} onClick={() => {
                         updatePhotoProfile()
                     }}>Update</Button>
                 </DialogActions>

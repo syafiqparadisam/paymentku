@@ -17,7 +17,6 @@ const NewPassword = () => {
     const onSubmit: SubmitHandler<dto.ForgotPassword> = async (data) => {
         try {
             await passwordReset({ token, password: data.password, confirmPassword: data.confirmPassword }).unwrap()
-            console.log(data)
             if (isSuccess) {
                 navigate(route["signin"])
             }
@@ -26,7 +25,6 @@ const NewPassword = () => {
         }
     }
     const password = watch("password")
-    console.log(data, error)
     useEffect(() => {
         const queryString = window.location.search;
 
@@ -36,7 +34,6 @@ const NewPassword = () => {
 
         if (token) {
             setToken(token)
-            console.log('Token:', token);
         } else {
             navigate("/signin")
         }

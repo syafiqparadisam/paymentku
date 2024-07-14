@@ -1,5 +1,7 @@
 package config
 
+import "os"
+
 type HTTPConfig struct {
 	Port          string
 	AllowedOrigin []string
@@ -15,6 +17,7 @@ func (h *HTTPConfig) WithPort(port string) *HTTPConfig {
 }
 
 func (h *HTTPConfig) GetAllowedOrigin() []string {
-	h.AllowedOrigin = []string{"http://localhost:8800"}
+	allowOrigin := os.Getenv("ORIGIN_URL")
+	h.AllowedOrigin = []string{allowOrigin}
 	return h.AllowedOrigin
 }

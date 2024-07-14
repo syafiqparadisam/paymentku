@@ -1,15 +1,23 @@
 package controllerhttp
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/syafiqparadisam/paymentku/services/user/dto"
 	"github.com/syafiqparadisam/paymentku/services/user/errors"
+	"go.opentelemetry.io/otel"
 )
 
 func (s *ControllerHTTP) UpdateBio(c *fiber.Ctx, user *dto.XUserData) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	tracer := otel.GetTracerProvider()
+	ctx, span := tracer.Tracer("github.com/syafiqparadisam/paymentku/services/user/controller/http").Start(ctx, "update bio profile")
+	defer span.End()
 	dtoBio := &dto.UpdateBioDTO{}
 	bodyBytes := c.Body()
 
@@ -17,7 +25,7 @@ func (s *ControllerHTTP) UpdateBio(c *fiber.Ctx, user *dto.XUserData) error {
 		return c.Status(404).JSON(dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrInvalidReqBody.Error()})
 	}
 
-	result := s.usecase.UpdateBio(dtoBio, user.UserId)
+	result := s.usecase.UpdateBio(ctx, dtoBio, user.UserId)
 	if result.StatusCode == 500 {
 		fmt.Println(result)
 		return c.SendStatus(result.StatusCode)
@@ -26,6 +34,11 @@ func (s *ControllerHTTP) UpdateBio(c *fiber.Ctx, user *dto.XUserData) error {
 }
 
 func (s *ControllerHTTP) UpdateName(c *fiber.Ctx, user *dto.XUserData) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	tracer := otel.GetTracerProvider()
+	ctx, span := tracer.Tracer("github.com/syafiqparadisam/paymentku/services/user/controller/http").Start(ctx, "update name profile")
+	defer span.End()
 	dtoName := &dto.UpdateNameDTO{}
 	bodyBytes := c.Body()
 
@@ -33,7 +46,7 @@ func (s *ControllerHTTP) UpdateName(c *fiber.Ctx, user *dto.XUserData) error {
 		return c.Status(404).JSON(dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrInvalidReqBody.Error()})
 	}
 
-	result := s.usecase.UpdateName(dtoName, user.UserId)
+	result := s.usecase.UpdateName(ctx, dtoName, user.UserId)
 	if result.StatusCode == 500 {
 		fmt.Println(result)
 		return c.SendStatus(result.StatusCode)
@@ -43,6 +56,11 @@ func (s *ControllerHTTP) UpdateName(c *fiber.Ctx, user *dto.XUserData) error {
 }
 
 func (s *ControllerHTTP) UpdatePhoneNumber(c *fiber.Ctx, user *dto.XUserData) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	tracer := otel.GetTracerProvider()
+	ctx, span := tracer.Tracer("github.com/syafiqparadisam/paymentku/services/user/controller/http").Start(ctx, "update phone number")
+	defer span.End()
 	dtoPhoneNumber := &dto.UpdatePhoneNumberDTO{}
 	bodyBytes := c.Body()
 
@@ -50,7 +68,7 @@ func (s *ControllerHTTP) UpdatePhoneNumber(c *fiber.Ctx, user *dto.XUserData) er
 		return c.Status(404).JSON(dto.APIResponse[interface{}]{StatusCode: 400, Message: errors.ErrInvalidReqBody.Error()})
 	}
 
-	result := s.usecase.UpdatePhoneNumber(dtoPhoneNumber, user.UserId)
+	result := s.usecase.UpdatePhoneNumber(ctx, dtoPhoneNumber, user.UserId)
 	if result.StatusCode == 500 {
 		fmt.Println(result)
 		return c.SendStatus(result.StatusCode)

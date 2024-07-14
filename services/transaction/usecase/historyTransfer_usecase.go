@@ -5,17 +5,16 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
-	"time"
-
+	"github.com/syafiqparadisam/paymentku/services/transaction/config"
 	"github.com/syafiqparadisam/paymentku/services/transaction/domain"
 	"github.com/syafiqparadisam/paymentku/services/transaction/dto"
 	"github.com/syafiqparadisam/paymentku/services/transaction/errors"
 )
 
-func (u *Usecase) InsertHistoryTransfer(payload *dto.TransferRequest, user *dto.XUserData) dto.APIResponse[interface{}] {
+func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.TransferRequest, user *dto.XUserData) dto.APIResponse[interface{}] {
+	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+
 	tx, err := u.TransferRepo.StartTransaction(ctx)
 	if err != nil {
 		panic(err)
@@ -26,14 +25,20 @@ func (u *Usecase) InsertHistoryTransfer(payload *dto.TransferRequest, user *dto.
 		panic(errFoundSender)
 	}
 	if foundSender.Balance < int64(payload.Amount) {
-		return dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrInsufficientBalance.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrInsufficientBalance.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+		return response
 	}
 	if payload.AccountNumber == foundSender.AccountNumber {
-		return dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrTransferWithSameAccount.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrTransferWithSameAccount.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+		return response
 	}
 	foundReceiver, errFoundReceiver := u.TransferRepo.FindUserByAccNum(tx, ctx, payload.AccountNumber)
 	if errFoundReceiver == sql.ErrNoRows {
-		return dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrUserNoRows.Error()}
+		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrUserNoRows.Error()}
+		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+		return response
 	}
 	if errFoundReceiver != nil {
 		panic(errFoundReceiver)
@@ -44,55 +49,49 @@ func (u *Usecase) InsertHistoryTransfer(payload *dto.TransferRequest, user *dto.
 		tx.Rollback()
 		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
 		// insert to mongodb transfer
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(tx, ctx, transferInfo)
+		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
 		if errInsertHistory != nil {
-			tx.Rollback()
 			panic(errInsertHistory)
 		}
 		panic(errDecreaseBalance)
 	}
+
 	errIncreaseBalance := u.TransferRepo.IncreaseBalanceByAccNumber(tx, ctx, payload.Amount, payload.AccountNumber)
 	if errIncreaseBalance != nil {
 		tx.Rollback()
 
 		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(tx, ctx, transferInfo)
+		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
 		if errInsertHistory != nil {
-			tx.Rollback()
 			panic(errInsertHistory)
 		}
 		panic(errIncreaseBalance)
-	}
-	transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "SUCCESS", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance-int64(payload.Amount))
-	// insert to mongodb transfer
-
-	errInsertHistory := u.TransferRepo.InsertTransferHistory(tx, ctx, transferInfo)
-	if errInsertHistory != nil {
-		tx.Rollback()
-		panic(errInsertHistory)
-	}
-	// insert notification to receiver
-	notification := domain.NewNotification(foundReceiver.Id, transferInfo, foundReceiver)
-	errInsertNotification := u.TransferRepo.InsertToNotification(tx, ctx, notification)
-	if errInsertNotification != nil {
-		tx.Rollback()
-		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(tx, ctx, transferInfo)
-		if errInsertHistory != nil {
-			tx.Rollback()
-			panic(errInsertHistory)
-		}
-		panic(errInsertNotification)
 	}
 
 	if errCommit := tx.Commit(); errCommit != nil {
 		panic(errCommit)
 	}
 
-	if ctx.Err() == context.DeadlineExceeded {
-		// Konteks telah melampaui batas waktu
-		// Lakukan tindakan yang sesuai, seperti mengembalikan status 500
-		return dto.APIResponse[interface{}]{StatusCode: http.StatusInternalServerError, Message: errors.ErrServer.Error()}
+	transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "SUCCESS", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance-int64(payload.Amount))
+	errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
+	if errInsertHistory != nil {
+		tx.Rollback()
+		panic(errInsertHistory)
 	}
-	return dto.APIResponse[interface{}]{StatusCode: 200, Data: nil, Message: "Successfully transfer"}
+	// insert notification to receiver
+	notification := domain.NewNotification(foundReceiver.Id, transferInfo, foundReceiver)
+	errInsertNotification := u.TransferRepo.InsertToNotification(ctx, notification)
+
+	if errInsertNotification != nil {
+		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
+		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
+		if errInsertHistory != nil {
+			panic(errInsertHistory)
+		}
+		panic(errInsertNotification)
+	}
+
+	response := dto.APIResponse[interface{}]{StatusCode: 200, Message: "Successfully transfer"}
+	log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
+	return response
 }

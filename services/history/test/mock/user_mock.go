@@ -14,7 +14,7 @@ type Profile struct {
 	Name          string  `json:"name"`
 	Bio           *string `json:"bio"`
 	PhoneNumber   *string `json:"phoneNumber"`
-	PhotoProfile  *string `json:"photo_profile"`
+	PhotoProfile  string `json:"photo_profile"`
 }
 
 func generateRandomString(length int) string {
@@ -39,7 +39,7 @@ func NewUser1ProfileMock() *Profile {
 	accNum := uint64(rand.Intn(100000))
 	phone := "0" + generateRandomPhoneNumber()
 	bio := "Hllo broo im a programmer"
-	photo := "https://placehold.co/100x100"
+	photo := "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716213116/usericon_hrikn3.jpg"
 	return &Profile{
 		User:          generateRandomString(34),
 		Email:         generateRandomString(50) + "@gmail.com",
@@ -49,7 +49,7 @@ func NewUser1ProfileMock() *Profile {
 		Balance:       100000,
 		PhoneNumber:   &phone,
 		Bio:           &bio,
-		PhotoProfile:  &photo,
+		PhotoProfile:  photo,
 	}
 }
 
@@ -57,7 +57,6 @@ func NewUser2ProfileMock() *Profile {
 	accNum := uint64(rand.Intn(100000))
 	phone := "0" + generateRandomPhoneNumber()
 	bio := "Hllo broo im a programmer"
-	photo := "https://placehold.co/100x100"
 	return &Profile{
 		User:          generateRandomString(34),
 		Email:         generateRandomString(50) + "@gmail.com",
@@ -67,6 +66,6 @@ func NewUser2ProfileMock() *Profile {
 		PhoneNumber:   &phone,
 		Balance:       100000,
 		Bio:           &bio,
-		PhotoProfile:  &photo,
+		PhotoProfile:  "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716213116/usericon_hrikn3.jpg",
 	}
 }

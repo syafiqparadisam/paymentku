@@ -14,26 +14,25 @@ import HistoryTopup from './pages/HistoryTopup';
 import HistoryTopupById from './pages/HistoryTopupById';
 import HistoryTransfer from './pages/HistoryTransfer';
 import HistoryTransferById from './pages/HistoryTransferById';
-import Navbar from './component/Navbar';
-import Footer from './component/Footer';
 import PersistentLogin from './component/PersistentLogin';
 import TopUp from './pages/TopUp';
 import Settings from './pages/Settings';
 import Help from './pages/Help';
 import Transfer from './pages/Transfer';
 import { GlobalStyles } from '@mui/material';
+import Layout from './component/Layout';
 
 function App() {
 
   return (
     <>
-    <GlobalStyles styles={[]}>
+      <GlobalStyles styles={[]}>
 
-    </GlobalStyles>
+      </GlobalStyles>
       <BrowserRouter>
-        <Navbar />
+        {/* <Navbar /> */}
         <Routes>
-          <Route path="/">
+          <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path='/signin' element={<SignIn />} />
             <Route path='/forgotPassword' element={<ForgotPassword />} />
@@ -60,8 +59,8 @@ function App() {
                       </User>
                     </>
                   } />
-                  <Route path="settings" element={<Settings/>}/>
-                  <Route path="help" element={<Help/>}/>
+                  <Route path="settings" element={<Settings />} />
+                  <Route path="help" element={<Help />} />
                   <Route path='history'>
                     <Route path='topup/:id' element={<HistoryTopupById />} />
                     <Route path='topup' element={<HistoryTopup />} />
@@ -75,7 +74,7 @@ function App() {
             <Route path='*' element={<NotFound />} />
           </Route>
         </Routes>
-        <Footer />
+        {/* <Footer /> */}
       </BrowserRouter >
     </>
   )

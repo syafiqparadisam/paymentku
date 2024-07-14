@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/XSAM/otelsql"
 	_ "github.com/go-sql-driver/mysql"
@@ -14,7 +13,6 @@ type MySqlStore struct {
 }
 
 func NewMySqlStore(mysqlCfg string) (*MySqlStore, error) {
-	// url := config_golang.NewMYSQLConfig().DefaultDevelopment()
 	db, err := otelsql.Open("mysql", mysqlCfg, otelsql.WithAttributes(semconv.DBSystemMySQL))
 	db.SetMaxOpenConns(40)
 	db.SetMaxIdleConns(40)
@@ -34,6 +32,5 @@ func NewMySqlStore(mysqlCfg string) (*MySqlStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(err)
 	return &MySqlStore{Db: db}, nil
 }

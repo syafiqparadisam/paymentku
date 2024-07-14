@@ -1,14 +1,13 @@
 import { ArrowBack } from '@mui/icons-material';
 import { Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import serverError from "../assets/servererror.jpg"
 
 const Maintenance = () => {
     const navigate = useNavigate()
 
     return (
         <Box height={"100vh"} display={"flex"} justifyContent={"center"} flexDirection={"column"} alignItems={"center"}>
-            <img src={serverError} width={"500px"} />
+            <img src={"https://res.cloudinary.com/dktwq4f3f/image/upload/v1716341297/servererror_ol5gkf.jpg"} width={"500px"} />
             <Box display={"flex"} sx={{ marginTop: "-40px" }} justifyContent={"center"} flexDirection={"column"} alignItems={"center"}>
                 <Box width={"80%"} mb={2}>
                     <Typography fontWeight={"bold"} fontSize={"30px"} textAlign={"center"}>Sorry something went wrong in our server, we will be recover as soon as possible</Typography>

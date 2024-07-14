@@ -4,21 +4,24 @@ import { useSelector } from "react-redux"
 import { User } from "../types/response"
 import { useTopupMutation } from "../services/transactionApi"
 import { ArrowBack, BoltRounded, CloseOutlined, Done } from "@mui/icons-material"
+// @ts-ignore
 import toRupiah from "@develoka/angka-rupiah-js"
 import FastTransferBox from "../component/FastTransferBox"
 import { useNavigate } from "react-router-dom"
+import { RootState } from "../app/store"
 
 const TopUp = () => {
     const [amount, setAmount] = useState<number>(0)
     const [err, setErr] = useState<any>("")
-    const user: User = useSelector(state => state.user)
+    const user: User = useSelector((state: RootState) => state.user)
     const [totalPrice, setTotalPrice] = useState<number>(0)
     const [isChecked, setIsChecked] = useState<boolean>(false)
-    const [topup, { data, isSuccess }] = useTopupMutation()
+    const [topup, { data, isSuccess, error, isLoading }] = useTopupMutation()
     const [operational, setOperational] = useState<boolean>(true)
     const [bonus, setBonus] = useState<number>(0)
     const [totalGettingMoney, setTotalGettingMoney] = useState<number>(0)
     const [open, setOpen] = useState<boolean>(false)
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false)
     const navigate = useNavigate()
 
     function calculatePrice(amount: number, checked: boolean, operationalFee: boolean, bonus: number): number {
@@ -30,21 +33,26 @@ const TopUp = () => {
         return amount + bonus
     }
 
-    console.log(data)
+
     useEffect(() => {
         const total = calculatePrice(amount, isChecked, operational, bonus)
         setTotalPrice(total)
         setTotalGettingMoney(calculateGettingMoney(amount, bonus))
-    }, [amount, isChecked])
+    }, [amount, isChecked, bonus, operational])
+    useEffect(() => {
+        if (isSuccess) {
+            setOpenSnackbar(true)
+        }
+    }, [isSuccess, error])
 
     return (
         <>
-            {isSuccess && <Snackbar
-                open={isSuccess}
-                key={"top" + "center"}
+            {openSnackbar && <Snackbar
+                open={openSnackbar}
+                onClose={() => setOpenSnackbar(false)}
                 autoHideDuration={3000}
                 color="success"
-                message="Successfully topup"
+                message={data?.message}
             />}
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -67,12 +75,13 @@ const TopUp = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)} variant="contained" color="error">No</Button>
-                    <Button variant="contained" color="success" onClick={async () => {
+                    <Button variant="contained" disabled={isLoading == false ? false : true} color="success" onClick={async () => {
                         try {
                             await topup({ amount: totalGettingMoney }).unwrap()
                             setOpen(false)
 
-                        } catch (error: response) {
+                        } catch (error: any) {
+
                             setErr(error.data.message)
                         }
                     }}>
@@ -179,7 +188,7 @@ const TopUp = () => {
                                         <Typography>Protection costs : {toRupiah(500, { dot: ",", floatingPoint: 0 })}</Typography>
                                         <Checkbox
                                             checked={isChecked}
-                                            onChange={(event) => {setIsChecked(event.target.checked)}}
+                                            onChange={(event) => { setIsChecked(event.target.checked) }}
                                             inputProps={{ 'aria-label': 'controlled' }}
                                         />
                                     </Box>
@@ -188,14 +197,13 @@ const TopUp = () => {
                             </Box>
                             <Typography>Total obtained : {toRupiah(totalGettingMoney, { dot: ",", floatingPoint: 0 })}</Typography>
                             <Typography mb={1}>Total payment : {toRupiah(totalPrice - bonus, { dot: ",", floatingPoint: 0 })}</Typography>
-                            <Button variant="contained" fullWidth color="success" onClick={() => {
+                            <Button variant="contained" fullWidth color="success" disabled={amount == 0 ? true : false} onClick={() => {
                                 if (totalPrice <= 0) return
                                 setOpen(true)
                             }}>Topup</Button>
                         </Box>
                     </Box>
                 </Box>
-
             </Box>
         </>
     )

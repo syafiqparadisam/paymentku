@@ -1,16 +1,16 @@
 
-export interface SignUpInput {
+export type SignUpInput = {
     user: string
     email: string
     password: string
 }
 
-export interface SignInInput {
+export type SignInInput = {
     user: string,
     password: string
 }
 
-export interface Profile {
+export type Profile = {
     username: string,
     password: string,
     name: string,
@@ -22,25 +22,25 @@ export interface Profile {
     accountNumber: string
 }
 
-export interface ForgotPassword {
+export type ForgotPassword = {
     token: string,
     password: string,
     confirmPassword: string
 }
 
-export interface SendEmail {
+export type SendEmail = {
     email: string,
 }
 
-export interface TopUp {
+export type TopUp = {
     amount: number
 }
 
-export interface VerifyPassword {
+export type VerifyPassword = {
     password: string
 }
 
-export interface Transfer {
+export type Transfer = {
     accountNumber: number,
     notes?: string,
     amount: number

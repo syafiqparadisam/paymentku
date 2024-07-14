@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/syafiqparadisam/paymentku/services/transaction/controller/http"
+	controllerhttp "github.com/syafiqparadisam/paymentku/services/transaction/controller/http"
 	"github.com/syafiqparadisam/paymentku/services/transaction/dto"
 	"github.com/syafiqparadisam/paymentku/services/transaction/errors"
 	"github.com/syafiqparadisam/paymentku/services/transaction/test/mock"
@@ -30,6 +30,10 @@ func (tf *TransactionTestWeb) CreateTopUpTransaction(t *testing.T) {
 	// creating user and profile
 	usermock := mock.NewUser1ProfileMock()
 	idProfile, idUser := tf.Seeder.UserSeeder.Up(usermock)
+	defer func() {
+		tf.Seeder.TopUpSeeder.Down(idUser)
+		tf.Seeder.UserSeeder.Down(idUser, idProfile)
+	}()
 	// config request
 	req, err := http.NewRequest(http.MethodPost, server.URL+fmt.Sprintf("?userid=%d", idUser), bytes.NewReader(bodyBytes))
 	if err != nil {
@@ -43,10 +47,6 @@ func (tf *TransactionTestWeb) CreateTopUpTransaction(t *testing.T) {
 	// check in db is correct
 	history := tf.Seeder.TopUpSeeder.Find(idUser)
 	// delete all seeder
-	defer func() {
-		tf.Seeder.TopUpSeeder.Down(idUser)
-		tf.Seeder.UserSeeder.Down(idUser, idProfile)
-	}()
 
 	// expected response
 	expected := &dto.APIResponse[interface{}]{
@@ -92,6 +92,9 @@ func (tf *TransactionTestWeb) CreateTopUpTransactionWith0Amount(t *testing.T) {
 	// creating user and profile
 	usermock := mock.NewUser1ProfileMock()
 	idProfile, idUser := tf.Seeder.UserSeeder.Up(usermock)
+	defer func() {
+		tf.Seeder.UserSeeder.Down(idUser, idProfile)
+	}()
 
 	// config request
 	req, err := http.NewRequest(http.MethodPost, server.URL+fmt.Sprintf("?userid=%d", idUser), bytes.NewReader(bodyBytes))
@@ -104,10 +107,8 @@ func (tf *TransactionTestWeb) CreateTopUpTransactionWith0Amount(t *testing.T) {
 	resp, _ := client.Do(req)
 
 	// delete all seeder
-	// tf.Seeder.TopUpSeeder.Down(userid)
-	defer tf.Seeder.UserSeeder.Down(idUser, idProfile)
 
-	// mock response
+	// expected response
 	expected := &dto.APIResponse[interface{}]{
 		StatusCode: 400,
 		Message:    errors.ErrAmountIsLessThanZero.Error(),
@@ -116,7 +117,6 @@ func (tf *TransactionTestWeb) CreateTopUpTransactionWith0Amount(t *testing.T) {
 	bytesResp, err := io.ReadAll(resp.Body)
 	actualResponse := &dto.APIResponse[interface{}]{}
 	json.Unmarshal(bytesResp, actualResponse)
-	t.Log(*actualResponse)
 
 	if err != nil {
 		t.Error(err)

@@ -1,9 +1,15 @@
-import { Entity, ManyToOne, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  ManyToOne,
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+} from 'typeorm';
 import { Users } from './users.entity';
 import { Status } from './enum';
 
 @Entity()
-export class HistoryTransfer {
+export class HistoryTransfer extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,10 +28,10 @@ export class HistoryTransfer {
   @Column()
   receiver_name: string;
 
-  @Column({ type: "bigint" })
+  @Column({ type: 'bigint' })
   previous_balance: number;
 
-  @Column({ type: "bigint" })
+  @Column({ type: 'bigint' })
   balance: number;
 
   @Column({ type: 'enum', enum: Status })

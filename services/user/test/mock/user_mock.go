@@ -26,37 +26,34 @@ func generateRandomPhoneNumber() string {
 }
 
 func NewUser1ProfileMock() *user_domain.Profile {
-	accNum := uint64(rand.Intn(100000))
 	phone := "0" + generateRandomPhoneNumber()
 	bio := "Hllo broo im a programmer"
-	photo := "https://placehold.co/100x100"
+
 	return &user_domain.Profile{
 		User:          generateRandomString(34),
 		Email:         generateRandomString(50) + "@gmail.com",
-		AccountNumber: accNum,
+		AccountNumber: uint64(rand.Intn(100000)),
 		CreatedAt:     time.Now().UTC().Format("2006-01-02T15:04:05.999Z"),
 		Name:          "afiq",
 		Balance:       100000,
 		PhoneNumber:   &phone,
 		Bio:           &bio,
-		PhotoProfile:  photo,
+		PhotoProfile:  "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716213116/usericon_hrikn3.jpg",
 	}
 }
 
 func NewUser2ProfileMock() *user_domain.Profile {
-	accNum := uint64(rand.Intn(100000))
 	phone := "0" + generateRandomPhoneNumber()
 	bio := "Hllo broo im a programmer"
-	photo := "https://placehold.co/100x100"
 	return &user_domain.Profile{
 		User:          generateRandomString(34),
 		Email:         generateRandomString(50) + "@gmail.com",
-		AccountNumber: accNum,
+		AccountNumber:  uint64(rand.Intn(100000)),
 		CreatedAt:     time.Now().UTC().Format("2006-01-02T15:04:05.999Z"),
 		Name:          "rull",
 		PhoneNumber:   &phone,
 		Balance:       100000,
 		Bio:           &bio,
-		PhotoProfile:  photo,
+		PhotoProfile:  "https://res.cloudinary.com/dktwq4f3f/image/upload/v1716213116/usericon_hrikn3.jpg",
 	}
 }

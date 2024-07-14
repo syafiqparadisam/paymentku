@@ -18,7 +18,6 @@ const HistoryTopup = () => {
     const [deleteTopUp, { error: errDeleteAllHistory }] = useDeleteHistoryTopUpMutation()
     const navigate = useNavigate()
 
-
     return (
         <>
             <Dialog
@@ -52,7 +51,7 @@ const HistoryTopup = () => {
                     </Box>
                     <Box width={"90%"} display={"flex"} justifyContent={"space-between"}>
                         <Category firstItem={"Topup"} menuItem={[{ categories: "Topup", redirect: "/dashboard/user/history/topup" }, { categories: "Transfer", redirect: "/dashboard/user/history/transfer" }]} />
-                        {errDeleteAllHistory && <Typography fontWeight={"bold"} color={"red"} fontSize={"20px"}>{errDeleteAllHistory?.data?.message}</Typography>}
+                        {errDeleteAllHistory && <Typography fontWeight={"bold"} color={"red"} fontSize={"20px"}>{(errDeleteAllHistory as any).data?.message}</Typography>}
                         <Box display={"flex"} gap={2} width={"30%"}>
                             <Button color="success" variant="contained" startIcon={<Loop />} onClick={refetch}>Reload</Button>
                             <Button color="error" variant="contained" startIcon={<Delete />} onClick={() => {
@@ -74,10 +73,10 @@ const HistoryTopup = () => {
                             ) : (
                                 data?.data?.map((d: HistoryTopUps) => {
                                     return (
-                                        <Box width={"100%"} onClick={() => navigate(`${route["topuphistory"]}/${d.id}`)} justifyContent={"space-around"} borderRadius={"10px"} alignItems={"center"} display={"flex"} bgcolor={d.isRead == true ? "#ddd" : "lightgreen"} p={3}>
+                                        <Box width={"100%"} onClick={() => navigate(`${route["topuphistory"]}/${d.id}`)} justifyContent={"space-around"} borderRadius={"10px"} alignItems={"center"} display={"flex"} bgcolor={d.isRead == true ? "#ddd" : d.status === "SUCCESS" ? "lightgreen" : "red"} p={3}>
 
                                             <Box width={"50%"} display={"flex"} flexDirection={"column"}>
-                                                <Typography color={d.status === "SUCCESS" ? "green" : "red"} fontWeight={"bold"}>{d.status}</Typography>
+                                                <Typography color={d.status === "SUCCESS" ? "green" : "white"} fontWeight={"bold"}>{d.status}</Typography>
                                                 <Typography color={"black"}>Amount: Rp.{d.amount}</Typography>
                                             </Box>
                                             <Box width={"50%"}>

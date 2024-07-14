@@ -1,9 +1,8 @@
 import { Box, Button, List, ListItem, ListItemIcon, ListItemText, Typography } from "@mui/material"
-import { Circle, MoneyOffOutlined } from "@mui/icons-material"
+import { CardCover, Card } from "@mui/joy"
+import { Circle } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
 import { route } from "../constant/route"
-import transactionIllustration from "../assets/transaction-illustration1.png"
-import successPeople from "../assets/chooseus.png"
 
 const Home = () => {
   const navigate = useNavigate()
@@ -16,14 +15,14 @@ const Home = () => {
           <Typography fontSize={"14px"}>Enjoy the convenience of handling all your financial transactions in one place. At paymentku, we offer quick, secure, and reliable services for money top-ups, game top-ups, and bill payments.</Typography>
         </Box>
         <Box width={"40%"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
-          <img src={transactionIllustration} width={500}/>
+          <img src={"https://res.cloudinary.com/dktwq4f3f/image/upload/v1716381412/transaction-illustration1_wswxgb.png"} width={500} />
         </Box>
       </Box>
-      <Box display={"flex"} justifyContent={"space-around"} width={"80%"} alignItems={"center"} p={5} height={"100vh"}>
-        <Box width={"40%"}>
-          <MoneyOffOutlined />
+      <Box display={"flex"} justifyContent={"space-between"} width={"80%"} alignItems={"center"} p={5} height={"100vh"}>
+        <Box width={"30%"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
+          <img src="https://res.cloudinary.com/dktwq4f3f/image/upload/v1716382048/easypayment_ndllea.png" width={400} />
         </Box>
-        <Box width={"60%"}>
+        <Box width={"50%"}>
           <Typography fontWeight={"bold"} fontSize={"25px"}>Our Key Features:</Typography>
           <List>
             <ListItem>
@@ -53,7 +52,7 @@ const Home = () => {
           </List>
         </Box>
       </Box>
-      <Box display={"flex"} justifyContent={"space-around"} width={"100%"} mx={10} alignItems={"center"} p={5} height={"100vh"} bgcolor={"#f5ffaa"}>
+      <Box display={"flex"} id="aboutUs" justifyContent={"space-around"} width={"100%"} mx={10} alignItems={"center"} p={5} height={"100vh"} bgcolor={"#f5ffaa"}>
         <Box width={"50%"}>
           <Typography fontWeight={"bold"} fontSize={"25px"}>Why Choose Us?</Typography>
           <List>
@@ -84,14 +83,29 @@ const Home = () => {
           </List>
         </Box>
         <Box width={"30%"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
-          <img src={successPeople} width={400}/>
+          <img src={"https://res.cloudinary.com/dktwq4f3f/image/upload/v1716342319/chooseus_fac0xl.png"} width={400} />
         </Box>
       </Box>
       <Box display={"flex"} justifyContent={"space-around"} width={"80%"} alignItems={"center"} p={5} height={"100vh"}>
-        <Box width={"40%"}>
-          d
+        <Box display={"flex"} width={"40%"} height={"40%"} justifyContent={"center"} alignItems={"center"}>
+          <Card sx={{ width: "100%", height: "100%" }}>
+            <CardCover>
+              <video
+                autoPlay
+                loop
+                muted
+                
+              >
+                <source
+                  src="https://res.cloudinary.com/dktwq4f3f/video/upload/v1716439798/lv_0_20240523101204_lelo6d.mp4"
+                  type="video/mp4"
+                />
+              </video>
+            </CardCover>
+          </Card>
         </Box>
-        <Box width={"60%"}>
+
+        <Box width={"50%"}>
           <Typography fontWeight={"bold"} fontSize={"25px"}>How it works ?</Typography>
           <List>
             <ListItem>
@@ -134,11 +148,11 @@ const Home = () => {
           <Typography fontWeight={"bold"} fontSize={"20px"}>Don't wait any longer, join thousands of other users who have experienced the convenience of digital transactions with paymentku. Enjoy convenience, speed, and security all in one place.</Typography>
         </Box>
         <Box width={"30%"} display={"flex"} alignItems={"center"} justifyContent={"center"}>
-          <Button variant="contained" color="secondary" sx={{fontWeight:"bold"}} onClick={() => navigate(route["dashboard"])}>See our product</Button>
+          <Button variant="contained" color="secondary" sx={{ fontWeight: "bold" }} onClick={() => navigate(route["dashboard"])}>See our product</Button>
 
         </Box>
       </Box>
-    </Box>
+    </Box >
   )
 }
 

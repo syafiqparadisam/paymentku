@@ -1,7 +1,6 @@
 import { Typography, Box, Container, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import notfoundImg from "../assets/notfound.jpg"
 import { ArrowBack } from '@mui/icons-material'
 import { route } from '../constant/route'
 
@@ -24,7 +23,7 @@ const NotFound = () => {
     return (
         <Container>
             <Box display={"flex"} height={"100vh"} flexDirection={"column"} alignItems={"center"}>
-                <img src={notfoundImg} width="500px" style={{marginTop: "20px"}}/>
+                <img src={"https://res.cloudinary.com/dktwq4f3f/image/upload/v1716340580/notfound_s2tqyt.jpg"} width="500px" style={{marginTop: "20px"}}/>
                 <Typography fontWeight={"bold"} fontSize={"50px"}>Not Found</Typography>
                 <Typography fontWeight={"bold"} fontSize={"20px"}>Automatically back to home in {time}s</Typography>
                 <Button variant="contained" color="primary" size="large" sx={{marginTop: "10px"}} onClick={() => navigate(route["home"])}>

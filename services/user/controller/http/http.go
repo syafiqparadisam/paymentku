@@ -44,16 +44,15 @@ func ExstractJWTToken(f HTTPFunc) fiber.Handler {
 func Logger(f HTTPFuncLogger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		start := time.Now()
-		res := c.Response()
 		reqId := c.Get("X-Request-Id")
 		log := config.Log()
 
 		defer func() {
 			if r := recover(); r != nil {
-				c.SendStatus(500)
 				log.WithLevel(zerolog.PanicLevel).Err(r.(error)).Str("Request-id", reqId).Msg("Server paniccing")
+				c.SendStatus(500)
 			}
-			log.Info().Str("Request-id", reqId).Str("User-agent", c.Get("User-Agent")).Str("Origin", c.Get("Origin", "")).Str("Method", c.Method()).Dur("Latency (milisecond)", time.Duration(time.Duration(time.Since(start)).Milliseconds())).Str("Path", c.Path()).Interface("Query", c.Queries()).Int("Status", res.StatusCode()).Str("Ip", c.IP()).Msg("Request Logs")
+			log.Info().Str("Request-id", reqId).Str("User-agent", c.Get("User-Agent")).Str("Origin", c.Get("Origin", "")).Str("Method", c.Method()).Dur("Latency (milisecond)", time.Duration(time.Duration(time.Since(start)).Milliseconds())).Str("Path", c.Path()).Interface("Query", c.Queries()).Str("Ip", c.IP()).Msg("Request Logs")
 		}()
 
 		err := f(c)

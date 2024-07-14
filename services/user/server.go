@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/syafiqparadisam/paymentku/services/user/config"
 	controllerhttp "github.com/syafiqparadisam/paymentku/services/user/controller/http"
+	caching_repo "github.com/syafiqparadisam/paymentku/services/user/repository/caching"
 	user_repo "github.com/syafiqparadisam/paymentku/services/user/repository/user"
 	"github.com/syafiqparadisam/paymentku/services/user/usecase"
 	"go.opentelemetry.io/otel"
@@ -25,13 +26,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var serviceName = semconv.ServiceNameKey.String("otlp-user")
-
 // Initialize a gRPC connection to be used by both the tracer and meter
 // providers.
 func initConn() (*grpc.ClientConn, error) {
+	grpcServerUrl := os.Getenv("GRPC_SERVER_URL")
 	// Make a gRPC connection with otel collector.
-	conn, err := grpc.NewClient("127.0.0.53:4317",
+	conn, err := grpc.NewClient(grpcServerUrl,
 		// Note the use of insecure transport here. TLS is recommended in production.
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
@@ -43,11 +43,11 @@ func initConn() (*grpc.ClientConn, error) {
 }
 
 // Initializes an OTLP exporter, and configures the corresponding trace providers.
-func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (func(context.Context) error, error) {
+func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (*sdktrace.TracerProvider, error) {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
-			serviceName,
+			semconv.ServiceNameKey.String("tracer-user"),
 		),
 	)
 	if err != nil {
@@ -74,16 +74,16 @@ func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (func(contex
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 
 	// Shutdown will flush any remaining spans and shut down the exporter.
-	return tracerProvider.Shutdown, nil
+	return tracerProvider, nil
 }
 
 // Initializes an OTLP exporter, and configures the corresponding meter
 // provider.
-func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (func(context.Context) error, error) {
+func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.MeterProvider, error) {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
-			serviceName,
+			semconv.ServiceNameKey.String("metric-user"),
 		),
 	)
 	if err != nil {
@@ -101,7 +101,7 @@ func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (func(context
 	)
 	otel.SetMeterProvider(meterProvider)
 
-	return meterProvider.Shutdown, nil
+	return meterProvider, nil
 }
 
 func main() {
@@ -110,48 +110,58 @@ func main() {
 		fmt.Println("Failed to load env file")
 	}
 
-	ctx := context.TODO()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	log := config.Log()
-	conn, _ := initConn()
-	// if err != nil {
-	// log.Fatal().Err(err).Msg("Connection grpc error")
-	// }
+	logZero := config.Log()
+	conn, err := initConn()
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Connection grpc error")
+	}
 
-	shutdownTracerProvider, _ := initTracerProvider(ctx, conn)
-	// if err != nil {
-	// log.Fatal().Err(err).Msg("is this ??")
-	// }
+	tracerProvider, err := initTracerProvider(ctx, conn)
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Tracer provider error")
+	}
 
-	shutdownMeterProvider, _ := initMeterProvider(ctx, conn)
-	// if err != nil {
-	// log.Fatal().Err(err).Msg(err.Error())
-	// }
+	metricProvider, err := initMeterProvider(ctx, conn)
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Meter provider error")
+	}
 
-	appPort := os.Getenv("APP_PORT")
+	appPort := os.Getenv("USER_SVC_PORT")
 	httpCfg := config.NewHTTPConfig().WithPort(appPort)
+
 	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
+	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 	dbParam := os.Getenv("DB_PARAM")
+
 	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s", user, pass, host, dbPort, dbName, dbParam)
 	mysql, errConnMySQL := config.NewMySqlStore(url)
 	if errConnMySQL != nil {
-		log.Fatal().Err(errConnMySQL).Msg("Mysql connection error")
+		logZero.Fatal().Err(errConnMySQL).Msg("Mysql connection error")
 	}
-	fmt.Printf("connected to mysql on port %s", dbPort)
 
-	// dbConfig := user_config.NewDatabaseConfig(mysql)
+	fmt.Println("Connected to mysql on port ", dbPort)
+
+	redClient, redSync, err := config.NewRedisStore()
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Redis connection error")
+	}
+
 	userRepo := user_repo.NewUserRepository(mysql)
-	usecase := usecase.NewUserUsecase(userRepo)
+	cachingRepo := caching_repo.NewCacheRepo(redSync, redClient)
+	usecase := usecase.NewUserUsecase(userRepo, cachingRepo)
 
 	server := controllerhttp.NewControllerHTTP(usecase)
 	app := server.Routes()
 
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, os.Interrupt)
+	errch := make(chan error, 1)
+	signal.Notify(signalChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM, os.Interrupt)
 
 	go func() {
 		<-signalChan
@@ -161,33 +171,36 @@ func main() {
 		// server shutdown
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		mysql.Db.Close()
-		app.ShutdownWithContext(ctx)
+		errch <- mysql.Db.Close()
+		fmt.Println("db already closed")
+		errch <- app.ShutdownWithContext(ctx)
+		fmt.Println("server already closed")
+		errch <- tracerProvider.Shutdown(ctx)
+		fmt.Println("tracer provider already closed")
+		errch <- metricProvider.Shutdown(ctx)
+		fmt.Println("metric provider already closed")
 
 		select {
-		case <-time.After(11 * time.Second):
-			fmt.Println("Connection still exist, not all connections done")
 		case <-ctx.Done():
 			fmt.Println("Shutdown successfully")
+		case <-time.After(11 * time.Second):
+			fmt.Println("still has connection, not successfully shutdown")
 		}
-		time.Sleep(2 * time.Second)
+		close(errch)
 	}()
+
 	defer func() {
-		if err := os.Remove("server"); err != nil {
-			log.Err(err).Msg("Remove build file error")
+		for e := range errch {
+			fmt.Println(e)
+			if e != nil {
+				logZero.Err(e).Msg("error shutdowning app")
+			}
 		}
-
-		if err := shutdownTracerProvider(ctx); err != nil {
-			log.Fatal().Err(err).Msg("failed to shutdown TracerProvider")
-		}
-		if err := shutdownMeterProvider(ctx); err != nil {
-			log.Fatal().Err(err).Msg("failed to shutdown MeterProvider")
-		}
+		os.Remove("server.out")
 	}()
-
-	err := app.Listen(httpCfg.Port)
+	err = app.Listen(httpCfg.Port)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Server error")
+		logZero.Fatal().Err(err).Msg("Server error")
 	}
 
 }

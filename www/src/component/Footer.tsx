@@ -1,9 +1,10 @@
-import { CopyrightOutlined, Email, EmailOutlined, GitHub, Instagram, LocalAtmRounded, ReportGmailerrorred, WhatsApp, YouTube } from "@mui/icons-material"
+import { CopyrightOutlined, Email, EmailOutlined, GitHub, Instagram, LocalAtmRounded, YouTube } from "@mui/icons-material"
 import { Box, Button, Input, Link, Typography } from "@mui/material"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
+import { route } from "../constant/route"
 
-interface Email {
+type Email = {
     email: string
 }
 
@@ -60,11 +61,11 @@ const Footer = () => {
                         </Box>
                         <Box display={"flex"} flexDirection={"column"}>
                             <Typography fontWeight={"bold"} fontSize={"18px"}>Helpful links</Typography>
-                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate("/")}>Home</Typography>
-                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate("/dashboard")}>Dashboard</Typography>
-                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate("/user")}>Profile</Typography>
-                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate("/user/history")}>History</Typography>
-                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate("/user/settings")}>Settings</Typography>
+                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate(route["home"])}>Home</Typography>
+                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate(route["dashboard"])}>Dashboard</Typography>
+                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate(route["user"])}>Profile</Typography>
+                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate(route["topuphistory"])}>History</Typography>
+                            <Typography sx={{ cursor: "pointer" }} fontSize={"18px"} onClick={() => navigate(route["settings"])}>Settings</Typography>
                         </Box>
                         <Box display={"flex"} flexDirection={"column"}>
                             <Typography fontWeight={"bold"} fontSize={"18px"}>Services</Typography>
@@ -74,10 +75,6 @@ const Footer = () => {
                         </Box>
                         <Box display={"flex"} flexDirection={"column"}>
                             <Typography fontWeight={"bold"} fontSize={"18px"}>Contact us</Typography>
-                            <Box display={"flex"} alignItems={"center"}>
-                                <WhatsApp color="success" />
-                                <Typography fontSize={"18px"} ml={1}>+62 8816977857</Typography>
-                            </Box>
                             <Box display={"flex"} alignItems={"center"}>
                                 <EmailOutlined color="error" />
                                 <Typography fontSize={"18px"} ml={1}>syafiqpinginfullstack@gmail.com</Typography>

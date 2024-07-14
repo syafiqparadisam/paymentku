@@ -1,4 +1,4 @@
-import { Box, Typography, InputLabel, FormControl, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material"
+import { Box,InputLabel, FormControl, MenuItem, Select, SelectChangeEvent } from "@mui/material"
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom";
 
@@ -7,7 +7,7 @@ type menuItem = {
     categories: string,
 }
 
-interface Header {
+type Header = {
     firstItem: string,
     menuItem: menuItem[]
 }
@@ -32,7 +32,7 @@ const Category: React.FC<Header> = ({ firstItem, menuItem }) => {
                         onChange={handleChange}
                     >
                         {menuItem.map((menu) => (
-                            <MenuItem onClick={() => navigate(menu.redirect)} value={menu.categories}>{menu.categories}</MenuItem>
+                            <MenuItem key={menu.categories} onClick={() => navigate(menu.redirect)} value={menu.categories}>{menu.categories}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>

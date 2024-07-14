@@ -41,6 +41,11 @@ export class RedisService {
       throw error;
     }
   }
+  async deleteCacheProfile(lockKey: string[], userid: number) {
+    const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
+    await this.redisStore.del(`userprofile:${userid}`)
+    await locking.release();
+  }
 
   async isAuthTokenAlreadyExist(
     key: string,

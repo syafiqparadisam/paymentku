@@ -27,7 +27,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private redisService: RedisService,
     private cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   async signInWithGoogle(
     payload: loginWithGoogle,
@@ -93,12 +93,18 @@ export class AuthService {
         user.id,
       );
       if (userAndprofile.profile.name == null) {
+        // delete cache profile
+        await this.redisService.deleteCacheProfile([lockKey], userAndprofile.id)
+
         await this.usersService.updateName(
           userAndprofile.profile.id,
           payload.name,
         );
       }
       if (userAndprofile.profile.photo_profile == null) {
+        // delete cache profile
+        await this.redisService.deleteCacheProfile([lockKey], userAndprofile.id)
+
         await this.usersService.updatePhotoProfile(
           payload.picture,
           userAndprofile.profile.id,
@@ -456,6 +462,7 @@ export class AuthService {
     userData: jwtPayload,
   ): Promise<response> {
     try {
+      const lockKey = crypto.randomUUID();
       const user = await this.usersService.findUserById(userData.user_id);
 
       // if username equal to previous username, it hasn't changes
@@ -491,6 +498,10 @@ export class AuthService {
           message: 'Username is already exist',
         };
       }
+
+      // delete cache profile
+      await this.redisService.deleteCacheProfile([lockKey], userData.user_id)
+
 
       // updating username
       await this.usersService.updateUsername(userData.user_id, dto.username);
@@ -553,6 +564,7 @@ export class AuthService {
     publicIdImg: string,
   ): Promise<response> {
     try {
+      const lockKey = crypto.randomUUID()
       // upload file to cloudinary
       const result = await this.cloudinaryService.uploadImage(pathUploadfile);
 
@@ -560,6 +572,9 @@ export class AuthService {
       const joinUserAndProfile = await this.usersService.joiningUserAndProfile(
         userData.user_id,
       );
+      // delete cache profile
+      await this.redisService.deleteCacheProfile([lockKey], userData.user_id)
+
       await this.usersService.updatePhotoProfile(
         result.secure_url,
         joinUserAndProfile.profile.id,

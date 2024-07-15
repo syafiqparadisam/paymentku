@@ -8,6 +8,9 @@ export default defineConfig({
     react(),
     checker({typescript: true})
   ],
+  preview: {
+    port: 5000
+  },
   resolve: {
     alias: {
       '@': '/src',

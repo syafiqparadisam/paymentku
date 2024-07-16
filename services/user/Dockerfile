@@ -21,4 +21,4 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-CMD go build -o server.out . && ./server
+CMD go build -o server.out . && ./server.out

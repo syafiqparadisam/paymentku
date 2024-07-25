@@ -1,5 +1,5 @@
 # Use original image golang as build stage
-FROM golang:1.22-alpine
+FROM golang:1.22-alpine AS build
 
 # Create a non-root user and group
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup

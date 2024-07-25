@@ -1,5 +1,5 @@
 # Use original image golang as build stage
-FROM golang:1.22-alpine
+FROM golang:1.22-alpine AS build
 
 # Create a non-root user and group
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -16,9 +16,43 @@ RUN go mod download
 # Copy source code
 COPY . .
 
+RUN --mount=type=secret,id=DB_PORT,required=true,mode=0666 \
+    --mount=type=secret,id=DB_NAME,required=true,mode=0666 \
+    --mount=type=secret,id=DB_USER,required=true,mode=0666 \
+    --mount=type=secret,id=DB_PASSWD,required=true,mode=0666 \
+    --mount=type=secret,id=DB_HOST,required=true,mode=0666 \
+    --mount=type=secret,id=DB_PARAM,required=true,mode=0666 \
+    --mount=type=secret,id=USER_SVC_PORT,required=true,mode=0666 \
+    --mount=type=secret,id=REDIS_ADDR,required=true,mode=0666 \
+    --mount=type=secret,id=GRPC_SERVER_URL,required=true,mode=0666 \
+    --mount=type=secret,id=ORIGIN_URL,required=true,mode=0666 \
+    sh -c 'for i in DB_PORT DB_NAME DB_USER DB_PASSWD DB_HOST DB_PARAM USER_SVC_PORT REDIS_ADDR GRPC_SERVER_URL ORIGIN_URL; \
+    do \
+        echo "$i=$(cat /run/secrets/$i)" >> /etc/environment; \ 
+    done \
+    && go build -o /app/server.out'
+
+
+# Final stage
+FROM alpine:3.20.2
+
+RUN apk update && apk --no-cache add ca-certificates
+
+# Create a non-root user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Set working directory inside container
+WORKDIR /app
+
+# Copy build binary 
+
+COPY --from=build /app/server.out /app/server.out
+
 # Change ownership of the working directory
 RUN chown -R appuser:appgroup /app
 
+# Switch to non-root user
 USER appuser
 
-CMD go build -o server.out . && ./server.out
+CMD [ "./server.out" ]
+

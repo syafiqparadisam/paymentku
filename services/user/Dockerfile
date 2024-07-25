@@ -28,7 +28,7 @@ RUN --mount=type=secret,id=DB_PORT,required=true,mode=0666 \
     --mount=type=secret,id=ORIGIN_URL,required=true,mode=0666 \
     sh -c 'for i in DB_PORT DB_NAME DB_USER DB_PASSWD DB_HOST DB_PARAM USER_SVC_PORT REDIS_ADDR GRPC_SERVER_URL ORIGIN_URL; \
     do \
-        echo "$i=$(cat /run/secrets/$i)" >> /etc/environment; \ 
+       $i=$(cat /run/secrets/$i); \ 
     done \
     && go build -o /app/server.out'
 

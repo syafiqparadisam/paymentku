@@ -39,7 +39,7 @@ RUN --mount=type=secret,id=CLIENT_ID,required=true,mode=0666 \
     --mount=type=secret,id=CLOUDINARY_APIKEY,required=true,mode=0666 \
     sh -c 'for i in CLIENT_ID CLIENT_SECRET CALLBACK_URL_GOOGLE FRONTEND SMTP_KEY SMTP_LOGIN AUTH_SVC USER_ICON_DEFAULT USER_SVC TF_SVC HISTORY_SVC NEST_APP_PORT REDIS_HOST DB_PORT DB_HOST DB_USER DB_PASSWD DB_NAME REDIS_PORT CLOUDINARY_APISECRET CLOUDINARY_CLOUDNAME CLOUDINARY_APIKEY; \
     do \
-        echo "$i=$(cat /run/secrets/$i)" >> /etc/environment"; \
+        $i=$(cat /run/secrets/$i); \
     done \
     && npm run build \'
 

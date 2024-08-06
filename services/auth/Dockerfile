@@ -35,11 +35,29 @@ RUN --mount=type=secret,id=CLIENT_ID,required=true,mode=0666 \
     --mount=type=secret,id=CLOUDINARY_APISECRET,required=true,mode=0666 \
     --mount=type=secret,id=CLOUDINARY_CLOUDNAME,required=true,mode=0666 \
     --mount=type=secret,id=CLOUDINARY_APIKEY,required=true,mode=0666 \
-    sh -c 'for i in CLIENT_ID CLIENT_SECRET CALLBACK_URL_GOOGLE FRONTEND SMTP_KEY SMTP_LOGIN AUTH_SVC USER_ICON_DEFAULT USER_SVC TF_SVC HISTORY_SVC NEST_APP_PORT REDIS_HOST DB_PORT DB_HOST DB_USER DB_PASSWD DB_NAME REDIS_PORT CLOUDINARY_APISECRET CLOUDINARY_CLOUDNAME CLOUDINARY_APIKEY; \
-    do \
-    $i=$(cat /run/secrets/$i); \
-    done \
-    && npm run build \'
+    CLIENT_ID=$(cat /run/secrets/CLIENT_ID) \
+    CLIENT_SECRET=$(cat /run/secrets/CLIENT_SECRET) \
+    CALLBACK_URL_GOOGLE=$(cat /run/secrets/CALLBACK_URL_GOOGLE) \
+    FRONTEND=$(cat /run/secrets/FRONTEND) \
+    SMTP_KEY=$(cat /run/secrets/SMTP_KEY) \
+    SMTP_LOGIN=$(cat /run/secrets/SMTP_LOGIN) \
+    AUTH_SVC=$(cat /run/secrets/AUTH_SVC) \
+    USER_ICON_DEFAULT=$(cat /run/secrets/USER_ICON_DEFAULT) \
+    USER_SVC=$(cat /run/secrets/USER_SVC) \
+    TF_SVC=$(cat /run/secrets/TF_SVC) \
+    HISTORY_SVC=$(cat /run/secrets/HISTORY_SVC) \
+    NEST_APP_PORT=$(cat /run/secrets/NEST_APP_PORT) \
+    REDIS_HOST=$(cat /run/secrets/REDIS_HOST) \
+    DB_PORT=$(cat /run/secrets/DB_PORT) \
+    DB_HOST=$(cat /run/secrets/DB_HOST) \
+    DB_USER=$(cat /run/secrets/DB_USER) \
+    DB_PASSWD=$(cat /run/secrets/DB_PASSWD) \
+    DB_NAME=$(cat /run/secrets/DB_NAME) \
+    REDIS_PORT=$(cat /run/secrets/REDIS_PORT) \
+    CLOUDINARY_APISECRET=$(cat /run/secrets/CLOUDINARY_APISECRET) \
+    CLOUDINARY_CLOUDNAME=$(cat /run/secrets/CLOUDINARY_CLOUDNAME) \
+    CLOUDINARY_APIKEY=$(cat /run/secrets/CLOUDINARY_APIKEY) \
+    npm run build
 
 RUN npm run migrate-generate
 

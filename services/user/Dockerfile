@@ -36,7 +36,7 @@ RUN --mount=type=secret,id=DB_PORT,required=true,mode=0666 \
     REDIS_ADDR=$(cat /run/secrets/REDIS_ADDR) \
     GRPC_SERVER_URL=$(cat /run/secrets/GRPC_SERVER_URL) \
     ORIGIN_URL=$(cat /run/secrets/ORIGIN_URL) \
-    go build -o /app/server.out'
+    go build -o /app/server.out
 
 
 # Final stage

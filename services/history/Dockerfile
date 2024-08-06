@@ -39,7 +39,7 @@ RUN --mount=type=secret,id=DB_PORT,required=true,mode=0666 \
     HISTORY_SVC_PORT=$(cat /run/secrets/HISTORY_SVC_PORT) \
     GRPC_SERVER_URL=$(cat /run/secrets/GRPC_SERVER_URL) \
     ORIGIN_URL=$(cat /run/secrets/ORIGIN_URL) \
-    go build -o /app/server.out'
+    go build -o /app/server.out
 
 
 # Final stage

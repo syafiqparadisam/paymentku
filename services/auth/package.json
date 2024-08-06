@@ -18,11 +18,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migrate-run": "npx typeorm-ts-node-esm  migration:run -d ./src/dataSource/ormconfig.ts",
-    "migrate-run-prod": "npx typeorm  migration:run -d ./dist/dataSource/ormconfig.js",
-    "migrate-revert": "npx typeorm-ts-node-esm  migration:revert -d ./src/dataSource/ormconfig.ts",
-    "migrate-revert-prod": "npx typeorm migration:revert -d ./dist/dataSource/ormconfig.js",
-    "migrate-generate": "npx typeorm-ts-node-esm migration:generate ./src/migration/Migration -d src/dataSource/ormconfig.ts"
+    "migrate-run": "npx typeorm-ts-node-esm migration:run -d ./src/dataSource/migrate.ts",
+    "migrate-run-prod": "npx typeorm  migration:run -d ./dist/dataSource/migrate.js",
+    "migrate-revert": "npx typeorm-ts-node-esm  migration:revert -d ./src/dataSource/migrate.ts",
+    "migrate-revert-prod": "npx typeorm migration:revert -d ./dist/dataSource/migrate.js",
+    "migrate-generate": "npx typeorm-ts-node-esm migration:generate ./src/migration/Migrate -d ./src/dataSource/migrate.ts",
+    "migrate-create": "npx typeorm migration:create ./src/migration/Migrate"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.10.3",

@@ -7,3 +7,4 @@ dist/*
 .prettierrc
 Dockerfile
 .dockerignore
+migration/*

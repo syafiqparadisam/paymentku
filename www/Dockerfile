@@ -9,8 +9,6 @@ COPY . .
 # Install the dependencies
 RUN npm install
 
-
-
 # Mount env variables
 RUN --mount=type=secret,id=VITE_API_URL, required=true,mode=0666 \
     --mount=type=secret,id=VITE_FRONTEND_URL,required=true,mode=0666 \
@@ -22,7 +20,7 @@ RUN --mount=type=secret,id=VITE_API_URL, required=true,mode=0666 \
     VITE_TEMPLATE_ID_HELPING_EMAILJS=$(VITE_TEMPLATE_ID_HELPING_EMAILJS) \
     VITE_SERVICE_ID_EMAILJS=$(cat /run/secrets/VITE_SERVICE_ID_EMAILJS) \
     VITE_FRONTEND_URL=$(cat /run/secrets/VITE_FRONTEND_URL) \
-    npm run build
+    sh -c "npm run build" 
 
 # use nginx to put build website
 FROM nginx:alpine

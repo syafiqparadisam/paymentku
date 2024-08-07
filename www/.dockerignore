@@ -1,4 +1,1 @@
-node_modules/*
-dist/*
-*.env.*
-.eslintrc.js
+node_modules

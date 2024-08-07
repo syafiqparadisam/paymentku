@@ -245,6 +245,20 @@ jobs:
             CLOUDINARY_APIKEY=${{ secrets.CLOUDINARY_APIKEY }}
         # AUTH SERVICE END
 
+      - name: Print secrets
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_FRONTEND_URL: ${{ secrets.VITE_FRONTEND_URL }}
+          VITE_SERVICE_ID_EMAILJS: ${{ secrets.VITE_SERVICE_ID_EMAILJS }}
+          VITE_TEMPLATE_ID_HELPING_EMAILJS: ${{ secrets.VITE_TEMPLATE_ID_HELPING_EMAILJS }}
+          VITE_PUBLIC_KEY_EMAILJS: ${{ secrets.VITE_PUBLIC_KEY_EMAILJS }}
+        run: |
+          echo "VITE_API_URL=$VITE_API_URL"
+          echo "VITE_FRONTEND_URL=$VITE_FRONTEND_URL"
+          echo "VITE_SERVICE_ID_EMAILJS=$VITE_SERVICE_ID_EMAILJS"
+          echo "VITE_TEMPLATE_ID_HELPING_EMAILJS=$VITE_TEMPLATE_ID_HELPING_EMAILJS"
+          echo "VITE_PUBLIC_KEY_EMAILJS=$VITE_PUBLIC_KEY_EMAILJS"
+          
         # FRONTEND APP START
       - name: Deploy frontend service to dockerhub
         uses: docker/build-push-action@v5

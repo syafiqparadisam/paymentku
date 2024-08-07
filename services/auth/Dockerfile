@@ -2,7 +2,7 @@
 FROM node:18.17.1-alpine AS builder
 
 # Create app directory
-WORKDIR /usr/src/app    
+WORKDIR /app    
 
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
@@ -64,11 +64,11 @@ FROM node:18.17.1-alpine
 
 WORKDIR /app
 
-COPY --from=builder /usr/src/app/dist /app/dist
-COPY --from=builder /usr/src/app/dataSource /app/dataSource
-COPY --from=builder /usr/src/app/migration /app/migration
-COPY --from=builder /usr/src/app/package.json /app/package.json
-COPY --from=builder /usr/src/app/package-lock.json /app/package-lock.json
+COPY --from=builder /app/dist /app/dist
+COPY --from=builder /app/src/dataSource /app/src/dataSource
+COPY --from=builder /app/src/migration /app/src/migration
+COPY --from=builder /app/package.json /app/package.json
+COPY --from=builder /app/package-lock.json /app/package-lock.json
 
 # Start the server using the production build
 CMD npm run migrate-run && node dist/main.js

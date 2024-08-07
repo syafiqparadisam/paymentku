@@ -253,7 +253,7 @@ jobs:
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
           secrets: |
-            "VITE_API_URL=${{secrets.VITE_API_URL}}""
+            "VITE_API_URL=${{secrets.VITE_API_URL}}"
             "VITE_FRONTEND_URL=${{secrets.VITE_FRONTEND_URL}}"
             "VITE_SERVICE_ID_EMAILJS=${{secrets.VITE_SERVICE_ID_EMAILJS}}"
             "VITE_TEMPLATE_ID_HELPING_EMAILJS=${{secrets.VITE_TEMPLATE_ID_HELPING_EMAILJS}}"

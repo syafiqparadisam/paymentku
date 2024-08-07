@@ -59,8 +59,6 @@ RUN --mount=type=secret,id=CLIENT_ID,required=true,mode=0666 \
     CLOUDINARY_APIKEY=$(cat /run/secrets/CLOUDINARY_APIKEY) \
     npm run build
 
-RUN npm run migrate-generate
-
 # for build
 FROM node:18.17.1-alpine
 

@@ -25,7 +25,7 @@ RUN --mount=type=secret,id=VITE_API_URL, required=true,mode=0666 \
     npm run build
 
 # use nginx to put build website
-FROM nginx:1.27-alpine
+FROM nginx:alpine
 
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 

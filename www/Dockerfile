@@ -12,11 +12,11 @@ RUN npm install
 
 
 # Mount env variables
-RUN --mount=type=secret,id=VITE_API_URL, required=true \
-    --mount=type=secret,id=VITE_FRONTEND_URL,required=true \
-    --mount=type=secret,id=VITE_SERVICE_ID_EMAILJS,required=true \
-    --mount=type=secret,id=VITE_TEMPLATE_ID_HELPING_EMAILJS,required=true \
-    --mount=type=secret,id=VITE_PUBLIC_KEY_EMAILJS,required=true \
+RUN --mount=type=secret,id=VITE_API_URL, required=true,mode=0666 \
+    --mount=type=secret,id=VITE_FRONTEND_URL,required=true,mode=0666 \
+    --mount=type=secret,id=VITE_SERVICE_ID_EMAILJS,required=true,mode=0666 \
+    --mount=type=secret,id=VITE_TEMPLATE_ID_HELPING_EMAILJS,required=true,mode=0666 \
+    --mount=type=secret,id=VITE_PUBLIC_KEY_EMAILJS,required=true,mode=0666 \
     VITE_API_URL=$(cat /run/secrets/VITE_API_URL) \
     VITE_PUBLIC_KEY_EMAILJS=$(cat /run/secrets/VITE_PUBLIC_KEY_EMAILJS) \
     VITE_TEMPLATE_ID_HELPING_EMAILJS=$(VITE_TEMPLATE_ID_HELPING_EMAILJS) \

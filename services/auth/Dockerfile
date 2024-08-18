@@ -74,7 +74,8 @@ COPY --from=builder /app/tsconfig.build.json  /app/tsconfig.build.json
 COPY --from=builder /app/tsconfig.json /app/tsconfig.json
 COPY --from=builder /app/nest-cli.json /app/nest-cli.json
 
+
 RUN npm install
 
 # Start the server using the production build
-CMD npm run migrate-run && node dist/main.js
+CMD ["npm", "run", "migrate-run", "&&", "node", "dist/main.js"]

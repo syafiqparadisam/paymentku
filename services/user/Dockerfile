@@ -16,6 +16,7 @@ RUN go mod download
 # Copy source code
 COPY . .
 
+
 RUN --mount=type=secret,id=DB_PORT,required=true,mode=0666 \
     --mount=type=secret,id=DB_NAME,required=true,mode=0666 \
     --mount=type=secret,id=DB_USER,required=true,mode=0666 \

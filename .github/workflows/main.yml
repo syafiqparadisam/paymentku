@@ -3,49 +3,12 @@ name: CI
 on:
   push:
     branches:
-      - main
-      - develop
-      - features*
+     - "**"
 
 jobs:
-  develop:
-    name: Development processes
+  functional-test:
+    name: Functional Test application
     runs-on: ubuntu-22.04
-    env:
-      CLIENT_ID: ${{secrets.CLIENT_ID}}
-      CLIENT_SECRET: ${{secrets.CLIENT_SECRET}}
-      CALLBACK_URL_GOOGLE: ${{secrets.CALLBACK_URL_GOOGLE}}
-      FRONTEND: ${{secrets.FRONTEND}}
-      SMTP_KEY: ${{secrets.SMTP_KEY}}
-      SMTP_LOGIN: ${{secrets.SMTP_LOGIN}}
-      AUTH_SVC: ${{secrets.AUTH_SVC}}
-      USER_ICON_DEFAULT: ${{secrets.USER_ICON_DEFAULT}}
-      USER_SVC: ${{secrets.USER_SVC}}
-      TF_SVC: ${{secrets.TF_SVC}}
-      HISTORY_SVC: ${{secrets.HISTORY_SVC}}
-      NEST_APP_PORT: ${{secrets.NEST_APP_PORT}}
-      REDIS_HOST: ${{secrets.REDIS_HOST}}
-      DB_PORT: ${{secrets.DB_PORT}}
-      DB_USER: ${{secrets.DB_USER}}
-      DB_NAME: ${{secrets.DB_NAME}}
-      DB_PARAM: ${{secrets.DB_PARAM}}
-      DB_PASSWD: ${{secrets.DB_PASSWD}}
-      DB_HOST: ${{secrets.DB_HOST}}
-      REDIS_PORT: ${{secrets.REDIS_PORT}}
-      CLOUDINARY_APISECRET: ${{secrets.CLOUDINARY_APISECRET}}
-      CLOUDINARY_CLOUDNAME: ${{secrets.CLOUDINARY_CLOUDNAME}}
-      CLOUDINARY_APIKEY: ${{secrets.CLOUDINARY_APIKEY}}
-      GRPC_SERVER_URL: ${{secrets.GRPC_SERVER_URL}}
-      HISTORY_SVC_PORT: ${{secrets.HISTORY_SVC_PORT}}
-      ORIGIN_URL: ${{secrets.ORIGIN_URL}}
-      TF_ICON: ${{secrets.TF_ICON}}
-      TRANSFER_SVC_PORT: ${{secrets.TRANSFER_SVC_PORT}}
-      DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
-      DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      DOCKER_TAGS_PAYMENTKU: ${{secrets.DOCKER_TAGS_PAYMENTKU}}
-      USER_SVC_PORT: ${{secrets.USER_SVC_PORT}}
-      MYSQL_DATABASE: ${{secrets.MYSQL_DATABASE}}
-
     steps:
       - name: Check Repository
         uses: actions/checkout@v4
@@ -132,6 +95,15 @@ jobs:
       - name: Revert migration
         run: |
           make migrate-revert
+  
+  build:
+    name: Build docker
+    runs-on: ubuntu-latest
+    needs: functional-test
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' }}
+    steps:
+      - name: Check Repository
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -265,3 +237,13 @@ jobs:
             "VITE_TEMPLATE_ID_HELPING_EMAILJS=${{secrets.VITE_TEMPLATE_ID_HELPING_EMAILJS}}"
             "VITE_PUBLIC_KEY_EMAILJS=${{secrets.VITE_PUBLIC_KEY_EMAILJS}}"
         # FRONTEND APP END
+
+  # security-testing:
+  #   name: Security Testing 
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check Repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Scans Docker images with trivy
+ 

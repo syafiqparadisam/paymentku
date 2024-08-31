@@ -1,5 +1,4 @@
 import { Module, Logger } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AccessTokenGuardModule } from './access-token-guard/access-token-guard.module';
 import { RedisModule } from './redis/redis.module';
@@ -8,16 +7,19 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { WinstonModule } from 'nest-winston';
 import { transports } from 'winston';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { mysqlOptionRunner } from './dataSource/runner';
+import { DrizzleMySqlModule } from '@knaadh/nestjs-drizzle-mysql2';
+import { RepositoryModule } from './repository/repository.module';
+import { mysqlConfig } from './config/mysql-config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(mysqlOptionRunner),
+    DrizzleMySqlModule.register({
+      tag: 'SDGDS',
+      ...mysqlConfig,
+    }),
     WinstonModule.forRoot({
       transports: [new transports.Console({ level: 'info' })],
     }),
-    UsersModule,
     AuthModule,
     AccessTokenGuardModule,
     RedisModule,
@@ -29,6 +31,7 @@ import { mysqlOptionRunner } from './dataSource/runner';
       },
     ]),
     CloudinaryModule,
+    RepositoryModule,
   ],
   providers: [Logger],
 })

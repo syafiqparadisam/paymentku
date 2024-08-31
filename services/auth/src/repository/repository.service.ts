@@ -1,24 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from './schemas/users.entity';
-import { Repository, DataSource, EntityManager } from 'typeorm';
+import { Inject, Injectable } from '@nestjs/common';
 import { loginWithGoogle, registerRequest } from '../auth/dtos/request';
 import * as bcrypt from 'bcrypt';
-import generateRandNum from './utils/randNum';
-import { Profile } from './schemas/profile.entity';
-import { HistoryTopup } from './schemas/history_topup.entity';
-import { Notification } from './schemas/notification.entity';
-import { HistoryTransfer } from './schemas/history_transfer.entity';
 import { ConfigService } from '@nestjs/config';
-
+import { MySql2Database } from 'drizzle-orm/mysql2';
+import * as schema from '../schema/schema';
+import { Utils } from './utils';
 @Injectable()
-export class UsersService {
+export class RepositoryService {
   constructor(
-    @InjectRepository(Users)
-    private userRepo: Repository<Users>,
-    @InjectRepository(Profile)
-    private profileRepo: Repository<Profile>,
-    private readonly ds: DataSource,
+    @Inject('MYSQL_DB') private db: MySql2Database<typeof schema>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -62,7 +52,7 @@ export class UsersService {
       let accNumber: number;
       // check accountNumber is duplicate
       while (true) {
-        const randNum: number = generateRandNum();
+        const randNum: number =genera;
         const user: Users[] = await this.findAccNumber(randNum);
         if (user.length === 0) {
           accNumber = randNum;

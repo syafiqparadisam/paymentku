@@ -32,7 +32,7 @@ jobs:
 
       - name: Run docker compose
         run: |
-          make
+          make test-docker
 
         # AUTH SERVICE START
       - name: Download dependencies in auth service
@@ -184,44 +184,44 @@ jobs:
           context: "{{defaultContext}}:services/auth"
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-          secrets: |
-            CLIENT_ID=${{ secrets.CLIENT_ID }}
-            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
-            CALLBACK_URL_GOOGLE=${{ secrets.CALLBACK_URL_GOOGLE }}
-            FRONTEND=${{ secrets.FRONTEND }}
-            SMTP_KEY=${{ secrets.SMTP_KEY }}
-            SMTP_LOGIN=${{ secrets.SMTP_LOGIN }}
-            AUTH_SVC=${{ secrets.AUTH_SVC }}
-            USER_ICON_DEFAULT=${{ secrets.USER_ICON_DEFAULT }}
-            USER_SVC=${{ secrets.USER_SVC }}
-            TF_SVC=${{ secrets.TF_SVC }}
-            HISTORY_SVC=${{ secrets.HISTORY_SVC }}
-            NEST_APP_PORT=${{ secrets.NEST_APP_PORT }}
-            REDIS_HOST=${{ secrets.REDIS_HOST }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWD=${{ secrets.DB_PASSWD }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            REDIS_PORT=${{ secrets.REDIS_PORT }}
-            CLOUDINARY_APISECRET=${{ secrets.CLOUDINARY_APISECRET }}
-            CLOUDINARY_CLOUDNAME=${{ secrets.CLOUDINARY_CLOUDNAME }}
-            CLOUDINARY_APIKEY=${{ secrets.CLOUDINARY_APIKEY }}
+          # secrets: |
+          #   CLIENT_ID=${{ secrets.CLIENT_ID }}
+          #   CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+          #   CALLBACK_URL_GOOGLE=${{ secrets.CALLBACK_URL_GOOGLE }}
+          #   FRONTEND=${{ secrets.FRONTEND }}
+          #   SMTP_KEY=${{ secrets.SMTP_KEY }}
+          #   SMTP_LOGIN=${{ secrets.SMTP_LOGIN }}
+          #   AUTH_SVC=${{ secrets.AUTH_SVC }}
+          #   USER_ICON_DEFAULT=${{ secrets.USER_ICON_DEFAULT }}
+          #   USER_SVC=${{ secrets.USER_SVC }}
+          #   TF_SVC=${{ secrets.TF_SVC }}
+          #   HISTORY_SVC=${{ secrets.HISTORY_SVC }}
+          #   NEST_APP_PORT=${{ secrets.NEST_APP_PORT }}
+          #   REDIS_HOST=${{ secrets.REDIS_HOST }}
+          #   DB_PORT=${{ secrets.DB_PORT }}
+          #   DB_HOST=${{ secrets.DB_HOST }}
+          #   DB_USER=${{ secrets.DB_USER }}
+          #   DB_PASSWD=${{ secrets.DB_PASSWD }}
+          #   DB_NAME=${{ secrets.DB_NAME }}
+          #   REDIS_PORT=${{ secrets.REDIS_PORT }}
+          #   CLOUDINARY_APISECRET=${{ secrets.CLOUDINARY_APISECRET }}
+          #   CLOUDINARY_CLOUDNAME=${{ secrets.CLOUDINARY_CLOUDNAME }}
+          #   CLOUDINARY_APIKEY=${{ secrets.CLOUDINARY_APIKEY }}
         # AUTH SERVICE END
 
-      - name: Print secrets
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_FRONTEND_URL: ${{ secrets.VITE_FRONTEND_URL }}
-          VITE_SERVICE_ID_EMAILJS: ${{ secrets.VITE_SERVICE_ID_EMAILJS }}
-          VITE_TEMPLATE_ID_HELPING_EMAILJS: ${{ secrets.VITE_TEMPLATE_ID_HELPING_EMAILJS }}
-          VITE_PUBLIC_KEY_EMAILJS: ${{ secrets.VITE_PUBLIC_KEY_EMAILJS }}
-        run: |
-          echo "VITE_API_URL=$VITE_API_URL"
-          echo "VITE_FRONTEND_URL=$VITE_FRONTEND_URL"
-          echo "VITE_SERVICE_ID_EMAILJS=$VITE_SERVICE_ID_EMAILJS"
-          echo "VITE_TEMPLATE_ID_HELPING_EMAILJS=$VITE_TEMPLATE_ID_HELPING_EMAILJS"
-          echo "VITE_PUBLIC_KEY_EMAILJS=$VITE_PUBLIC_KEY_EMAILJS"
+      # - name: Print secrets
+      #   env:
+      #     VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      #     VITE_FRONTEND_URL: ${{ secrets.VITE_FRONTEND_URL }}
+      #     VITE_SERVICE_ID_EMAILJS: ${{ secrets.VITE_SERVICE_ID_EMAILJS }}
+      #     VITE_TEMPLATE_ID_HELPING_EMAILJS: ${{ secrets.VITE_TEMPLATE_ID_HELPING_EMAILJS }}
+      #     VITE_PUBLIC_KEY_EMAILJS: ${{ secrets.VITE_PUBLIC_KEY_EMAILJS }}
+      #   run: |
+      #     echo "VITE_API_URL=$VITE_API_URL"
+      #     echo "VITE_FRONTEND_URL=$VITE_FRONTEND_URL"
+      #     echo "VITE_SERVICE_ID_EMAILJS=$VITE_SERVICE_ID_EMAILJS"
+      #     echo "VITE_TEMPLATE_ID_HELPING_EMAILJS=$VITE_TEMPLATE_ID_HELPING_EMAILJS"
+      #     echo "VITE_PUBLIC_KEY_EMAILJS=$VITE_PUBLIC_KEY_EMAILJS"
           
         # FRONTEND APP START
       - name: Deploy frontend service to dockerhub

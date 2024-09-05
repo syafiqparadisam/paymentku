@@ -21,28 +21,7 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-
-RUN --mount=type=secret,id=DB_PORT,required=true,mode=0666 \
-    --mount=type=secret,id=DB_NAME,required=true,mode=0666 \
-    --mount=type=secret,id=DB_USER,required=true,mode=0666 \
-    --mount=type=secret,id=DB_PASSWD,required=true,mode=0666 \
-    --mount=type=secret,id=DB_HOST,required=true,mode=0666 \
-    --mount=type=secret,id=DB_PARAM,required=true,mode=0666 \
-    --mount=type=secret,id=TRANSFER_SVC_PORT,required=true,mode=0666 \
-    --mount=type=secret,id=TF_ICON,required=true,mode=0666 \
-    --mount=type=secret,id=GRPC_SERVER_URL,required=true,mode=0666 \
-    --mount=type=secret,id=ORIGIN_URL,required=true,mode=0666 \
-    DB_PORT=$(cat /run/secrets/DB_PORT) \
-    DB_NAME=$(cat /run/secrets/DB_NAME) \
-    DB_USER=$(cat /run/secrets/DB_USER) \
-    DB_PASSWD=$(cat /run/secrets/DB_PASSWD) \
-    DB_HOST=$(cat /run/secrets/DB_HOST) \
-    DB_PARAM=$(cat /run/secrets/DB_PARAM) \
-    TRANSFER_SVC_PORT=$(cat /run/secrets/TRANSFER_SVC_PORT) \
-    TF_ICON=$(cat /run/secrets/TF_ICON) \
-    GRPC_SERVER_URL=$(cat /run/secrets/GRPC_SERVER_URL) \
-    ORIGIN_URL=$(cat /run/secrets/ORIGIN_URL) \
-    go build -o /app/server.out
+RUN go build -o /app/server.out
 
 
 # Final stage

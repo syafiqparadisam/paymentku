@@ -1,3 +1,4 @@
+
 version: "3"
 services:
   mysqldb:
@@ -7,9 +8,9 @@ services:
     ports:
       - 3306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     healthcheck:
       test:
         [
@@ -20,38 +21,22 @@ services:
           "127.0.0.1",
           "-u",
           "root",
-          "--password=$$MYSQL_ROOT_PASSWORD",
+          "--password=$MYSQL_ROOT_PASSWORD",
         ]
       start_period: 5s
       interval: 5s
       timeout: 5s
       retries: 10
     volumes:
-      - ../../database/DB:/var/lib/mysql
-      - ../../database/init.sql:/docker-entrypoint-initdb.d/initsql
-    networks:
-      - mysql-phpmyadmin
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmin
-    restart: always
-    ports:
-      - 8080:80
-    environment:
-      PMA_HOST: mysqldb
-      MYSQL_ROOT_PASSWORD: password
-    depends_on:
-      - mysqldb
-    networks:
-      - mysql-phpmyadmin
+      - ../../../database/DB:/var/lib/mysql
+      - ../../../services/auth/migrations:/docker-entrypoint-initdb.d/
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.91.0
     container_name: otel-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
-      - ../../observability/otel-collector.yaml:/etc/otel-collector-config.yaml
+      - ../../../observability/otel-collector.yaml:/etc/otel-collector-config.yaml
     ports:
       - "1888:1888" # pprof extension
       - "8888:8888" # Prometheus metrics exposed by the collector
@@ -66,7 +51,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ../../observability/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ../../../observability/prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
     depends_on:
@@ -86,9 +71,9 @@ services:
     restart: always
     ports:
       - 6379:6379
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["redis-server", "--requirepass", "$REDIS_PASSWORD"]
     volumes:
-      - ../../database/redis/data:/data
-      - ../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf
-
-networks:
-  mysql-phpmyadmin:
+      - ../../../database/redis/data:/data
+      - ../../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf

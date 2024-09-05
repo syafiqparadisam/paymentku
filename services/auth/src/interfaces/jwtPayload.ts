@@ -1,3 +1,5 @@
-export default interface jwtPayload {
+type jwtPayload = {
   user_id: number;
-}
+};
+
+export default jwtPayload;

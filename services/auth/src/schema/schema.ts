@@ -15,7 +15,11 @@ export const Profile = mysqlTable('profile', {
   bio: text('bio'),
   name: varchar('name', { length: 255 }).notNull(),
   photo_public_id: text('photo_public_id'),
-  photo_profile: text('photo_profile').notNull(),
+  photo_profile: text('photo_profile')
+    .default(
+      'https://res.cloudinary.com/dktwq4f3f/image/upload/v1716213116/usericon_hrikn3.jpg',
+    )
+    .notNull(),
   phone_number: varchar('phone_number', { length: 18 }).unique().notNull(),
 });
 
@@ -23,20 +27,23 @@ export const Users = mysqlTable('users', {
   id: bigint('id', { mode: 'number', unsigned: true })
     .autoincrement()
     .primaryKey(),
-  user: varchar('user', { length: 255 }).unique('user').notNull(),
+  user: varchar('user', { length: 255 }).unique().notNull(),
   password: varchar('password', { length: 255 }),
-  email: varchar('email', { length: 255 }).unique('user').notNull(),
-  balance: bigint('balance', { mode: 'number', unsigned: true }).notNull(),
+  email: varchar('email', { length: 255 }).unique().notNull(),
+  balance: bigint('balance', { mode: 'number', unsigned: true })
+    .notNull()
+    .default(0),
   accountNumber: bigint('accountNumber', {
     mode: 'number',
     unsigned: true,
   })
     .unique()
     .notNull(),
-  profileId: bigint('id', { mode: 'number', unsigned: true }).references(
-    () => Profile.id,
-  ),
-  created_at: text('created_at').notNull(),
+  profileId: bigint('profile_id', {
+    mode: 'number',
+    unsigned: true,
+  }).references(() => Profile.id),
+  created_at: text('created_at').notNull().default(new Date().toISOString()),
 });
 
 export const HistoryTopup = mysqlTable('history_topup', {

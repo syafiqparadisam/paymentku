@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import * as schema from '../schema/schema';
 import { Utils } from './utils';
+import { eq } from 'drizzle-orm';
+import { accountNumber } from 'src/domain/sqlResultType';
 @Injectable()
 export class RepositoryService {
   constructor(
@@ -22,21 +24,20 @@ export class RepositoryService {
     publicId: string,
   ) {
     try {
-      await this.ds.manager.transaction(
-        'READ COMMITTED',
-        async (entityManager: EntityManager) => {
-          await entityManager.update<Profile>(
-            Profile,
-            { id: profileId },
-            {
-              photo_profile: photoProfileUrl,
-            },
-          );
-          await entityManager.update<Profile>(
-            Profile,
-            { id: profileId },
-            { photo_public_id: publicId },
-          );
+      await this.db.transaction(
+        async (tx) => {
+          await tx
+            .update(schema.Profile)
+            .set({ photo_profile: photoProfileUrl })
+            .where(eq(schema.Profile.id, profileId));
+
+          await tx
+            .update(schema.Profile)
+            .set({ photo_public_id, publicId })
+            .where(eq(schema.Profile.id, profileId));
+        },
+        {
+          isolationLevel: 'read committed',
         },
       );
     } catch (error) {
@@ -44,16 +45,27 @@ export class RepositoryService {
     }
   }
 
-  async findAccNumber(accNumber: number): Promise<Users[]> {
-    return this.userRepo.find({ where: { accountNumber: accNumber } });
+  async findAccNumber(accNumber: number): Promise<accountNumber[]> {
+    try {
+      const users = await this.db
+        .select({
+          accountNumber: schema.Users.accountNumber,
+        })
+        .from(schema.Users)
+        .where(eq(schema.Users.accountNumber, accNumber));
+      return users;
+    } catch (error) {
+      throw error;
+    }
   }
+
   async createAccountNumber(): Promise<number> {
     try {
       let accNumber: number;
       // check accountNumber is duplicate
       while (true) {
-        const randNum: number =genera;
-        const user: Users[] = await this.findAccNumber(randNum);
+        const randNum: number = this.generateAccountNumber();
+        const user = await this.findAccNumber(randNum);
         if (user.length === 0) {
           accNumber = randNum;
           break;
@@ -65,34 +77,35 @@ export class RepositoryService {
     }
   }
 
+  generateRandNum(): number {
+    return Math.floor(Math.random() * 99999) + 1;
+  }
+
   async createAccount(data: registerRequest): Promise<void> {
     try {
       // hashing password by bcrypt
       const salt = await bcrypt.genSalt(10);
       const password = await bcrypt.hash(data.password, salt);
-
       const accNumber = await this.createAccountNumber();
 
       // create account with ACID transaction
-      await this.ds.manager.transaction(
-        'READ COMMITTED',
-        async (entitymanager) => {
-          // insert into profile
-          const profile = new Profile();
-          const userIcon = this.configService.get<string>('USER_ICON_DEFAULT');
-          profile.name = data.user + generateRandNum().toString();
-          profile.photo_profile = userIcon;
-          await entitymanager.save(profile);
-          // insert into users
-          await entitymanager.insert(Users, {
+      await this.db.transaction(
+        async (tx) => {
+          const result = await tx
+            .insert(schema.Profile)
+            .values({ name: data.user + this.generateRandNum().toString() })
+            .$returningId();
+
+          await tx.insert(schema.Users).values({
             user: data.user,
             email: data.email,
             password,
             accountNumber: accNumber,
-            created_at: new Date().toISOString(),
-            balance: 0,
-            profile,
+            profile_id: result.id,
           });
+        },
+        {
+          isolationLevel: 'read committed',
         },
       );
     } catch (error) {
@@ -100,9 +113,12 @@ export class RepositoryService {
     }
   }
 
-  async findUserById(id: number): Promise<Users> {
+  async findUserById(id: number): Promise<typeof schema.Users> {
     try {
-      return await this.userRepo.findOne({ where: { id } });
+      return await this.db
+        .select()
+        .from(schema.Users)
+        .where(eq(schema.Users.id, id));
     } catch (error) {
       throw error;
     }
@@ -110,23 +126,26 @@ export class RepositoryService {
 
   async emptyPassword(userid: number) {
     try {
-      await this.userRepo.update({ id: userid }, { password: null });
+      await this.db
+        .update(schema.Users)
+        .set({ password: null })
+        .where(eq(schema.Users.id, userid));
     } catch (error) {
       throw error;
     }
   }
 
-  async findUserByEmail(email: string): Promise<Users> {
+  async findUserByEmail(email: string): Promise<typeof schema.Users> {
     try {
-      return await this.userRepo.findOne({ where: { email } });
+      return await this.db.select().from(schema.Users).where({ email });
     } catch (error) {
       throw error;
     }
   }
 
-  async findUserByUsername(user: string): Promise<Users> {
+  async findUserByUsername(user: string): Promise<typeof schema.Users> {
     try {
-      return await this.userRepo.findOne({ where: { user } });
+      return await this.db.select().from(schema.Users).where({user})
     } catch (error) {
       throw error;
     }

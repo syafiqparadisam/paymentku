@@ -34,6 +34,7 @@ export const mysqlOptionRunner: TypeOrmModuleOptions = {
   password: process.env.DB_PASSWD,
   database: process.env.DB_NAME,
   logging: true,
+  synchronize: true,
   migrations: [Migration1718333322243],
 };
 

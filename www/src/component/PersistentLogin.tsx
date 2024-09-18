@@ -9,6 +9,7 @@ const PersistentLogin = () => {
     const { data, error, isSuccess } = useGetUserQuery()
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    console.log(data)
     useEffect(() => {
         if (data?.statusCode == 200) {
             data?.data ? dispatch(setUser(data?.data)) : null

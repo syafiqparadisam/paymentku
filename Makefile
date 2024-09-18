@@ -4,14 +4,14 @@ USER_SVC_PATH := services/user
 HISTORY_SVC_PATH := services/history
 TRANSACTION_SVC_PATH := services/transaction
 AUTH_SVC_PATH := services/auth
-COMPOSE_PATH := docker/compose
+COMPOSE_PATH := docker/compose/dev
 
 docker-compose:
 	docker compose -f ${COMPOSE_PATH}/compose.yml up -d
 
 # USER START
 run-user: docker-compose
-	cd ${USER_SVC_PATH} && go build -o server.out server.go && ./server
+	cd ${USER_SVC_PATH} && go build -o server server.go && ./server
 
 test-user: docker-compose
 	cd ${USER_SVC_PATH}/test && go test -v ./... --count=1
@@ -23,7 +23,7 @@ install-user:
 
 # TRANSACTION START
 run-transaction: docker-compose	
-	cd ${TRANSACTION_SVC_PATH} && go build -o server.out server.go && ./server
+	cd ${TRANSACTION_SVC_PATH} && go build -o server server.go && ./server
 
 test-transaction:
 	cd ${TRANSACTION_SVC_PATH}/test && go test -v ./... --count=1
@@ -31,7 +31,7 @@ test-transaction:
 
 # HISTORY START
 run-history: docker-compose
-	cd ${HISTORY_SVC_PATH} && go build -o server.out server.go && ./server
+	cd ${HISTORY_SVC_PATH} && go build -o server server.go && ./server
 	
 
 test-history: docker-compose

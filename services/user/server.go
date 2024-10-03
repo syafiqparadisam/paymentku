@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/syafiqparadisam/paymentku/services/user/config"
 	controllerhttp "github.com/syafiqparadisam/paymentku/services/user/controller/http"
 	caching_repo "github.com/syafiqparadisam/paymentku/services/user/repository/caching"
@@ -105,11 +104,6 @@ func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.M
 }
 
 func main() {
-	envFilePath := ".env"
-	if err := godotenv.Load(envFilePath); err != nil {
-		fmt.Println("Failed to load env file")
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

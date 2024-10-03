@@ -1,24 +1,30 @@
 # Use original image golang as build stage
-FROM golang:1.22-alpine
-
-# Create a non-root user and group
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+FROM golang:1.22-alpine AS build
 
 # Set working directory inside container
 WORKDIR /app
 
-# Copy module
-COPY go.mod go.sum ./
-
-# Download dependencies
-RUN go mod download
-
 # Copy source code
 COPY . .
 
-# Change ownership of the working directory
-RUN chown -R appuser:appgroup /app
+# Download dependencies
+RUN go mod tidy
 
-USER appuser
+# Compile aplikasi Go
+RUN go build -o server.out server.go
 
-CMD go build -o server.out . && ./server
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=build /app/server.out /app/server.out
+
+RUN addgroup -S nonroot && adduser -S nonroot -G nonroot
+
+RUN chown -R nonroot:nonroot /app/server.out
+
+USER nonroot:nonroot
+
+EXPOSE 8803
+
+ENTRYPOINT ["./server.out"]

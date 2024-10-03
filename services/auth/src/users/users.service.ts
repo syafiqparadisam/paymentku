@@ -1,14 +1,14 @@
+import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from './schemas/users.entity';
+import { Users } from '../schemas/users.entity';
 import { Repository, DataSource, EntityManager } from 'typeorm';
 import { loginWithGoogle, registerRequest } from '../auth/dtos/request';
 import * as bcrypt from 'bcrypt';
-import generateRandNum from './utils/randNum';
-import { Profile } from './schemas/profile.entity';
-import { HistoryTopup } from './schemas/history_topup.entity';
-import { Notification } from './schemas/notification.entity';
-import { HistoryTransfer } from './schemas/history_transfer.entity';
+import { Profile } from '../schemas/profile.entity';
+import { HistoryTopup } from '../schemas/history_topup.entity';
+import { Notification } from '../schemas/notification.entity';
+import { HistoryTransfer } from '../schemas/history_transfer.entity';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -57,12 +57,19 @@ export class UsersService {
   async findAccNumber(accNumber: number): Promise<Users[]> {
     return this.userRepo.find({ where: { accountNumber: accNumber } });
   }
+
+  generateRandNum(): number {
+    const buffer = crypto.randomBytes(4);
+    const uniqueRandom = buffer.readUInt32LE(0);
+    return uniqueRandom;
+  }
+  
   async createAccountNumber(): Promise<number> {
     try {
       let accNumber: number;
       // check accountNumber is duplicate
       while (true) {
-        const randNum: number = generateRandNum();
+        const randNum: number = this.generateRandNum();
         const user: Users[] = await this.findAccNumber(randNum);
         if (user.length === 0) {
           accNumber = randNum;
@@ -90,7 +97,7 @@ export class UsersService {
           // insert into profile
           const profile = new Profile();
           const userIcon = this.configService.get<string>('USER_ICON_DEFAULT');
-          profile.name = data.user + generateRandNum().toString();
+          profile.name = data.user + this.generateRandNum().toString();
           profile.photo_profile = userIcon;
           await entitymanager.save(profile);
           // insert into users

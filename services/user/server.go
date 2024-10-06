@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/syafiqparadisam/paymentku/services/user/config"
 	controllerhttp "github.com/syafiqparadisam/paymentku/services/user/controller/http"
 	caching_repo "github.com/syafiqparadisam/paymentku/services/user/repository/caching"
@@ -104,6 +105,7 @@ func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.M
 }
 
 func main() {
+	godotenv.Load(".env")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

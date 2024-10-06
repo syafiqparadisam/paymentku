@@ -45,6 +45,7 @@ jobs:
       DOCKER_TAGS_PAYMENTKU: ${{secrets.DOCKER_TAGS_PAYMENTKU}}
       USER_SVC_PORT: ${{secrets.USER_SVC_PORT}}
       MYSQL_DATABASE: ${{secrets.MYSQL_DATABASE}}
+      NODE_ENV: ${{secrets.NODE_ENV}}
 
     steps:
       - name: Check Repository
@@ -58,7 +59,7 @@ jobs:
       - name: Setup nodejs
         uses: actions/setup-node@v4
         with:
-          node-version: 18.17.1
+          node-version: 21.0.0
 
       - uses: oNaiPs/secrets-to-env-action@v1
         with:
@@ -81,12 +82,6 @@ jobs:
         working-directory: ./services/auth
         run: |
           npm run lint
-
-      - name: Migrate table on database
-        working-directory: ./services/auth
-        run: |
-          npm i -g typeorm
-          npm run migrate-run
 
       - name: Test auth service
         run: |

@@ -22,6 +22,7 @@
     "migrate-revert": "npx typeorm-ts-node-esm  migration:revert -d ./src/dataSource/ormconfig.ts",
     "migrate-generate": "npx typeorm-ts-node-esm migration:generate ./src/migration/Migration -d src/dataSource/ormconfig.ts"
   },
+  
   "dependencies": {
     "@eslint/config-array": "^0.18.0",
     "@eslint/object-schema": "^2.1.4",

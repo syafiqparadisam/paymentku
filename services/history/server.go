@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/syafiqparadisam/paymentku/services/history/config"
 	controller_http "github.com/syafiqparadisam/paymentku/services/history/controller/http"
 	history_repo "github.com/syafiqparadisam/paymentku/services/history/repository/history"
@@ -78,6 +79,7 @@ func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.M
 }
 
 func main() {
+	godotenv.Load(".env")
 	logZero := config.Log()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

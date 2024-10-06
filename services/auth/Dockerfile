@@ -27,6 +27,8 @@ COPY --from=build /app/dist /app/dist
 # Create a non-root user and group for running the app
 RUN addgroup -S runner && adduser -S runner -G runner
 
+ENV NODE_ENV=production
+
 # Change the ownership of the files to the 'runner' user
 RUN chown -R runner:runner /app
 

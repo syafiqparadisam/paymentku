@@ -3,7 +3,8 @@
 *.env
 infrastructure/DB
 *.vagrant*
-database/DB*
+database/mysql*
+services/auth/src/uploads
 database/redis
 *.out
 

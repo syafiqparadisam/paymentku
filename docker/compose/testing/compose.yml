@@ -29,7 +29,7 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - ../../../database/DB:/var/lib/mysql
+      - ../../../database/mysql:/var/lib/mysql
       - ../../../database/init.sql:/docker-entrypoint-initdb.d/initsql
 
   otel-collector:

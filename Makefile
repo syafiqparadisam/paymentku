@@ -6,6 +6,10 @@ TRANSACTION_SVC_PATH := services/transaction
 AUTH_SVC_PATH := services/auth
 COMPOSE_PATH := docker/compose/dev
 
+
+test-start:
+	docker compose -f docker/compose/testing/compose.yml up -d
+
 docker-compose:
 	docker compose -f ${COMPOSE_PATH}/compose.yml up -d
 
@@ -63,3 +67,6 @@ migrate-revert: docker-compose
 
 down: 
 	docker compose -f ${COMPOSE_PATH}/compose.yml down
+
+test-down:
+	docker compose -f docker/compose/testing/compose.yml down

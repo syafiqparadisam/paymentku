@@ -33,3 +33,4 @@ dist-ssr
 *.njsproj
 *.sln
 
+deleteVolume.sh

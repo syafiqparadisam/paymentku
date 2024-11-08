@@ -1,16 +1,15 @@
-
-version: "3"
 services:
   mysqldb:
     image: mysql:latest
     container_name: mysqldb
-    restart: always
+    restart: on-failure
     ports:
-      - 3306:3306
+      - "127.0.0.1:3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     healthcheck:
       test:
         [
@@ -30,22 +29,6 @@ services:
     volumes:
       - ../../../database/DB:/var/lib/mysql
       - ../../../database/init.sql:/docker-entrypoint-initdb.d/initsql
-    networks:
-      - mysql-phpmyadmin
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmin
-    restart: always
-    ports:
-      - 8080:80
-    environment:
-      PMA_HOST: mysqldb
-      MYSQL_ROOT_PASSWORD: password
-    depends_on:
-      - mysqldb
-    networks:
-      - mysql-phpmyadmin
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.91.0
@@ -54,12 +37,12 @@ services:
     volumes:
       - ../../../observability/otel-collector.yaml:/etc/otel-collector-config.yaml
     ports:
-      - "1888:1888" # pprof extension
-      - "8888:8888" # Prometheus metrics exposed by the collector
-      - "8889:8889" # Prometheus exporter metrics
-      - "13133:13133" # health_check extension
-      - "4317:4317" # OTLP gRPC receiver
-      - "55670:55679" # zpages extension
+      - "127.0.0.1:1888:1888" # pprof extension
+      - "127.0.0.1:8888:8888" # Prometheus metrics exposed by the collector
+      - "127.0.0.1:8889:8889" # Prometheus exporter metrics
+      - "127.0.0.1:13133:13133" # health_check extension
+      - "127.0.0.53:4317:4317" # OTLP gRPC receiver
+      - "127.0.0.1:55670:55679" # zpages extension
     depends_on:
       - jaeger
 
@@ -69,7 +52,7 @@ services:
     volumes:
       - ../../../observability/prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
-      - 9090:9090
+      - "127.0.0.1:9090:9090"
     depends_on:
       - otel-collector
 
@@ -77,19 +60,22 @@ services:
     image: jaegertracing/all-in-one:1.52
     container_name: jaeger
     ports:
-      - 16686:16686
-      - "14268"
-      - "14250"
+      - "127.0.0.1:16686:16686"
+      - "127.0.0.1:32783:14268"
+      - "127.0.0.1:32782:4250"
 
   redis:
     image: redis:latest
     container_name: redis
-    restart: always
+    restart: on-failure
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
-      - 6379:6379
+      - "127.0.0.1:6379:6379"
     volumes:
       - ../../../database/redis/data:/data
       - ../../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf
 
-networks:
-  mysql-phpmyadmin:
+volumes:
+   DB:
+   redis:

@@ -11,7 +11,42 @@ jobs:
   develop:
     name: Development processes
     runs-on: ubuntu-22.04
-    
+    env:
+      CLIENT_ID: ${{secrets.CLIENT_ID}}
+      CLIENT_SECRET: ${{secrets.CLIENT_SECRET}}
+      CALLBACK_URL_GOOGLE: ${{secrets.CALLBACK_URL_GOOGLE}}
+      FRONTEND: ${{secrets.FRONTEND}}
+      SMTP_KEY: ${{secrets.SMTP_KEY}}
+      SMTP_LOGIN: ${{secrets.SMTP_LOGIN}}
+      AUTH_SVC: ${{secrets.AUTH_SVC}}
+      USER_ICON_DEFAULT: ${{secrets.USER_ICON_DEFAULT}}
+      USER_SVC: ${{secrets.USER_SVC}}
+      TF_SVC: ${{secrets.TF_SVC}}
+      HISTORY_SVC: ${{secrets.HISTORY_SVC}}
+      NEST_APP_PORT: ${{secrets.NEST_APP_PORT}}
+      REDIS_HOST: ${{secrets.REDIS_HOST}}
+      DB_PORT: ${{secrets.DB_PORT}}
+      DB_USER: ${{secrets.DB_USER}}
+      DB_NAME: ${{secrets.DB_NAME}}
+      DB_PARAM: ${{secrets.DB_PARAM}}
+      DB_PASSWD: ${{secrets.DB_PASSWD}}
+      DB_HOST: ${{secrets.DB_HOST}}
+      REDIS_PORT: ${{secrets.REDIS_PORT}}
+      CLOUDINARY_APISECRET: ${{secrets.CLOUDINARY_APISECRET}}
+      CLOUDINARY_CLOUDNAME: ${{secrets.CLOUDINARY_CLOUDNAME}}
+      CLOUDINARY_APIKEY: ${{secrets.CLOUDINARY_APIKEY}}
+      GRPC_SERVER_URL: ${{secrets.GRPC_SERVER_URL}}
+      HISTORY_SVC_PORT: ${{secrets.HISTORY_SVC_PORT}}
+      ORIGIN_URL: ${{secrets.ORIGIN_URL}}
+      TF_ICON: ${{secrets.TF_ICON}}
+      TRANSFER_SVC_PORT: ${{secrets.TRANSFER_SVC_PORT}}
+      DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+      DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      DOCKER_TAGS_PAYMENTKU: ${{secrets.DOCKER_TAGS_PAYMENTKU}}
+      USER_SVC_PORT: ${{secrets.USER_SVC_PORT}}
+      MYSQL_DATABASE: ${{secrets.MYSQL_DATABASE}}
+      NODE_ENV: ${{secrets.NODE_ENV}}
+
     steps:
       - name: Check Repository
         uses: actions/checkout@v4
@@ -93,6 +128,14 @@ jobs:
         run: |
           make migrate-revert
 
+  staging:
+    name: Staging
+    runs-on: ubuntu-22.04
+    if: ${{github.ref == 'refs/heads/develop'}}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -112,16 +155,6 @@ jobs:
           context: "{{defaultContext}}:services/history"
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/history_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-          secrets: |
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_PASSWD=${{ secrets.DB_PASSWD }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_PARAM=${{ secrets.DB_PARAM }}
-            HISTORY_SVC_PORT=${{ secrets.HISTORY_SVC_PORT }}
-            GRPC_SERVER_URL=${{ secrets.GRPC_SERVER_URL }}
-            ORIGIN_URL=${{ secrets.ORIGIN_URL }}
 
         # HISTORY SERVICE END
 
@@ -132,17 +165,7 @@ jobs:
           context: "{{defaultContext}}:services/transaction"
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/transaction_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-          secrets: |
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_PASSWD=${{ secrets.DB_PASSWD }}
-            GRPC_SERVER_URL=${{ secrets.GRPC_SERVER_URL }}
-            DB_PARAM=${{ secrets.DB_PARAM }}
-            TF_ICON=${{ secrets.TF_ICON }}
-            ORIGIN_URL=${{ secrets.ORIGIN_URL }}
-            TRANSFER_SVC_PORT=${{ secrets.TRANSFER_SVC_PORT }}
+
         # TRANSACTION SERVICE END
 
         # USER SERVICE START
@@ -152,17 +175,6 @@ jobs:
           context: "{{defaultContext}}:services/user"
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/user_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-          secrets: |
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWD=${{ secrets.DB_PASSWD }}
-            DB_PARAM=${{ secrets.DB_PARAM }}
-            USER_SVC_PORT=${{ secrets.USER_SVC_PORT }}
-            GRPC_SERVER_URL=${{ secrets.GRPC_SERVER_URL }}
-            ORIGIN_URL=${{ secrets.ORIGIN_URL }}
-            REDIS_ADDR=${{ secrets.REDIS_ADDR }}
         # USER SERVICE END
 
         # AUTH SERVICE START
@@ -172,45 +184,9 @@ jobs:
           context: "{{defaultContext}}:services/auth"
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/auth_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-          secrets: |
-            CLIENT_ID=${{ secrets.CLIENT_ID }}
-            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
-            CALLBACK_URL_GOOGLE=${{ secrets.CALLBACK_URL_GOOGLE }}
-            FRONTEND=${{ secrets.FRONTEND }}
-            SMTP_KEY=${{ secrets.SMTP_KEY }}
-            SMTP_LOGIN=${{ secrets.SMTP_LOGIN }}
-            AUTH_SVC=${{ secrets.AUTH_SVC }}
-            USER_ICON_DEFAULT=${{ secrets.USER_ICON_DEFAULT }}
-            USER_SVC=${{ secrets.USER_SVC }}
-            TF_SVC=${{ secrets.TF_SVC }}
-            HISTORY_SVC=${{ secrets.HISTORY_SVC }}
-            NEST_APP_PORT=${{ secrets.NEST_APP_PORT }}
-            REDIS_HOST=${{ secrets.REDIS_HOST }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWD=${{ secrets.DB_PASSWD }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            REDIS_PORT=${{ secrets.REDIS_PORT }}
-            CLOUDINARY_APISECRET=${{ secrets.CLOUDINARY_APISECRET }}
-            CLOUDINARY_CLOUDNAME=${{ secrets.CLOUDINARY_CLOUDNAME }}
-            CLOUDINARY_APIKEY=${{ secrets.CLOUDINARY_APIKEY }}
+
         # AUTH SERVICE END
 
-      - name: Print secrets
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_FRONTEND_URL: ${{ secrets.VITE_FRONTEND_URL }}
-          VITE_SERVICE_ID_EMAILJS: ${{ secrets.VITE_SERVICE_ID_EMAILJS }}
-          VITE_TEMPLATE_ID_HELPING_EMAILJS: ${{ secrets.VITE_TEMPLATE_ID_HELPING_EMAILJS }}
-          VITE_PUBLIC_KEY_EMAILJS: ${{ secrets.VITE_PUBLIC_KEY_EMAILJS }}
-        run: |
-          echo "VITE_API_URL=$VITE_API_URL"
-          echo "VITE_FRONTEND_URL=$VITE_FRONTEND_URL"
-          echo "VITE_SERVICE_ID_EMAILJS=$VITE_SERVICE_ID_EMAILJS"
-          echo "VITE_TEMPLATE_ID_HELPING_EMAILJS=$VITE_TEMPLATE_ID_HELPING_EMAILJS"
-          echo "VITE_PUBLIC_KEY_EMAILJS=$VITE_PUBLIC_KEY_EMAILJS"
-          
         # FRONTEND APP START
       - name: Deploy frontend service to dockerhub
         uses: docker/build-push-action@v5
@@ -218,10 +194,4 @@ jobs:
           context: "{{defaultContext}}:www"
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/frontend_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
-          secrets: |
-            "VITE_API_URL=${{secrets.VITE_API_URL}}"
-            "VITE_FRONTEND_URL=${{secrets.VITE_FRONTEND_URL}}"
-            "VITE_SERVICE_ID_EMAILJS=${{secrets.VITE_SERVICE_ID_EMAILJS}}"
-            "VITE_TEMPLATE_ID_HELPING_EMAILJS=${{secrets.VITE_TEMPLATE_ID_HELPING_EMAILJS}}"
-            "VITE_PUBLIC_KEY_EMAILJS=${{secrets.VITE_PUBLIC_KEY_EMAILJS}}"
         # FRONTEND APP END

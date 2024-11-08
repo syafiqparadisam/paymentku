@@ -1,35 +1,45 @@
-FROM node:18.17.1-alpine AS build
+# Step 1: Build Stage
+FROM node:21-alpine AS build
 
-# Set the working directory
+# Set the working directory for the build stage
 WORKDIR /app
 
-# Copy source code
-COPY . .
+# Copy the package.json and package-lock.json files to the container
+COPY package*.json ./
 
 # Install the dependencies
 RUN npm install
 
-# Mount env variables
-RUN --mount=type=secret,id=VITE_API_URL,required=true,mode=0666 \
-    --mount=type=secret,id=VITE_FRONTEND_URL,required=true,mode=0666 \
-    --mount=type=secret,id=VITE_SERVICE_ID_EMAILJS,required=true,mode=0666 \
-    --mount=type=secret,id=VITE_TEMPLATE_ID_HELPING_EMAILJS,required=true,mode=0666 \
-    --mount=type=secret,id=VITE_PUBLIC_KEY_EMAILJS,required=true,mode=0666 \
-    VITE_API_URL=$(cat /run/secrets/VITE_API_URL) \
-    VITE_PUBLIC_KEY_EMAILJS=$(cat /run/secrets/VITE_PUBLIC_KEY_EMAILJS) \
-    VITE_TEMPLATE_ID_HELPING_EMAILJS=$(cat /run/secrets/VITE_TEMPLATE_ID_HELPING_EMAILJS) \
-    VITE_SERVICE_ID_EMAILJS=$(cat /run/secrets/VITE_SERVICE_ID_EMAILJS) \
-    VITE_FRONTEND_URL=$(cat /run/secrets/VITE_FRONTEND_URL) \
-    sh -c "npm run build" 
+# Copy the application files to the container
+COPY . .
 
-# use nginx to put build website
+
+ENV VITE_API_URL="MY_APP_API_URL"
+ENV VITE_FRONTEND_URL="MY_APP_FRONTEND_URL"
+ENV VITE_SERVICE_ID_EMAILJS="MY_APP_SERVICE_ID_EMAILJS"
+ENV VITE_TEMPLATE_ID_HELPING_EMAILJS="MY_APP_TEMPLATE_ID_HELPING_EMAILJS"
+ENV VITE_PUBLIC_KEY_EMAILJS="MY_APP_PUBLIC_KEY_EMAILJS" 
+
+RUN npm run build
+
 FROM nginx:alpine
 
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
+# Build the application 
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Copy the custom NGINX configuration
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY ./env.sh /docker-entrypoint.d/env.sh
+RUN chmod +x /docker-entrypoint.d/env.sh
+
+# Expose port 80 to allow access to the app
 EXPOSE 80
 
-# Run the app
-CMD [ "nginx", "-g", "daemon off;" ]
+# Define a healthcheck to monitor the container's health
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl --fail http://localhost:80/ || exit 1
+
+# Start the NGINX server
+CMD ["nginx", "-g", "daemon off;"]

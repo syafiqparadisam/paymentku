@@ -4,7 +4,7 @@ USER_SVC_PATH := services/user
 HISTORY_SVC_PATH := services/history
 TRANSACTION_SVC_PATH := services/transaction
 AUTH_SVC_PATH := services/auth
-COMPOSE_PATH := docker/compose
+COMPOSE_PATH := docker/compose/dev
 
 docker-compose:
 	docker compose -f ${COMPOSE_PATH}/compose.yml up -d

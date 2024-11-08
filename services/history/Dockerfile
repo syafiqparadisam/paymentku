@@ -1,8 +1,11 @@
 # Use original image golang as build stage
 FROM golang:1.22-alpine AS build
+<<<<<<< HEAD
 
 # Create a non-root user and group
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+=======
+>>>>>>> master
 
 # Set working directory inside container
 WORKDIR /app
@@ -19,7 +22,22 @@ COPY . .
 # Change ownership of the working directory
 RUN chown -R appuser:appgroup /app
 
+<<<<<<< HEAD
 USER appuser
+=======
+# Compile aplikasi Go
+RUN go build -o server.out server.go
+
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=build /app/server.out /app/server.out
+
+RUN addgroup -S nonroot && adduser -S nonroot -G nonroot
+
+RUN chown -R nonroot:nonroot /app/server.out
+>>>>>>> master
 
 RUN --mount=type=secret,id=DB_PORT,required=true,mode=0666 \
     --mount=type=secret,id=DB_NAME,required=true,mode=0666 \
@@ -41,6 +59,7 @@ RUN --mount=type=secret,id=DB_PORT,required=true,mode=0666 \
     ORIGIN_URL=$(cat /run/secrets/ORIGIN_URL) \
     go build -o /app/server.out
 
+<<<<<<< HEAD
 
 # Final stage
 FROM alpine:3.20.2
@@ -64,3 +83,8 @@ RUN chown -R appuser:appgroup /app
 USER appuser
 
 CMD [ "./server.out" ]
+=======
+EXPOSE 8803
+
+ENTRYPOINT ["./server.out"]
+>>>>>>> master

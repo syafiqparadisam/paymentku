@@ -5,6 +5,7 @@ infrastructure/DB
 *.vagrant*
 database/DB*
 database/redis
+*.out
 
 # Logs
 logs

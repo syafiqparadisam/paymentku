@@ -79,10 +79,8 @@ func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.M
 }
 
 func main() {
+	godotenv.Load(".env")
 	logZero := config.Log()
-	if err := godotenv.Load(".env"); err != nil {
-		logZero.Fatal().Err(err).Msg("Failed to load env file")
-	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

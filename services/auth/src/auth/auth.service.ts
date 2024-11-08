@@ -27,7 +27,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private redisService: RedisService,
     private cloudinaryService: CloudinaryService,
-  ) { }
+  ) {}
 
   async signInWithGoogle(
     payload: loginWithGoogle,
@@ -94,7 +94,10 @@ export class AuthService {
       );
       if (userAndprofile.profile.name == null) {
         // delete cache profile
-        await this.redisService.deleteCacheProfile([lockKey], userAndprofile.id)
+        await this.redisService.deleteCacheProfile(
+          [lockKey],
+          userAndprofile.id,
+        );
 
         await this.usersService.updateName(
           userAndprofile.profile.id,
@@ -103,7 +106,10 @@ export class AuthService {
       }
       if (userAndprofile.profile.photo_profile == null) {
         // delete cache profile
-        await this.redisService.deleteCacheProfile([lockKey], userAndprofile.id)
+        await this.redisService.deleteCacheProfile(
+          [lockKey],
+          userAndprofile.id,
+        );
 
         await this.usersService.updatePhotoProfile(
           payload.picture,
@@ -500,8 +506,7 @@ export class AuthService {
       }
 
       // delete cache profile
-      await this.redisService.deleteCacheProfile([lockKey], userData.user_id)
-
+      await this.redisService.deleteCacheProfile([lockKey], userData.user_id);
 
       // updating username
       await this.usersService.updateUsername(userData.user_id, dto.username);
@@ -564,7 +569,7 @@ export class AuthService {
     publicIdImg: string,
   ): Promise<response> {
     try {
-      const lockKey = crypto.randomUUID()
+      const lockKey = crypto.randomUUID();
       // upload file to cloudinary
       const result = await this.cloudinaryService.uploadImage(pathUploadfile);
 
@@ -573,7 +578,7 @@ export class AuthService {
         userData.user_id,
       );
       // delete cache profile
-      await this.redisService.deleteCacheProfile([lockKey], userData.user_id)
+      await this.redisService.deleteCacheProfile([lockKey], userData.user_id);
 
       await this.usersService.updatePhotoProfile(
         result.secure_url,

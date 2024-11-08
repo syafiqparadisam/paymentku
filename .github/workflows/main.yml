@@ -131,6 +131,7 @@ jobs:
   staging:
     name: Staging
     runs-on: ubuntu-22.04
+    needs: develop
     if: ${{github.ref == 'refs/heads/develop'}}
     steps:
       - name: Checkout repository

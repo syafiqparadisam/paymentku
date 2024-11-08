@@ -11,8 +11,8 @@ import {
   loginRequest,
   registerRequest,
   updateUsernameDTO,
-} from 'src/auth/dtos/request';
-import { response } from 'src/interfaces/response';
+} from '../src/auth/dtos/request';
+import { response } from '../src/interfaces/response';
 import { parsingCookie } from './utils';
 import crypto from 'crypto';
 

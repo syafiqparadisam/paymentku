@@ -43,7 +43,7 @@ run-auth: docker-compose
 	cd ${AUTH_SVC_PATH} && npm run start:dev
 
 
-test-auth: docker-compose
+test-auth:
 	cd ${AUTH_SVC_PATH}/test && npm run test:e2e
 # AUTHENTICATION END
 

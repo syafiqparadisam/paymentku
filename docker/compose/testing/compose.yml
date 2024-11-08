@@ -1,13 +1,15 @@
+
+version: "3"
 services:
   mysqldb:
     image: mysql:latest
     container_name: mysqldb
-    restart: on-failure
+    restart: always
     ports:
       - "127.0.0.1:3306:3306"
     environment:
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
+      # MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     healthcheck:
@@ -37,12 +39,12 @@ services:
     volumes:
       - ../../../observability/otel-collector.yaml:/etc/otel-collector-config.yaml
     ports:
-      - "127.0.0.1:1888:1888" # pprof extension
-      - "127.0.0.1:8888:8888" # Prometheus metrics exposed by the collector
-      - "127.0.0.1:8889:8889" # Prometheus exporter metrics
-      - "127.0.0.1:13133:13133" # health_check extension
-      - "127.0.0.53:4317:4317" # OTLP gRPC receiver
-      - "127.0.0.1:55670:55679" # zpages extension
+      - "1888:1888" # pprof extension
+      - "8888:8888" # Prometheus metrics exposed by the collector
+      - "8889:8889" # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317" # OTLP gRPC receiver
+      - "55670:55679" # zpages extension
     depends_on:
       - jaeger
 
@@ -52,7 +54,7 @@ services:
     volumes:
       - ../../../observability/prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
-      - "127.0.0.1:9090:9090"
+      - 9090:9090
     depends_on:
       - otel-collector
 
@@ -60,22 +62,18 @@ services:
     image: jaegertracing/all-in-one:1.52
     container_name: jaeger
     ports:
-      - "127.0.0.1:16686:16686"
-      - "127.0.0.1:32783:14268"
-      - "127.0.0.1:32782:4250"
+      - 16686:16686
+      - "14268"
+      - "14250"
 
   redis:
     image: redis:latest
     container_name: redis
-    restart: on-failure
+    restart: always
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
-      - "127.0.0.1:6379:6379"
+      - 6379:6379
     volumes:
       - ../../../database/redis/data:/data
       - ../../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf
-
-volumes:
-   DB:
-   redis:

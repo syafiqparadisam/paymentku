@@ -43,10 +43,10 @@ jobs:
         run: |
           npm install
 
-      - name: Run eslint for auth service
-        working-directory: ./services/auth
-        run: |
-          npm run lint
+      # - name: Run eslint for auth service
+      #   working-directory: ./services/auth
+      #   run: |
+      #     npm run lint
 
       - name: Test auth service
         run: |

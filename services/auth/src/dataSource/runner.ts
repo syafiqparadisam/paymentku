@@ -1,9 +1,9 @@
 
-import { Users } from '../users/schemas/users.entity';
-import { Profile } from '../users/schemas/profile.entity';
-import { Notification } from '../users/schemas/notification.entity';
-import { HistoryTopup } from '../users/schemas/history_topup.entity';
-import { HistoryTransfer } from '../users/schemas/history_transfer.entity';
+import { Users } from '../schemas/users.entity';
+import { Profile } from '../schemas/profile.entity';
+import { Notification } from '../schemas/notification.entity';
+import { HistoryTopup } from '../schemas/history_topup.entity';
+import { HistoryTransfer } from '../schemas/history_transfer.entity';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export const mysqlOptionRunner: TypeOrmModuleOptions = {

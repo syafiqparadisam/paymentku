@@ -13,20 +13,26 @@ RUN npm install
 # Copy the application files to the container
 COPY . .
 
-# Build the application
+
+ENV VITE_API_URL="MY_APP_API_URL"
+ENV VITE_FRONTEND_URL="MY_APP_FRONTEND_URL"
+ENV VITE_SERVICE_ID_EMAILJS="MY_APP_SERVICE_ID_EMAILJS"
+ENV VITE_TEMPLATE_ID_HELPING_EMAILJS="MY_APP_TEMPLATE_ID_HELPING_EMAILJS"
+ENV VITE_PUBLIC_KEY_EMAILJS="MY_APP_PUBLIC_KEY_EMAILJS" 
+
 RUN npm run build
 
-# Step 2: Production Stage with Nginx
 FROM nginx:alpine
 
-# Set the working directory for the NGINX stage
-WORKDIR /app
 
-# Copy the built app from the build stage to the NGINX web root
+# Build the application 
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy the custom NGINX configuration
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY ./env.sh /docker-entrypoint.d/env.sh
+RUN chmod +x /docker-entrypoint.d/env.sh
 
 # Expose port 80 to allow access to the app
 EXPOSE 80

@@ -82,6 +82,11 @@ jobs:
       #   working-directory: ./services/auth
       #   run: |
       #     npm run lint
+    
+      - name: test env
+        run: |
+         printenv
+
 
       - name: Test auth service
         run: |

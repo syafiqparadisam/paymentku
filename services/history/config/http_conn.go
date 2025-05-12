@@ -17,7 +17,7 @@ func (h *HTTPConfig) WithPort(port string) *HTTPConfig {
 }
 
 func (h *HTTPConfig) GetAllowedOrigin() []string {
-	allowOrigin := os.Getenv("ORIGIN_URL")
+	allowOrigin := os.Getenv("ALLOWED_ORIGIN")
 	h.AllowedOrigin = []string{allowOrigin}
 	return h.AllowedOrigin
 }

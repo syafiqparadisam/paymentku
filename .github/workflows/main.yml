@@ -8,7 +8,7 @@ on:
       - features*
 
 jobs:
-  develop:
+  testing:
     name: Development processes
     runs-on: ubuntu-22.04
     steps:
@@ -32,71 +32,28 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Run docker compose
+      - name: Setup Project
         run: |
-          make test-start
-
-        # AUTH SERVICE START
-      - name: Download dependencies in auth service
-        working-directory: ./services/auth
-        run: |
-          npm install
-
-      # - name: Run eslint for auth service
-      #   working-directory: ./services/auth
-      #   run: |
-      #     npm run lint
-
-      - name: test env
-        run: |
-          printenv
+          make install
 
       - name: Test auth service
         run: |
           make test-auth
-      # AUTH SERVICE END
-      # HISTORY SERVICE START
-      - name: Download dependencies in history service
-        working-directory: ./services/history
-        run: go mod download
-
+     
       - name: Test history service
-        working-directory: .
         run: make test-history
-
-      # HISTORY SERVICE END
-      # TRANSACTION SERVICE START
-      - name: Download dependencies in transaction service
-        working-directory: ./services/transaction
-        run: go mod download
 
       - name: Test transaction service
         run: make test-transaction
-      # TRANSACTION SERVICE END
-      # USER SERVICE START
-      - name: Download dependencies in user service
-        working-directory: ./services/user
-        run: go mod download
-
+    
       - name: Test user service
         run: make test-user
-      # USER SERVICE END
 
-      # FRONTEND START
-      - name: Download dependencies in frontend app
-        working-directory: ./www
-        run: npm install
-
-      # - name: Run eslint for frontend app
-      #   working-directory: ./www
-      #   run: npm run lint
-      # FRONTEND ENV
-
-  staging:
+  build:
     name: Staging
     runs-on: ubuntu-22.04
-    needs: develop
-    if: ${{github.ref == 'refs/heads/develop'}}
+    needs: testing
+    if: ${{github.ref == 'refs/heads/main'}}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

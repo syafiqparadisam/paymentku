@@ -37,6 +37,9 @@ you can install it on https://docs.docker.com/engine/install
 ### 3. Run docker compose
 Open your terminal and paste 
 ```
+make install
+
+// Fill .env file first before running docker
 make docker-compose
 ```
 ### 4. Run each service
@@ -51,7 +54,8 @@ make run-fe // frontend run
 ### 5. Open website
 Open your website on http://localhost:5173
 
-### How to run this project very quick
+
+### How to run this project quickly
 
 ### 1. Install docker
 you can install it on https://docs.docker.com/engine/install
@@ -60,47 +64,36 @@ you can install it on https://docs.docker.com/engine/install
 
 ```
 
-## How to Use
-
-### 1. Open this website
-
-- *Link*: https://syafiqparadisam.my.id 
-    if this website not found, maybe i dont publish this website online
+## Website Usage
+### 1. Open the website
+- *Link*: http://localhost:5173 
 
 ### 2. Registration and Login
-
 - **Registration**: Create a new account by entering the required information such as email, phone number, and password.
 - **Login**: Log in to your account with the registered email and password.
 
 ### 3. Making Payments
-
 - **Bills**: Select the type of bill you want to pay, enter the necessary details, and confirm the payment.
 - **Game**: Select the gaming platform, enter the game user ID, and choose the top-up amount.
 - **Wi-Fi**: Enter the Wi-Fi service details and the payment amount you wish to make.
 
 ### 4. Fund Transfers
-
 - Select the transfer option, enter the recipient's details (account number or phone number), enter the amount to be transferred, and confirm.
 
 ### 5. Top-Up
-
 - Select the service you want to top-up, enter the necessary details, and confirm the top-up amount.
 
 ### 6. Transaction History
-
 - Go to the "History" menu to view all the top-up and transfer transactions you have made.
 
 ### 7. Logout
-
 - To log out of your account, open the profile menu and select "Logout".
 
 ### 8. Delete Account
-
 - If you wish to delete your account, open the account settings menu and select "Delete Account". Please note that this action cannot be undone.
 
 ## Contact and Support
 
 If you encounter any issues or have questions, please contact our email or dm me on instagram, i already provide on my bio.
-
 Thank you for using Paymentku!
 

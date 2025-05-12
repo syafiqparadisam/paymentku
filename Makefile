@@ -7,6 +7,14 @@ AUTH_SVC_PATH := services/auth
 COMPOSE_PATH := docker/compose/dev
 
 
+install:
+	cd services/auth && npm install
+	cd services/history && go mod download
+	cd servicees/transaction && go mod download
+	cd services/user && go mod download
+	cd www && npm install
+	echo "Successfully install, then please fill .env file inside each services folder, www folder, docker/compose/dev folder like .env.example"
+
 test-start:
 	docker compose -f docker/compose/testing/compose.yml up -d
 

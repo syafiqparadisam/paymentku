@@ -410,7 +410,6 @@ export class AuthService {
           URL: redirectedURL,
         }),
       };
-
       // sending email
       await transporter.sendMail(emailOptions);
       res.cookie('pwToken', pwResetToken, {

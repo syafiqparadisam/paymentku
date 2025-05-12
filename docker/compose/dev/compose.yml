@@ -1,6 +1,6 @@
 services:
   mysqldb:
-    image: mysql:latest
+    image: mysql:9.1
     container_name: mysqldb
     restart: on-failure
     ports:
@@ -27,11 +27,11 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - ../../../database/DB:/var/lib/mysql
+      - mysqldb:/var/lib/mysql
       - ../../../database/init.sql:/docker-entrypoint-initdb.d/initsql
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.91.0
+    image: otel/opentelemetry-collector-contrib:0.118.0
     container_name: otel-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
@@ -47,7 +47,7 @@ services:
       - jaeger
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.0.1
     container_name: prometheus
     volumes:
       - ../../../observability/prometheus.yaml:/etc/prometheus/prometheus.yml
@@ -57,7 +57,7 @@ services:
       - otel-collector
 
   jaeger:
-    image: jaegertracing/all-in-one:1.52
+    image: jaegertracing/all-in-one:1.65.0
     container_name: jaeger
     ports:
       - "127.0.0.1:16686:16686"
@@ -65,7 +65,7 @@ services:
       - "127.0.0.1:32782:4250"
 
   redis:
-    image: redis:latest
+    image: redis:7.4.1
     container_name: redis
     restart: on-failure
     environment:
@@ -73,9 +73,9 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
     volumes:
-      - ../../../database/redis/data:/data
+      - redis_data:/data
       - ../../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf
 
 volumes:
-   DB:
-   redis:
+   mysqldb:
+   redis_data:

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import Redlock from 'redlock';
+import { profile } from '../interfaces/profile';
 
 @Injectable()
 export class RedisService {
@@ -18,6 +19,25 @@ export class RedisService {
       retryJitter: 200,
     });
     this.durationQuery = 2000;
+  }
+
+  async cacheUserProfile(userid: number, lockKey: string[], value: profile) {
+    const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
+    await this.redisStore.setex(
+      'userprofile:' + userid.toString(),
+      120,
+      JSON.stringify(value),
+    );
+    await locking.release();
+  }
+
+  async getCacheProfile(userid: number, lockKey: string[]): Promise<profile | null> {
+    const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
+    const user = await this.redisStore.get('userprofile:' + userid.toString());
+    if (!user) return null;
+    await locking.release();
+    const parsedUser = JSON.parse(user);
+    return parsedUser;
   }
 
   async addAuthTokenWithExpire(key: string, lockKey: string[], value: number) {
@@ -43,7 +63,7 @@ export class RedisService {
   }
   async deleteCacheProfile(lockKey: string[], userid: number) {
     const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
-    await this.redisStore.del(`userprofile:${userid}`)
+    await this.redisStore.del(`userprofile:${userid}`);
     await locking.release();
   }
 

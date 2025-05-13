@@ -237,175 +237,62 @@ export class AuthController {
     }
   }
 
-  @All('transaction*')
-  @UseGuards(AccessTokenGuardGuard)
-  async redirectToTransactionService(
-    @Req() req,
-    @Res() res,
-    @Body() body,
-  ): Promise<void> {
-    // config url to fetch into another service
-    const tf_svc = this.configService.get<string>('TF_SVC');
-    const spliturl: string[] = req.url.split('/');
-    const urlAfterProfile = spliturl.slice(4, spliturl.length).join('/');
-    let url;
-    if (spliturl.length == 4 || spliturl[4] == '') {
-      url = tf_svc + urlAfterProfile + '?userid=' + req.user_id;
-    } else {
-      url = tf_svc + '/' + urlAfterProfile + '?userid=' + req.user_id;
-    }
+  // @All('transactional*')
+  // @UseGuards(AccessTokenGuardGuard)
+  // async redirectToHistoryService(
+  //   @Req() req,
+  //   @Res() res,
+  //   @Body() body,
+  // ): Promise<void> {
+  //   // config url to fetch into another service
+  //   const transactional_svc = this.configService.get<string>('TRANSACTIONAL_SVC');
+  //   const spliturl: string[] = req.url.split('/');
+  //   const urlAfterProfile = spliturl.slice(4, spliturl.length).join('/');
+  //   let url;
+  //   if (spliturl.length == 4 || spliturl[4] == '') {
+  //     url = transactional_svc + urlAfterProfile + '?userid=' + req.user_id;
+  //   } else {
+  //     url = transactional_svc + '/' + urlAfterProfile + '?userid=' + req.user_id;
+  //   }
 
-    try {
-      const result = await this.fetcherService(url, req, body);
-      if (result.status == 500) {
-        return res.sendStatus(result.status);
-      }
-      const data = await result.json();
-      return res.status(data.statusCode).json(data);
-    } catch (error) {
-      console.log(error);
-      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  //   try {
+  //     const result = await this.fetcherService(url, req, body);
+  //     if (result.status == 500) {
+  //       return res.sendStatus(result.status);
+  //     }
+  //     const data = await result.json();
+  //     return res.status(data.statusCode).json(data);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 
-  @All('history*')
-  @UseGuards(AccessTokenGuardGuard)
-  async redirectToHistoryService(
-    @Req() req,
-    @Res() res,
-    @Body() body,
-  ): Promise<void> {
-    // config url to fetch into another service
-    const history_svc = this.configService.get<string>('HISTORY_SVC');
-    const spliturl: string[] = req.url.split('/');
-    const urlAfterProfile = spliturl.slice(4, spliturl.length).join('/');
-    let url;
-    if (spliturl.length == 4 || spliturl[4] == '') {
-      url = history_svc + urlAfterProfile + '?userid=' + req.user_id;
-    } else {
-      url = history_svc + '/' + urlAfterProfile + '?userid=' + req.user_id;
-    }
+  // async fetcherService(url: string, req: Request, body) {
+  //   try {
+  //     let result;
+  //     if (req.method == 'GET' || !body) {
+  //       result = await fetch(url, {
+  //         method: req.method,
+  //         headers: {
+  //           ...req.headers,
+  //           'X-Request-Id': crypto.randomUUID(),
+  //         },
+  //       });
+  //     } else {
+  //       result = await fetch(url, {
+  //         method: req.method,
+  //         headers: {
+  //           ...req.headers,
+  //           'X-Request-Id': crypto.randomUUID(),
+  //         },
+  //         body: JSON.stringify(body),
+  //       });
+  //     }
+  //     return result;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
-    try {
-      const result = await this.fetcherService(url, req, body);
-      if (result.status == 500) {
-        return res.sendStatus(result.status);
-      }
-      const data = await result.json();
-      return res.status(data.statusCode).json(data);
-    } catch (error) {
-      console.log(error);
-      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @Patch('profile/photoprofile')
-  @UseGuards(AccessTokenGuardGuard)
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: path.join(__dirname, '..', '..', 'src', 'uploads'),
-        filename(_, file, cb) {
-          const uniqueFile = new Date() + file.originalname;
-          cb(null, uniqueFile);
-        },
-      }),
-    }),
-  )
-  async updatePhotoProfile(
-    @UploadedFile() file: Express.Multer.File,
-    @Request() req,
-    @Response() res,
-  ) {
-    try {
-      const isAllow = allowedFile.includes(file.mimetype);
-      if (!isAllow) {
-        await fs.rm(file.path);
-        return res.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).json({
-          statusCode: HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-          message: `File type ${file.mimetype} not allowed`,
-        });
-      }
-      // max image is 2 mb
-      const maxFileSize = 2 * 1024 * 1024;
-      if (file.size > maxFileSize) {
-        await fs.rm(file.path);
-        return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
-          statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-          message: 'Image should be less than 2 mb size',
-        });
-      }
-
-      const userData: jwtPayload = {
-        user_id: req.user_id,
-      };
-      
-      const result = await this.authService.updatePhotoProfile(
-        userData,
-        file.path,
-        req.headers['x-data-publicid'],
-      );
-      return res.json(result);
-    } catch (error) {
-      console.log(error);
-      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  async fetcherService(url: string, req: Request, body) {
-    try {
-      let result;
-      if (req.method == 'GET' || !body) {
-        result = await fetch(url, {
-          method: req.method,
-          headers: {
-            ...req.headers,
-            'X-Request-Id': crypto.randomUUID(),
-          },
-        });
-      } else {
-        result = await fetch(url, {
-          method: req.method,
-          headers: {
-            ...req.headers,
-            'X-Request-Id': crypto.randomUUID(),
-          },
-          body: JSON.stringify(body),
-        });
-      }
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @All('profile*')
-  @UseGuards(AccessTokenGuardGuard)
-  async redirectToProfileService(
-    @Req() req: Request | any,
-    @Res() rs,
-    @Body() body,
-  ) {
-    // config url to fetch into another service
-    const usr_svc = this.configService.get<string>('USER_SVC');
-    const spliturl: string[] = req.url.split('/');
-    const urlAfterProfile = spliturl.slice(4, spliturl.length).join('/');
-    let url;
-    if (spliturl.length == 4 || spliturl[4] == '') {
-      url = usr_svc + urlAfterProfile + '?userid=' + req.user_id;
-    } else {
-      url = usr_svc + '/' + urlAfterProfile + '?userid=' + req.user_id;
-    }
-    try {
-      const result = await this.fetcherService(url, req, body);
-      if (result.status == 500) {
-        return rs.sendStatus(result.status);
-      }
-      const data = await result.json();
-      console.log(data);
-      return rs.status(data.statusCode).json(data);
-    } catch (error) {
-      return rs.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
 }

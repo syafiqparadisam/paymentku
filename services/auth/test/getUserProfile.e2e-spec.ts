@@ -12,6 +12,7 @@ import { parsingCookie } from "./utils";
 import request from 'supertest';
 import { AuthModule } from "../src/auth/auth.module";
 import { AccessTokenGuardGuard } from "src/access-token-guard/access-token-guard.guard";
+import { profile } from "src/interfaces/profile";
 
 describe("Get User Profile", () => {
 	let app: INestApplication;
@@ -87,9 +88,18 @@ describe("Get User Profile", () => {
 	  });
 	
 	  it("Should return user", async () => {
-		const req = await request(app.getHttpServer()).get("/api/v1/profile").set('Cookie', cookies)
+		const res = await request(app.getHttpServer()).get("/api/v1/profile").set('Cookie', cookies)
 
-		console.log(req.error)
-		expect(req.status).toBe(200)
+		const expected = {
+			user: userRegister.user,
+			email: userRegister.email,
+			balance: BigInt(0),
+
+		}
+		
+		const data = res.body.data
+
+		expect(res.status).toBe(200)
+		expect(data.user).toBe(expected.user)
 	  })
 })

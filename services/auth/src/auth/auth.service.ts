@@ -345,7 +345,7 @@ export class AuthService {
       const isUserHavePWToken = await this.redisService.getPWToken(token, [
         lockKey,
       ]);
-      
+
       if (isUserHavePWToken) {
         await this.redisService.deletePWToken(token, [lockKey]);
         res.clearCookie('pwToken', {
@@ -558,43 +558,6 @@ export class AuthService {
       await this.usersService.deleteAccount(userData.user_id, join.profile.id);
 
       return { statusCode: HttpStatus.OK, message: 'Successfully to delete' };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async updatePhotoProfile(
-    userData: jwtPayload,
-    pathUploadfile: string,
-    publicIdImg: string,
-  ): Promise<response> {
-    try {
-      const lockKey = crypto.randomUUID();
-      // upload file to cloudinary
-      const result = await this.cloudinaryService.uploadImage(pathUploadfile);
-
-      // update url and publicid to database
-      const joinUserAndProfile = await this.usersService.joiningUserAndProfile(
-        userData.user_id,
-      );
-      // delete cache profile
-      await this.redisService.deleteCacheProfile([lockKey], userData.user_id);
-
-      await this.usersService.updatePhotoProfile(
-        result.secure_url,
-        joinUserAndProfile.profile.id,
-        result.public_id,
-      );
-
-      // delete from cloudinary if this image already updated, in order to not over storage in cloudinary
-      publicIdImg == ''
-        ? null
-        : await this.cloudinaryService.deleteImage(publicIdImg);
-      await fs.rm(pathUploadfile);
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'Photo profile has been changed',
-      };
     } catch (error) {
       throw error;
     }

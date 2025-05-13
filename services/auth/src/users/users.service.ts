@@ -10,6 +10,8 @@ import { HistoryTopup } from '../schemas/history_topup.entity';
 import { Notification } from '../schemas/notification.entity';
 import { HistoryTransfer } from '../schemas/history_transfer.entity';
 import { ConfigService } from '@nestjs/config';
+import { profile, profileForFindWithAccount } from '../interfaces/profile';
+import { join } from 'path';
 
 @Injectable()
 export class UsersService {
@@ -26,8 +28,69 @@ export class UsersService {
     return Math.floor(Math.random() * 9999999999) + 1;
   }
 
-  async getUserProfile(userid: number) {
-    return await this.userRepo.findOne({ where: { id: userid } });
+
+  async getProfileByAccountNumber(accNumber: BigInt): Promise<profileForFindWithAccount> {
+    try {
+      const joined = await this.userRepo.findOne({
+        where: { accountNumber: Number(accNumber) },
+        select: {
+          user: true,
+          accountNumber: true,
+          created_at: true,
+          profile: {
+            name: true,
+            photo_profile: true,
+          },
+        },
+      });
+
+      return {
+        user: joined.user,
+        accountNumber: BigInt(joined.accountNumber),
+        created_at: joined.created_at,
+        name: joined.profile.name,
+        photo_profile: joined.profile.photo_profile,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUserProfile(userid: number): Promise<profile> {
+    try {
+      const joined = await this.userRepo.findOne({
+        where: { id: userid },
+        select: {
+          user: true,
+          email: true,
+          accountNumber: true,
+          balance: true,
+          created_at: true,
+          profile: {
+            name: true,
+            bio: true,
+            phone_number: true,
+            photo_profile: true,
+            photo_public_id: true,
+          },
+        },
+      });
+
+      return {
+        user: joined.user,
+        email: joined.email,
+        accountNumber: BigInt(joined.accountNumber),
+        balance: BigInt(joined.balance),
+        created_at: joined.created_at,
+        name: joined.profile.name,
+        bio: joined.profile.bio,
+        phone_number: joined.profile.phone_number,
+        photo_profile: joined.profile.photo_profile,
+        photo_public_id: joined.profile.photo_public_id,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getUserProfileByAccNumber(accNumber: number) {

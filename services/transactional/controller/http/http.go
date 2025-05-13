@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/syafiqparadisam/paymentku/services/history/config"
-	"github.com/syafiqparadisam/paymentku/services/history/dto"
-	"github.com/syafiqparadisam/paymentku/services/history/errors"
-	"github.com/syafiqparadisam/paymentku/services/history/usecase"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
+	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
+	"github.com/syafiqparadisam/paymentku/services/transactional/usecase"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 

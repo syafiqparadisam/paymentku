@@ -17,7 +17,6 @@ import {
   Patch,
   UseInterceptors,
   UploadedFile,
-  LoggerService,
   HttpStatus,
   Inject,
 } from '@nestjs/common';
@@ -49,8 +48,6 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
-    @Inject(WINSTON_MODULE_NEST_PROVIDER)
-    private readonly logger: LoggerService,
   ) {}
 
   @Post('login')
@@ -338,9 +335,11 @@ export class AuthController {
           message: 'Image should be less than 2 mb size',
         });
       }
+
       const userData: jwtPayload = {
         user_id: req.user_id,
       };
+      
       const result = await this.authService.updatePhotoProfile(
         userData,
         file.path,

@@ -26,6 +26,14 @@ export class UsersService {
     return Math.floor(Math.random() * 9999999999) + 1;
   }
 
+  async getUserProfile(userid: number) {
+    return await this.userRepo.findOne({ where: { id: userid } });
+  }
+
+  async getUserProfileByAccNumber(accNumber: number) {
+    return await this.userRepo.findOne({ where: { accountNumber: accNumber } });
+  }
+
   async updatePhotoProfile(
     photoProfileUrl: string,
     profileId: number,
@@ -63,7 +71,7 @@ export class UsersService {
     const uniqueRandom = buffer.readUInt32LE(0);
     return uniqueRandom;
   }
-  
+
   async createAccountNumber(): Promise<number> {
     try {
       let accNumber: number;
@@ -134,54 +142,36 @@ export class UsersService {
   }
 
   async findUserByEmail(email: string): Promise<Users> {
-    try {
-      return await this.userRepo.findOne({ where: { email } });
-    } catch (error) {
-      throw error;
-    }
+    return this.userRepo.findOne({ where: { email } });
   }
 
   async findUserByUsername(user: string): Promise<Users> {
-    try {
-      return await this.userRepo.findOne({ where: { user } });
-    } catch (error) {
-      throw error;
-    }
+    return this.userRepo.findOne({ where: { user } });
   }
 
   async updateName(profileId: number, name: any) {
-    try {
-      await this.profileRepo.update(
-        { id: profileId },
-        { name: name.givenName + ' ' + name.familyName },
-      );
-    } catch (error) {
-      throw error;
-    }
+    return this.profileRepo.update(
+      { id: profileId },
+      { name: name.givenName + ' ' + name.familyName },
+    );
   }
 
   async updatePassword(password: string, user_id: number) {
     try {
       const salt = await bcrypt.genSalt(10);
       const hashPassword = await bcrypt.hash(password, salt);
-      await this.userRepo.update({ id: user_id }, { password: hashPassword });
+      return this.userRepo.update({ id: user_id }, { password: hashPassword });
     } catch (error) {
       throw error;
     }
   }
 
   async joiningUserAndProfile(userId: number): Promise<Users> {
-    try {
-      // join table users and profile
-      const JoininguserAndProfile = await this.userRepo
-        .createQueryBuilder('users')
-        .leftJoinAndSelect('users.profile', 'profile')
-        .where('users.id = :id', { id: userId })
-        .getOne();
-      return JoininguserAndProfile;
-    } catch (error) {
-      throw error;
-    }
+    return this.userRepo
+      .createQueryBuilder('users')
+      .leftJoinAndSelect('users.profile', 'profile')
+      .where('users.id = :id', { id: userId })
+      .getOne();
   }
 
   async createAccountWithGoogle(user: loginWithGoogle) {
@@ -214,11 +204,7 @@ export class UsersService {
   }
 
   async updateUsername(userid: number, user: string) {
-    try {
-      await this.userRepo.update({ id: userid }, { user });
-    } catch (error) {
-      throw error;
-    }
+    return this.userRepo.update({ id: userid }, { user });
   }
 
   async deleteAccount(userid: number, profileId: number): Promise<void> {
@@ -242,10 +228,6 @@ export class UsersService {
     passwordFromPayload: string,
     passFromFindData: string,
   ): Promise<boolean> {
-    try {
-      return await bcrypt.compare(passwordFromPayload, passFromFindData);
-    } catch (error) {
-      throw error;
-    }
+    return bcrypt.compare(passwordFromPayload, passFromFindData);
   }
 }

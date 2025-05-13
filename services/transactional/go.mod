@@ -1,4 +1,4 @@
-module github.com/syafiqparadisam/paymentku/services/history
+module github.com/syafiqparadisam/paymentku/services/transactional
 
 go 1.22.0
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/syafiqparadisam/paymentku/services/history/dto"
+	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
 	"go.opentelemetry.io/otel"
 )
 

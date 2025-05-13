@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/syafiqparadisam/paymentku/services/history/config"
-	"github.com/syafiqparadisam/paymentku/services/history/domain"
-	"github.com/syafiqparadisam/paymentku/services/history/dto"
-	"github.com/syafiqparadisam/paymentku/services/history/errors"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
+	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
+	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
 )
 
 func (u *Usecase) DeleteHistoryTransferById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[interface{}] {

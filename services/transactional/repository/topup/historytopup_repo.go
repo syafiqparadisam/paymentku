@@ -1,13 +1,13 @@
-package history_repo
+package topup_repo
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 
-	"github.com/syafiqparadisam/paymentku/services/history/config"
-	"github.com/syafiqparadisam/paymentku/services/history/domain"
-	"github.com/syafiqparadisam/paymentku/services/history/errors"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
+	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
 )
 
 type TopUpRepository struct {
@@ -23,7 +23,10 @@ type TopUpInterface interface {
 	GetHistoryTopUpById(ctx context.Context, id int, userid int) (*domain.HistoryTopUp, error)
 	DeleteAllHistoryTopUp(tx *sql.Tx, ctx context.Context, userid int) error
 	UpdateIsRead(ctx context.Context, id int) error
-	StartACID(ctx context.Context) (*sql.Tx, error)
+	FindBalanceById(tx *sql.Tx, ctx context.Context, id int) (*domain.Balance, error)
+	IncreaseBalanceById(tx *sql.Tx, ctx context.Context, amount uint, id int) error
+	CreateTopUpHistory(ctx context.Context, domain *domain.HistoryTopUp) error
+	StartTransaction(ctx context.Context) (*sql.Tx, error)
 	FindIsRead(ctx context.Context, id int) (*domain.IsRead, error)
 	DeleteHistoryTopUpById(tx *sql.Tx, ctx context.Context, id int, userid int) error
 }

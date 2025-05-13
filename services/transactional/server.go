@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/syafiqparadisam/paymentku/services/history/config"
-	controller_http "github.com/syafiqparadisam/paymentku/services/history/controller/http"
-	history_repo "github.com/syafiqparadisam/paymentku/services/history/repository/history"
-	"github.com/syafiqparadisam/paymentku/services/history/usecase"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	controller_http "github.com/syafiqparadisam/paymentku/services/transactional/controller/http"
+	transaction_repo "github.com/syafiqparadisam/paymentku/services/transactional/repository/transaction"
+	"github.com/syafiqparadisam/paymentku/services/transactional/usecase"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -37,7 +37,7 @@ func initializeGRPCConnection() (*grpc.ClientConn, error) {
 }
 
 func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (*sdktrace.TracerProvider, error) {
-	res, err := resource.New(ctx, resource.WithAttributes(semconv.ServiceNameKey.String("tracer-history")))
+	res, err := resource.New(ctx, resource.WithAttributes(semconv.ServiceNameKey.String("tracer-transactional")))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create resource")
 	}
@@ -59,7 +59,7 @@ func initTracerProvider(ctx context.Context, conn *grpc.ClientConn) (*sdktrace.T
 }
 
 func initMeterProvider(ctx context.Context, conn *grpc.ClientConn) (*sdkmetric.MeterProvider, error) {
-	res, err := resource.New(ctx, resource.WithAttributes(semconv.ServiceNameKey.String("metric-history")))
+	res, err := resource.New(ctx, resource.WithAttributes(semconv.ServiceNameKey.String("metric-transactional")))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create tracer provider %w", err)
 	}
@@ -114,7 +114,8 @@ func main() {
 
 	tfRepo := history_repo.NewTransferRepository(mysql)
 	topUpRepo := history_repo.NewTopUpRepository(mysql)
-	usecase := usecase.NewHistoryUsecase(tfRepo, topUpRepo)
+
+	usecase := usecase.NewTransactionalUsecase(tfRepo, topUpRepo)
 	cfg := config.NewHTTPConfig().WithPort(port)
 	controller := controller_http.NewControllerHTTP(usecase, cfg)
 

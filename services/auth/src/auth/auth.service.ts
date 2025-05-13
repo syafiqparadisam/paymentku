@@ -345,6 +345,7 @@ export class AuthService {
       const isUserHavePWToken = await this.redisService.getPWToken(token, [
         lockKey,
       ]);
+      
       if (isUserHavePWToken) {
         await this.redisService.deletePWToken(token, [lockKey]);
         res.clearCookie('pwToken', {

@@ -3,9 +3,9 @@ package usecase
 import (
 	"context"
 
-	"github.com/syafiqparadisam/paymentku/services/history/domain"
-	"github.com/syafiqparadisam/paymentku/services/history/dto"
-	history_repo "github.com/syafiqparadisam/paymentku/services/history/repository/history"
+	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
+	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
+	history_repo "github.com/syafiqparadisam/paymentku/services/transactional/repository/history"
 )
 
 type Usecase struct {
@@ -22,8 +22,10 @@ type UsecaseInterface interface {
 	DeleteHistoryTopUpById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[interface{}]
 	DeleteHistoryTransferById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[interface{}]
 	DeleteAllHistoryTransfer(ctx context.Context, user *dto.XUserData) dto.APIResponse[interface{}]
+	InsertHistoryTransfer(ctx context.Context, payload *dto.TransferRequest, user *dto.XUserData) dto.APIResponse[interface{}]
+	InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequest, user *dto.XUserData) dto.APIResponse[interface{}]
 }
 
-func NewHistoryUsecase(tf history_repo.TransferInterface, topup history_repo.TopUpInterface) *Usecase {
+func NewTransactionalUsecase(tf transactional_repo.TransferInterface, topup transactional_repo.TopUpInterface) *Usecase {
 	return &Usecase{tfRepo: tf, topUpRepo: topup}
 }

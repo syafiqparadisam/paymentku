@@ -8,8 +8,11 @@ export default defineConfig({
     react(),
     checker({typescript: true})
   ],
+  server:{
+    port: 8800
+  },
   preview: {
-    port: 5000
+    port: 8800
   },
   resolve: {
     alias: {

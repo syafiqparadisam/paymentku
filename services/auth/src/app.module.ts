@@ -10,6 +10,7 @@ import { WinstonModule } from 'nest-winston';
 import { transports } from 'winston';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { mysqlOptionRunner } from './dataSource/ormconfig';
+import { ProfileModule } from './profile/profile.module';
 
 
 @Module({
@@ -30,6 +31,7 @@ import { mysqlOptionRunner } from './dataSource/ormconfig';
       },
     ]),
     CloudinaryModule,
+    ProfileModule,
   ],
   providers: [Logger],
 })

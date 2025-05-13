@@ -1,59 +1,30 @@
 
 
-USER_SVC_PATH := services/user
-HISTORY_SVC_PATH := services/history
-TRANSACTION_SVC_PATH := services/transaction
+TRANSACTION_SVC_PATH := services/transactional
 AUTH_SVC_PATH := services/auth
 COMPOSE_PATH := docker/compose/dev
 
 
 install:
 	cd services/auth && npm install
-	cd services/history && go mod download
-	cd servicees/transaction && go mod download
-	cd services/user && go mod download
+	cd servicees/transactional && go mod download
 	cd www && npm install
 	echo "Successfully install, then please fill .env file inside each services folder, www folder, docker/compose/dev folder like .env.example"
-
-test-start:
-	docker compose -f docker/compose/testing/compose.yml up -d
 
 docker-compose:
 	docker compose -f ${COMPOSE_PATH}/compose.yml up -d
 
-# USER START
-run-user: docker-compose
-	cd ${USER_SVC_PATH} && go build -o server.out server.go && ./server
-
-test-user: docker-compose
-	cd ${USER_SVC_PATH}/test && go test -v ./... --count=1
-
-install-user: 
-	cd ${USER_SVC_PATH} && go mod download
-# USER END
-
-
 # TRANSACTION START
-run-transaction: docker-compose	
+run-transactional: docker-compose	
 	cd ${TRANSACTION_SVC_PATH} && go build -o server.out server.go && ./server
 
-test-transaction:
+test-transactional:
 	cd ${TRANSACTION_SVC_PATH}/test && go test -v ./... --count=1
 # TRANSACTION END
-
-# HISTORY START
-run-history: docker-compose
-	cd ${HISTORY_SVC_PATH} && go build -o server.out server.go && ./server
-	
-
-test-history: docker-compose
-	cd ${HISTORY_SVC_PATH}/test && go test -v ./... --count=1
-# HISTORY END
 
 # AUTHENTICATION START
 run-auth: docker-compose
 	cd ${AUTH_SVC_PATH} && npm run start:dev
-
 
 test-auth:
 	cd ${AUTH_SVC_PATH}/test && npm run test:e2e
@@ -64,7 +35,7 @@ run-fe:
 	cd www && npm run dev
 
 # ALL
-test: test-user test-transaction test-history test-auth 
+test: test-auth test-transactional
 
 # MIGRATE
 migrate-run: docker-compose
@@ -75,6 +46,3 @@ migrate-revert: docker-compose
 
 down: 
 	docker compose -f ${COMPOSE_PATH}/compose.yml down
-
-test-down:
-	docker compose -f docker/compose/testing/compose.yml down

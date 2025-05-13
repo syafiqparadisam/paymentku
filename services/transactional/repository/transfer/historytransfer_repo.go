@@ -1,13 +1,13 @@
-package history_repo
+package transfer_repo
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 
-	"github.com/syafiqparadisam/paymentku/services/history/config"
-	"github.com/syafiqparadisam/paymentku/services/history/domain"
-	"github.com/syafiqparadisam/paymentku/services/history/errors"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
+	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
 )
 
 type TransferRepository struct {

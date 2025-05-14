@@ -13,14 +13,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { response } from 'src/interfaces/response';
-import { AccessTokenGuardGuard } from 'src/access-token-guard/access-token-guard.guard';
+import { AccessTokenGuardGuard } from '../access-token-guard/access-token-guard.guard';
 import { ProfileService } from './profile.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { allowedFile } from 'src/config/cloudinary-config';
-import jwtPayload from 'src/interfaces/jwtPayload';
+import { allowedFile } from '../config/cloudinary-config';
+import jwtPayload from '../interfaces/jwtPayload';
 
 @Controller('/api/v1/profile')
 export class ProfileController {

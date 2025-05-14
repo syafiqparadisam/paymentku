@@ -22,21 +22,39 @@ export class RedisService {
   }
 
   async cacheUserProfile(userid: number, lockKey: string[], value: profile) {
+    // const clearedValue = this.convertBigIntToString(value);
     const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
-    await this.redisStore.setex(
-      'userprofile:' + userid.toString(),
-      120,
-      JSON.stringify(value),
+    const val = JSON.stringify(value, (_, v) =>
+      typeof v === 'bigint' ? v.toString() : v,
     );
+
+    console.log(val);
+
+    await this.redisStore.setex('userprofile:' + userid.toString(), 120, val);
     await locking.release();
   }
 
-  async getCacheProfile(userid: number, lockKey: string[]): Promise<profile | null> {
+  convertBigIntToString(obj: any): any {
+    if (typeof obj === 'bigint') return obj.toString();
+    if (Array.isArray(obj)) return obj.map(this.convertBigIntToString);
+    if (obj !== null && typeof obj === 'object') {
+      return Object.fromEntries(
+        Object.entries(obj).map(([k, v]) => [k, this.convertBigIntToString(v)]),
+      );
+    }
+    return obj;
+  }
+
+  async getCacheProfile(
+    userid: number,
+    lockKey: string[],
+  ): Promise<profile | null> {
     const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
     const user = await this.redisStore.get('userprofile:' + userid.toString());
     if (!user) return null;
     await locking.release();
     const parsedUser = JSON.parse(user);
+    parsedUser.accountNumber = BigInt(parsedUser.accountNumber);
     return parsedUser;
   }
 

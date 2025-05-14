@@ -28,8 +28,9 @@ export class UsersService {
     return Math.floor(Math.random() * 9999999999) + 1;
   }
 
-
-  async getProfileByAccountNumber(accNumber: BigInt): Promise<profileForFindWithAccount> {
+  async getProfileByAccountNumber(
+    accNumber: BigInt,
+  ): Promise<profileForFindWithAccount> {
     try {
       const joined = await this.userRepo.findOne({
         where: { accountNumber: Number(accNumber) },
@@ -58,23 +59,7 @@ export class UsersService {
 
   async getUserProfile(userid: number): Promise<profile> {
     try {
-      const joined = await this.userRepo.findOne({
-        where: { id: userid },
-        select: {
-          user: true,
-          email: true,
-          accountNumber: true,
-          balance: true,
-          created_at: true,
-          profile: {
-            name: true,
-            bio: true,
-            phone_number: true,
-            photo_profile: true,
-            photo_public_id: true,
-          },
-        },
-      });
+      const joined = await this.joiningUserAndProfile(userid);
 
       return {
         user: joined.user,

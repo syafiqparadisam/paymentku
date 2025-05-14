@@ -12,21 +12,23 @@ export class ProfileService {
   constructor(
     private usersService: UsersService,
     private redisService: RedisService,
-	private cloudinaryService: CloudinaryService,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
   async getUserProfile(userid: number): Promise<response> {
     try {
-      let profile: profile | null;
+      let profile: profile | any
       const lockKey = crypto.randomUUID();
       // check cache
       profile = await this.redisService.getCacheProfile(userid, [lockKey]);
-	  console.log(profile)
       if (!profile) {
         profile = await this.usersService.getUserProfile(userid);
+        profile.accountNumber = Number(profile.accountNumber);
+        profile.balance = Number(profile.balance);
 
         // set cache
         await this.redisService.cacheUserProfile(userid, [lockKey], profile);
+        console.log(profile);
         return {
           statusCode: HttpStatus.OK,
           data: profile,
@@ -37,9 +39,10 @@ export class ProfileService {
         statusCode: HttpStatus.OK,
         data: profile,
       };
-    } catch (error) {}
+    } catch (error) {
+      throw error;
+    }
   }
-
 
   async updatePhotoProfile(
     userData: jwtPayload,
@@ -68,7 +71,7 @@ export class ProfileService {
       publicIdImg == ''
         ? null
         : await this.cloudinaryService.deleteImage(publicIdImg);
-	
+
       await fs.rm(pathUploadfile);
       return {
         statusCode: HttpStatus.OK,

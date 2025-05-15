@@ -1,7 +1,8 @@
 export type profile = {
+	id: number,
 	user: string,
 	email: string,
-	accountNumber: BigInt,
+	accountNumber: number,
 	balance: BigInt,
 	name: string,
 	created_at: string,
@@ -12,8 +13,9 @@ export type profile = {
 }
 
 export type profileForFindWithAccount = {
+	id: number,
 	user: string,
-	accountNumber: BigInt,
+	accountNumber: number,
 	created_at: string,
 	name: string,
 	photo_profile: string,

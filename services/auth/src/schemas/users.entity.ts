@@ -29,7 +29,7 @@ export class Users extends BaseEntity {
   @Column({ type: 'bigint' })
   balance: number;
 
-  @Column({ type: 'bigint', unsigned: true, unique: true })
+  @Column({ unsigned: true, unique: true })
   accountNumber: number;
 
   @OneToMany(() => HistoryTopup, (history_topup) => history_topup.user, {

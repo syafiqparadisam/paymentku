@@ -1,15 +1,20 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
   Inject,
   LoggerService,
+  Param,
   Patch,
+  Query,
   Request,
   Response,
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { response } from 'src/interfaces/response';
@@ -21,6 +26,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { allowedFile } from '../config/cloudinary-config';
 import jwtPayload from '../interfaces/jwtPayload';
+import { updateBio, updateName, updatePhoneNumber } from './dtos/request';
 
 @Controller('/api/v1/profile')
 export class ProfileController {
@@ -32,14 +38,71 @@ export class ProfileController {
   // Get user profile
   @Get('/')
   @UseGuards(AccessTokenGuardGuard)
-  async getUserProfile(@Request() req, @Response() res) {
+  async getUserProfile(
+    @Request() req,
+    @Response() res,
+    @Query('accountNumber') accNumber: number,
+  ) {
     try {
-      const resp = await this.profileService.getUserProfile(req.user_id);
+      let resp: response;
+      if (!accNumber) {
+        resp = await this.profileService.getUserProfile(req.user_id);
+        return res.status(resp.statusCode).json(resp);
+      }
+
+      resp = await this.profileService.getUserProfileByAccNumber(accNumber);
+      return res.status(resp.statusCode).json(resp);
+    } catch (error) {
+      console.log(error);
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Patch('name')
+  @UseGuards(AccessTokenGuardGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async updateName(@Request() req, @Response() res, @Body() name: updateName) {
+    try {
+      const resp = await this.profileService.updateName(name.name, req.user_id);
 
       return res.status(resp.statusCode).json(resp);
     } catch (error) {
       console.log(error);
-      return res.sendStatus(HttpStatus.OK);
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Patch('phonenumber')
+  @UseGuards(AccessTokenGuardGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async updatePhoneNumber(
+    @Request() req,
+    @Response() res,
+    @Body() phoneNumber: updatePhoneNumber,
+  ) {
+    try {
+      const resp = await this.profileService.updatePhoneNumber(
+        phoneNumber.phone_number,
+        req.user_id,
+      );
+      return res.status(resp.statusCode).json(resp);
+    } catch (error) {
+      console.log(error);
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Patch('bio')
+  @UseGuards(AccessTokenGuardGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async updateBio(@Request() req, @Response() res, @Body() bio: updateBio) {
+    try {
+      const resp = await this.profileService.updateBio(bio.bio, req.user_id)
+
+      return res.status(resp.statusCode).json(resp);
+    } catch (error) {
+      console.log(error);
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

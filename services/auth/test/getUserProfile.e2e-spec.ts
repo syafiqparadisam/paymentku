@@ -10,7 +10,8 @@ import cookieParser from 'cookie-parser';
 import { parsingCookie } from './utils';
 import request from 'supertest';
 import { AccessTokenGuardGuard } from '../src/access-token-guard/access-token-guard.guard';
-import { profile } from '../src/interfaces/profile';
+import { profile, profileForFindWithAccount } from '../src/interfaces/profile';
+import { use } from 'passport';
 
 describe('Get User Profile', () => {
   let app: INestApplication;
@@ -79,43 +80,125 @@ describe('Get User Profile', () => {
   // after test ended, close the server
   afterAll(async () => {
     try {
+      const user = await userSvc.findUserByUsername(userRegister.user);
+      const usrProfile = await userSvc.joiningUserAndProfile(user.id);
+      await userSvc.deleteAccount(usrProfile.id, usrProfile.profile.id);
       await app.close();
     } catch (error) {
       console.log(error);
     }
   });
 
-  it('Should return user', async () => {
-    try {
-      const res = await request(app.getHttpServer())
-        .get('/api/v1/profile')
-        .set('Cookie', cookies);
+  it('Should return user because success', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/profile')
+      .set('Cookie', cookies);
 
-      const data = res.body.data;
+    const data = res.body.data;
 
-	  const usr = await userSvc.findUserByUsername(userRegister.user)
-      let profiles: profile | any = await userSvc.getUserProfile(usr.id);
-      profiles.balance = Number(profiles.balance);
-      profiles.accountNumber = Number(profiles.accountNumber);
+    const usr = await userSvc.findUserByUsername(userRegister.user);
+    let profiles: profile = await userSvc.getUserProfile(usr.id);
 
-      console.log(res.body);
-      console.log(profiles);
+    expect(res.status).toBe(200);
+    expect(res.body.statusCode).toBe(200);
 
-      expect(res.status).toBe(200);
-      expect(data.user).toBe(profiles.user);
-      expect(data.name).toBe(profiles.name);
-      expect(data.email).toBe(profiles.email);
-      expect(data.accountNumber).toBe(profiles.accountNumber);
-      expect(data.balance).toEqual(0);
-      expect(data.bio).toBeNull();
-      expect(data.created_at).toBe(profiles.created_at);
-      expect(data.photo_profile).toBe(profiles.photo_profile);
-      expect(data.photo_public_id).toBeNull();
-      expect(data.phone_number).toBeNull();
-    } catch (error) {
-      const user = await userSvc.findUserByUsername(userRegister.user);
-      const usrProfile = await userSvc.joiningUserAndProfile(user.id);
-      await userSvc.deleteAccount(usrProfile.id, usrProfile.profile.id);
-    }
+    expect(data.id).toBe(profiles.id);
+    expect(data.user).toBe(profiles.user);
+    expect(data.name).toBe(profiles.name);
+    expect(data.email).toBe(profiles.email);
+    expect(data.accountNumber).toBe(profiles.accountNumber);
+    expect(data.balance).toEqual('0');
+    expect(data.bio).toBeNull();
+    expect(data.created_at).toBe(profiles.created_at);
+    expect(data.photo_profile).toBe(profiles.photo_profile);
+    expect(data.photo_public_id).toBeNull();
+    expect(data.phone_number).toBeNull();
+  });
+
+  it('Should return user if finding by account number', async () => {
+    const usr = await userSvc.findUserByUsername(userRegister.user);
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/profile?accountNumber=${usr.accountNumber}`)
+      .set('Cookie', cookies);
+
+    const data = res.body.data;
+
+    let profile: profileForFindWithAccount =
+      await userSvc.getProfileByAccountNumber(usr.accountNumber);
+
+    expect(res.status).toBe(200);
+    expect(res.body.statusCode).toBe(200);
+
+    expect(data.id).toBe(profile.id);
+    expect(data.user).toBe(profile.user);
+    expect(data.name).toBe(profile.name);
+    expect(data.accountNumber).toBe(profile.accountNumber);
+    expect(data.created_at).toBe(profile.created_at);
+    expect(data.photo_profile).toBe(profile.photo_profile);
+  });
+
+  it('Should return not found user if finding by account number is wrong account', async () => {
+    const wrongAccount = 837843743;
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/profile?accountNumber=${wrongAccount}`)
+      .set('Cookie', cookies);
+
+    const data = res.body.data;
+    console.log(res.body);
+
+    expect(res.status).toBe(404);
+    expect(res.body.statusCode).toBe(404);
+    expect(res.body.message).toBe(
+      `User with account number ${wrongAccount} not found`,
+    );
+  });
+
+  it('Should success update name', async () => {
+    const wantedName = 'HAHAHA';
+    const res = await request(app.getHttpServer())
+      .patch(`/api/v1/profile/name`)
+      .set('Cookie', cookies)
+      .send({ name: wantedName });
+
+    const user = await userSvc.findUserByUsername(userRegister.user);
+    const usrProfile = await userSvc.joiningUserAndProfile(user.id);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toEqual(
+      `Successfully update name to ${wantedName}`,
+    );
+    expect(usrProfile.profile.name).toEqual(wantedName);
+  });
+
+  it('Should success update bio', async () => {
+    const wantedBio = 'Sory lagi ngoding';
+    const res = await request(app.getHttpServer())
+      .patch(`/api/v1/profile/bio`)
+      .set('Cookie', cookies)
+      .send({ bio: wantedBio });
+
+    const user = await userSvc.findUserByUsername(userRegister.user);
+    const usrProfile = await userSvc.joiningUserAndProfile(user.id);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toEqual(`Successfully update bio`);
+    expect(usrProfile.profile.bio).toEqual(wantedBio);
+  });
+
+  it('Should success update phone number', async () => {
+    const phoneNumber = '089883478324';
+    const res = await request(app.getHttpServer())
+      .patch(`/api/v1/profile/phonenumber`)
+      .set('Cookie', cookies)
+      .send({ phone_number: phoneNumber });
+
+    const user = await userSvc.findUserByUsername(userRegister.user);
+    const usrProfile = await userSvc.joiningUserAndProfile(user.id);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toEqual(`Successfully update phone number`);
+    expect(usrProfile.profile.phone_number).toEqual(phoneNumber);
   });
 });

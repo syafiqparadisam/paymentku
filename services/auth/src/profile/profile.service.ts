@@ -17,14 +17,13 @@ export class ProfileService {
 
   async getUserProfile(userid: number): Promise<response> {
     try {
-      let profile: profile | any
+      let profile: profile | any;
       const lockKey = crypto.randomUUID();
       // check cache
       profile = await this.redisService.getCacheProfile(userid, [lockKey]);
       if (!profile) {
         profile = await this.usersService.getUserProfile(userid);
-        profile.accountNumber = Number(profile.accountNumber);
-        profile.balance = Number(profile.balance);
+        profile.balance = profile.balance.toString();
 
         // set cache
         await this.redisService.cacheUserProfile(userid, [lockKey], profile);
@@ -38,6 +37,67 @@ export class ProfileService {
       return {
         statusCode: HttpStatus.OK,
         data: profile,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updatePhoneNumber(phone_number: string, user_id: number): Promise<response> {
+    try {
+      const user = await this.usersService.joiningUserAndProfile(user_id);
+      await this.usersService.updatePhoneNumber(user.profile.id, phone_number);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Successfully update phone number',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateBio(bio: string, user_id: number): Promise<response> {
+    try {
+      const user = await this.usersService.joiningUserAndProfile(user_id);
+      await this.usersService.updateBio(user.profile.id, bio);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Successfully update bio',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateName(name: string, user_id: number): Promise<response> {
+    try {
+      const user = await this.usersService.joiningUserAndProfile(user_id);
+      await this.usersService.updateName(user.profile.id, name);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Successfully update name to ' + name,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUserProfileByAccNumber(accNumber: number): Promise<response> {
+    try {
+      const user = await this.usersService.getProfileByAccountNumber(accNumber);
+      if (!user) {
+        return {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: `User with account number ${accNumber} not found`,
+        };
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: user,
       };
     } catch (error) {
       throw error;

@@ -101,7 +101,8 @@ export class AuthService {
 
         await this.usersService.updateName(
           userAndprofile.profile.id,
-          payload.name,
+          payload.name.givenName,
+          payload.name.familyName,
         );
       }
       if (userAndprofile.profile.photo_profile == null) {

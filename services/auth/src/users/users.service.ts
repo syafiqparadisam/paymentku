@@ -28,29 +28,39 @@ export class UsersService {
     return Math.floor(Math.random() * 9999999999) + 1;
   }
 
+  async;
+
   async getProfileByAccountNumber(
-    accNumber: BigInt,
-  ): Promise<profileForFindWithAccount> {
+    accNumber: number,
+  ): Promise<profileForFindWithAccount | null> {
     try {
-      const joined = await this.userRepo.findOne({
-        where: { accountNumber: Number(accNumber) },
-        select: {
-          user: true,
-          accountNumber: true,
-          created_at: true,
-          profile: {
-            name: true,
-            photo_profile: true,
-          },
-        },
-      });
+      const joined = await this.userRepo
+        .createQueryBuilder('users')
+        .leftJoin('users.profile', 'profile')
+        .select([
+          'users.id',
+          'users.user',
+          'users.accountNumber',
+          'users.created_at',
+          'profile.name',
+          'profile.photo_profile',
+        ])
+        .where('users.accountNumber = :accountNumber', {
+          accountNumber: accNumber,
+        })
+        .getRawOne();
+
+      if (!joined) {
+        return null;
+      }
 
       return {
-        user: joined.user,
-        accountNumber: BigInt(joined.accountNumber),
-        created_at: joined.created_at,
-        name: joined.profile.name,
-        photo_profile: joined.profile.photo_profile,
+        id: joined.users_id,
+        user: joined.users_user,
+        accountNumber: joined.users_accountNumber,
+        created_at: joined.users_created_at,
+        name: joined.profile_name,
+        photo_profile: joined.profile_photo_profile,
       };
     } catch (error) {
       throw error;
@@ -59,27 +69,41 @@ export class UsersService {
 
   async getUserProfile(userid: number): Promise<profile> {
     try {
-      const joined = await this.joiningUserAndProfile(userid);
+      const joined = await this.userRepo
+        .createQueryBuilder('users')
+        .leftJoin('users.profile', 'profile')
+        .select([
+          'users.id',
+          'users.user',
+          'users.email',
+          'users.accountNumber',
+          'users.balance',
+          'users.created_at',
+          'profile.name',
+          'profile.bio',
+          'profile.phone_number',
+          'profile.photo_profile',
+          'profile.photo_public_id',
+        ])
+        .where('users.id = :id', { id: userid })
+        .getRawOne();
 
       return {
-        user: joined.user,
-        email: joined.email,
-        accountNumber: BigInt(joined.accountNumber),
-        balance: BigInt(joined.balance),
-        created_at: joined.created_at,
-        name: joined.profile.name,
-        bio: joined.profile.bio,
-        phone_number: joined.profile.phone_number,
-        photo_profile: joined.profile.photo_profile,
-        photo_public_id: joined.profile.photo_public_id,
+        id: joined.users_id,
+        user: joined.users_user,
+        email: joined.users_email,
+        accountNumber: joined.users_accountNumber,
+        balance: BigInt(joined.users_balance),
+        created_at: joined.users_created_at,
+        name: joined.profile_name,
+        bio: joined.profile_bio,
+        phone_number: joined.profile_phone_number,
+        photo_profile: joined.profile_photo_profile,
+        photo_public_id: joined.profile_photo_public_id,
       };
     } catch (error) {
       throw error;
     }
-  }
-
-  async getUserProfileByAccNumber(accNumber: number) {
-    return await this.userRepo.findOne({ where: { accountNumber: accNumber } });
   }
 
   async updatePhotoProfile(
@@ -197,11 +221,23 @@ export class UsersService {
     return this.userRepo.findOne({ where: { user } });
   }
 
-  async updateName(profileId: number, name: any) {
+  async updateName(
+    profileId: number,
+    firstName: string,
+    lastName: string = '',
+  ) {
     return this.profileRepo.update(
       { id: profileId },
-      { name: name.givenName + ' ' + name.familyName },
+      { name: firstName + lastName },
     );
+  }
+
+  async updatePhoneNumber(profileId: number, phone_number: string) {
+    return this.profileRepo.update({ id: profileId }, { phone_number });
+  }
+
+  async updateBio(profileId: number, bio: string) {
+    return this.profileRepo.update({ id: profileId }, { bio });
   }
 
   async updatePassword(password: string, user_id: number) {

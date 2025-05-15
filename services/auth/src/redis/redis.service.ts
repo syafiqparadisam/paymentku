@@ -22,7 +22,6 @@ export class RedisService {
   }
 
   async cacheUserProfile(userid: number, lockKey: string[], value: profile) {
-    // const clearedValue = this.convertBigIntToString(value);
     const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
     const val = JSON.stringify(value, (_, v) =>
       typeof v === 'bigint' ? v.toString() : v,
@@ -34,17 +33,6 @@ export class RedisService {
     await locking.release();
   }
 
-  convertBigIntToString(obj: any): any {
-    if (typeof obj === 'bigint') return obj.toString();
-    if (Array.isArray(obj)) return obj.map(this.convertBigIntToString);
-    if (obj !== null && typeof obj === 'object') {
-      return Object.fromEntries(
-        Object.entries(obj).map(([k, v]) => [k, this.convertBigIntToString(v)]),
-      );
-    }
-    return obj;
-  }
-
   async getCacheProfile(
     userid: number,
     lockKey: string[],
@@ -54,7 +42,7 @@ export class RedisService {
     if (!user) return null;
     await locking.release();
     const parsedUser = JSON.parse(user);
-    parsedUser.accountNumber = BigInt(parsedUser.accountNumber);
+    parsedUser.balance = parsedUser.balance.toString()
     return parsedUser;
   }
 

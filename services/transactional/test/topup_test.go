@@ -7,15 +7,19 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	controller_http "github.com/syafiqparadisam/paymentku/services/history/controller/http"
-	"github.com/syafiqparadisam/paymentku/services/history/domain"
-	"github.com/syafiqparadisam/paymentku/services/history/dto"
-	"github.com/syafiqparadisam/paymentku/services/history/errors"
-	"github.com/syafiqparadisam/paymentku/services/history/test/mock"
+	controller_http "github.com/syafiqparadisam/paymentku/services/transactional/controller/http"
+	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
+	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
+	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
+	"github.com/syafiqparadisam/paymentku/services/transactional/test/mock"
 )
+
+var internalSecret = os.Getenv("INTERNAL_SECRET")
 
 func (h *HistoryTest) GetAllHistoryTopUp(t *testing.T) {
 	t.Parallel()
@@ -38,11 +42,13 @@ func (h *HistoryTest) GetAllHistoryTopUp(t *testing.T) {
 	}()
 
 	// setup request
-	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("?userid=%d", idUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodGet, server.URL, http.NoBody)
+	req.Header.Add("X-Internal-Secret", internalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
-	actualResp := &dto.APIResponse[*[]domain.HistoryTopUpForGetAll]{}
+	actualResp := &dto.APIResponse[*[]domain.GetHistoryTopUpForGetAll]{}
 	bodyBytes, _ := io.ReadAll(resp.Body)
 	json.Unmarshal(bodyBytes, actualResp)
 
@@ -75,7 +81,9 @@ func (h *HistoryTest) GetHistoryTopUpById(t *testing.T) {
 	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleTopUpHistoryById), http.MethodGet, http.MethodDelete))
 	fmt.Println(server.URL + fmt.Sprintf("/topup/%d?userid=%d", idTopup1, idUser))
-	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/topup/%d?userid=%d", idTopup1, idUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/topup/%d", idTopup1), http.NoBody)
+	req.Header.Add("X-Internal-Secret", internalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 	defer func() {
@@ -85,7 +93,7 @@ func (h *HistoryTest) GetHistoryTopUpById(t *testing.T) {
 		server.Close()
 	}()
 
-	actualResp := &dto.APIResponse[*domain.HistoryTopUp]{}
+	actualResp := &dto.APIResponse[*domain.GetHistoryTopUpById]{}
 	bodyBytes, _ := io.ReadAll(resp.Body)
 	json.Unmarshal(bodyBytes, actualResp)
 
@@ -114,11 +122,13 @@ func (h *HistoryTest) GetHistoryTopUpByWrongId(t *testing.T) {
 	}()
 
 	randomId := 2422
-	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/topup/%d?userid=%d", randomId, idUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/topup/%d", randomId), http.NoBody)
+	req.Header.Add("X-Internal-Secret", internalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
-	actualResp := &dto.APIResponse[*domain.HistoryTopUp]{}
+	actualResp := &dto.APIResponse[*domain.GetHistoryTopUpById]{}
 	bodyBytes, _ := io.ReadAll(resp.Body)
 	json.Unmarshal(bodyBytes, actualResp)
 
@@ -137,7 +147,9 @@ func (h *HistoryTest) DeleteHistoryTopUpById(t *testing.T) {
 		h.UserSeeder.Down(idUser, idProfile)
 		server.Close()
 	}()
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/topup/%d?userid=%d", idTopup1, idUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/topup/%d", idTopup1), http.NoBody)
+	req.Header.Add("X-Internal-Secret", internalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
@@ -162,7 +174,9 @@ func (h *HistoryTest) DeleteHistoryTopUpByWrongId(t *testing.T) {
 	}()
 
 	randomId := 2422
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/topup/%d?userid=%d", randomId, idUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/topup/%d", randomId), http.NoBody)
+	req.Header.Add("X-Internal-Secret", internalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
@@ -187,7 +201,9 @@ func (h *HistoryTest) DeleteAllHistoryTopUp(t *testing.T) {
 		h.UserSeeder.Down(idUser, idProfile)
 		server.Close()
 	}()
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/topup?userid=%d", idUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodDelete, server.URL, http.NoBody)
+	req.Header.Add("X-Internal-Secret", internalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
@@ -212,7 +228,9 @@ func (h *HistoryTest) DeleteAllHistoryTopUpWithEmptyData(t *testing.T) {
 		h.UserSeeder.Down(idUser, idProfile)
 		server.Close()
 	}()
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/topup?userid=%d", idUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodDelete, server.URL, http.NoBody)
+	req.Header.Add("X-Internal-Secret", internalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 

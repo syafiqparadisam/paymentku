@@ -20,21 +20,21 @@ func (u *Usecase) InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequ
 	}
 	// update balance and find user
 	userid, _ := strconv.Atoi(user.UserId)
-	tx, errTx := u.TopUpRepo.StartTransaction(ctx)
+	tx, errTx := u.topUpRepo.StartTransaction(ctx)
 	if errTx != nil {
 		panic(errTx)
 	}
 
-	balance, err := u.TopUpRepo.FindBalanceById(tx, ctx, userid)
+	balance, err := u.topUpRepo.FindBalanceById(tx, ctx, userid)
 	if err != nil {
 		panic(err)
 	}
 
-	err = u.TopUpRepo.IncreaseBalanceById(tx, ctx, payload.Amount, userid)
+	err = u.topUpRepo.IncreaseBalanceById(tx, ctx, payload.Amount, userid)
 	if err != nil {
 		tx.Rollback()
 		topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance, balance.Balance, "FAILED", userid)
-		errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctx, topUpInfo)
+		errInsertHistory := u.topUpRepo.CreateTopUpHistory(ctx, topUpInfo)
 		if errInsertHistory != nil {
 			panic(errInsertHistory)
 		}
@@ -46,7 +46,7 @@ func (u *Usecase) InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequ
 	}
 
 	topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance+int64(payload.Amount), balance.Balance, "SUCCESS", userid)
-	errInsertHistory := u.TopUpRepo.CreateTopUpHistory(ctx, topUpInfo)
+	errInsertHistory := u.topUpRepo.CreateTopUpHistory(ctx, topUpInfo)
 	if errInsertHistory != nil {
 		tx.Rollback()
 		panic(errInsertHistory)
@@ -55,5 +55,4 @@ func (u *Usecase) InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequ
 	response := dto.APIResponse[interface{}]{StatusCode: http.StatusOK, Message: "Successfully topup"}
 	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
-
 }

@@ -16,7 +16,7 @@ func (u *Usecase) DeleteHistoryTransferById(ctx context.Context, user *dto.XUser
 	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
 
-	tx, err := u.tfRepo.StartACID(ctx)
+	tx, err := u.tfRepo.StartTransaction(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +43,7 @@ func (u *Usecase) DeleteAllHistoryTransfer(ctx context.Context, user *dto.XUserD
 	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
 	// find account by id
-	tx, err := u.tfRepo.StartACID(ctx)
+	tx, err := u.tfRepo.StartTransaction(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -68,7 +68,7 @@ func (u *Usecase) DeleteAllHistoryTransfer(ctx context.Context, user *dto.XUserD
 	return response
 }
 
-func (u *Usecase) GetAllHistoryTransfer(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.HistoryTransferForGetAll] {
+func (u *Usecase) GetAllHistoryTransfer(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.GetHistoryTransfers] {
 	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
 	// find account by id
@@ -78,19 +78,19 @@ func (u *Usecase) GetAllHistoryTransfer(ctx context.Context, user *dto.XUserData
 	if errFind != nil {
 		panic(errFind)
 	}
-	response := dto.APIResponse[*[]domain.HistoryTransferForGetAll]{StatusCode: 200, Data: data, Message: "Ok"}
+	response := dto.APIResponse[*[]domain.GetHistoryTransfers]{StatusCode: 200, Data: data, Message: "Ok"}
 	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
 
-func (u *Usecase) GetHistoryTransferById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.HistoryTransfer] {
+func (u *Usecase) GetHistoryTransferById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.GetHistoryTransferById] {
 	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
 	// find account by id
 
 	isRead, errFind := u.tfRepo.FindIsRead(ctx, id)
 	if errFind == sql.ErrNoRows {
-		response := dto.APIResponse[*domain.HistoryTransfer]{StatusCode: 404, Message: errors.ErrHistoryNoRows.Error()}
+		response := dto.APIResponse[*domain.GetHistoryTransferById]{StatusCode: 404, Message: errors.ErrHistoryNoRows.Error()}
 		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
@@ -107,14 +107,14 @@ func (u *Usecase) GetHistoryTransferById(ctx context.Context, user *dto.XUserDat
 	}
 	data, errFind := u.tfRepo.GetHistoryTransferById(ctx, id, userid)
 	if errFind == sql.ErrNoRows {
-		response := dto.APIResponse[*domain.HistoryTransfer]{StatusCode: 404, Message: errors.ErrHistoryNoRows.Error()}
+		response := dto.APIResponse[*domain.GetHistoryTransferById]{StatusCode: 404, Message: errors.ErrHistoryNoRows.Error()}
 		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
 	if errFind != nil {
 		panic(errFind)
 	}
-	response := dto.APIResponse[*domain.HistoryTransfer]{StatusCode: 200, Data: data, Message: "Ok"}
+	response := dto.APIResponse[*domain.GetHistoryTransferById]{StatusCode: 200, Data: data, Message: "Ok"}
 	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 }

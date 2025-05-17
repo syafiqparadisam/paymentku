@@ -46,7 +46,7 @@ const Footer = () => {
                             <Typography fontWeight={"bold"} py={3}>Subscribe now</Typography>
                             <form onSubmit={handleSubmit(submittedForm)}>
                                 {errors?.email && <Typography color={"red"}>{errors.email.message}</Typography>}
-                                <Input {...register("email", { pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: "Please enter correct email address" } })} placeholder={"Enter your email"} />
+                                <Input {...register("email", { pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: "Please enter correct email address" } })} placeholder={"Enter your email"}  />
 
                                 <Box width={"30%"} mt={3}>
                                     <Button color="error" variant="contained" type="submit">Subscribe</Button>

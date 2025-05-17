@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/syafiqparadisam/paymentku/services/history/config"
-	"github.com/syafiqparadisam/paymentku/services/history/domain"
-	"github.com/syafiqparadisam/paymentku/services/history/test/mock"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
+	"github.com/syafiqparadisam/paymentku/services/transactional/test/mock"
 )
 
 type TransferSeeder struct {
@@ -45,15 +45,15 @@ func (transferSeeder *TransferSeeder) Up(payload *mock.HistoryTransfer) int64 {
 	return idTransfer
 }
 
-func (transferSeeder *TransferSeeder) FindAll(userid int) (*[]domain.HistoryTransferForGetAll, error) {
+func (transferSeeder *TransferSeeder) FindAll(userid int) (*[]domain.GetHistoryTransfers, error) {
 	rowsHistory, err := transferSeeder.MySql.Db.Query("SELECT id, sender, receiver, amount, isRead, status, created_at FROM history_transfer WHERE userId = ? ORDER BY created_at DESC;", userid)
 	if err != nil {
 		return nil, err
 	}
 	defer rowsHistory.Close()
-	arrOfHistoryTf := []domain.HistoryTransferForGetAll{}
+	arrOfHistoryTf := []domain.GetHistoryTransfers{}
 	for rowsHistory.Next() {
-		historyTf := &domain.HistoryTransferForGetAll{}
+		historyTf := &domain.GetHistoryTransfers{}
 		if err := rowsHistory.Scan(
 			&historyTf.Id,
 			&historyTf.Sender,
@@ -70,13 +70,13 @@ func (transferSeeder *TransferSeeder) FindAll(userid int) (*[]domain.HistoryTran
 	return &arrOfHistoryTf, nil
 }
 
-func (transferSeeder *TransferSeeder) FindById(id int, userid int) (*domain.HistoryTransfer, error) {
+func (transferSeeder *TransferSeeder) FindById(id int, userid int) (*domain.GetHistoryTransferById, error) {
 	rowsHistory, err := transferSeeder.MySql.Db.Query("SELECT id, sender, receiver, notes, amount, isRead, status, sender_name, receiver_name, previous_balance,balance, created_at FROM history_transfer WHERE id = ? AND userId = ?", id, userid)
 	if err != nil {
 		return nil, err
 	}
 	defer rowsHistory.Close()
-	history := &domain.HistoryTransfer{}
+	history := &domain.GetHistoryTransferById{}
 	if rowsHistory.Next() {
 		if err := rowsHistory.Scan(
 			&history.Id,

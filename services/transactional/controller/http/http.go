@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
 	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
 	"github.com/syafiqparadisam/paymentku/services/transactional/usecase"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type ControllerHTTP struct {
@@ -35,6 +35,7 @@ func MakeHTTPHandler(f HandlerFunc, methods ...string) http.HandlerFunc {
 		start := time.Now()
 		log := config.Log()
 		header := r.Header
+		internalSecret := os.Getenv("INTERNAL_SECRET")
 		defer func() {
 			if r := recover(); r != nil {
 				log.WithLevel(zerolog.PanicLevel).Err(r.(error)).Str("Request-id", header.Get("X-Request-Id")).Msg("Server panicing")
@@ -43,6 +44,11 @@ func MakeHTTPHandler(f HandlerFunc, methods ...string) http.HandlerFunc {
 			log.Info().Str("Request-id", header.Get("X-Request-Id")).Str("User-agent", header.Get("User-Agent")).Str("Origin", header.Get("Origin")).Str("Method", r.Method).Dur("Latency (milisecond)", time.Duration(time.Duration(time.Since(start)).Milliseconds())).Str("Path", r.URL.Path).Interface("Query", r.URL.Query()).Str("Ip", r.RemoteAddr).Msg("Request Logs")
 
 		}()
+
+		if header.Get("X-Internal-Secret") != internalSecret || header.Get("X-Request-id") == ""{
+			WriteJSON(w, http.StatusForbidden, dto.APIResponse[interface{}]{StatusCode: http.StatusForbidden, Message: errors.ErrUnauthorizedInternalAccess.Error()})
+		}
+
 		if r.Method != methods[0] && r.Method != methods[1] {
 			WriteJSON(w, http.StatusMethodNotAllowed, dto.APIResponse[interface{}]{StatusCode: http.StatusMethodNotAllowed, Message: errors.ErrMethodNotAllowed.Error()})
 			return
@@ -56,8 +62,7 @@ func MakeHTTPHandler(f HandlerFunc, methods ...string) http.HandlerFunc {
 
 func (s *ControllerHTTP) ExstractHeaderXUserData(f decodeJWTTokenFunc) HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		query := r.URL.Query()
-		userid := query.Get("userid")
+		userid := r.Header.Get("X-Userid")
 		if userid == "" {
 			return WriteJSON(w, http.StatusForbidden, dto.APIResponse[interface{}]{StatusCode: http.StatusForbidden, Message: "Unknown users"})
 		}
@@ -82,10 +87,12 @@ func ExtractIDFromPath(r *http.Request, prefix string) (int, error) {
 
 func (s *ControllerHTTP) Routes() http.Handler {
 	mux := http.NewServeMux()
-	mux.Handle("/transfer", otelhttp.NewHandler(MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTransferHistory), http.MethodGet, http.MethodDelete), "get / delete all history transfer"))
-	mux.Handle("/topup", otelhttp.NewHandler(MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTopUpHistory), http.MethodGet, http.MethodDelete), "get / delete all history topup"))
-	mux.Handle("/topup/{id}", otelhttp.NewHandler(MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTopUpHistoryById), http.MethodGet, http.MethodDelete), "get / delete history topup by id"))
-	mux.Handle("/transfer/{id}", otelhttp.NewHandler(MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransferHistoryById), http.MethodGet, http.MethodDelete), "get / delete history transfer by id"))
+	mux.Handle("/history/transfer", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTransferHistory), http.MethodGet, http.MethodDelete))
+	mux.Handle("/history/topup", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTopUpHistory), http.MethodGet, http.MethodDelete))
+	mux.Handle("/history/topup/{id}", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTopUpHistoryById), http.MethodGet, http.MethodDelete))
+	mux.Handle("/history/transfer/{id}", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
+	mux.Handle("POST /topup", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandlerTopUp), http.MethodPost))
+	mux.Handle("POST /transfer", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransfer), http.MethodPost))
 	fmt.Printf("Server listening on port%s\n", s.cfg.Port)
 
 	return mux

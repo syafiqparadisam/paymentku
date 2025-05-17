@@ -11,11 +11,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	controller_http "github.com/syafiqparadisam/paymentku/services/history/controller/http"
-	"github.com/syafiqparadisam/paymentku/services/history/domain"
-	"github.com/syafiqparadisam/paymentku/services/history/dto"
-	"github.com/syafiqparadisam/paymentku/services/history/errors"
-	"github.com/syafiqparadisam/paymentku/services/history/test/mock"
+	controller_http "github.com/syafiqparadisam/paymentku/services/transactional/controller/http"
+	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
+	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
+	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
+	"github.com/syafiqparadisam/paymentku/services/transactional/test/mock"
 )
 
 func (h *HistoryTest) GetAllHistoryTransfer(t *testing.T) {
@@ -50,7 +50,7 @@ func (h *HistoryTest) GetAllHistoryTransfer(t *testing.T) {
 	resp, _ := client.Do(req)
 
 	bodyBytes, _ := io.ReadAll(resp.Body)
-	actualResp := &dto.APIResponse[*[]domain.HistoryTransferForGetAll]{}
+	actualResp := &dto.APIResponse[*[]domain.GetHistoryTransfers]{}
 	json.Unmarshal(bodyBytes, actualResp)
 
 	findHistory, _ := h.Seeder.TransferSeeder.FindAll(int(senderIdUser))
@@ -101,7 +101,7 @@ func (h *HistoryTest) GetHistoryTransferById(t *testing.T) {
 	resp, _ := client.Do(req)
 
 	bodyBytes, _ := io.ReadAll(resp.Body)
-	actualResp := &dto.APIResponse[*domain.HistoryTransfer]{}
+	actualResp := &dto.APIResponse[*domain.GetHistoryTransferById]{}
 	json.Unmarshal(bodyBytes, actualResp)
 
 	findHistory, _ := h.Seeder.TransferSeeder.FindById(int(idTransfer1), int(senderIdUser))
@@ -155,7 +155,7 @@ func (h *HistoryTest) GetHistoryTransferByWrongId(t *testing.T) {
 	resp, _ := client.Do(req)
 
 	bodyBytes, _ := io.ReadAll(resp.Body)
-	actualResp := &dto.APIResponse[*domain.HistoryTransfer]{}
+	actualResp := &dto.APIResponse[*domain.GetHistoryTransferById]{}
 	json.Unmarshal(bodyBytes, actualResp)
 
 	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
@@ -193,7 +193,7 @@ func (h *HistoryTest) DeleteHistoryTransferById(t *testing.T) {
 	assert.Equal(t, errFind, sql.ErrNoRows)
 
 	bodyBytes, _ := io.ReadAll(resp.Body)
-	actualResp := &dto.APIResponse[*domain.HistoryTransfer]{}
+	actualResp := &dto.APIResponse[*domain.GetHistoryTransferById]{}
 	json.Unmarshal(bodyBytes, actualResp)
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -230,7 +230,7 @@ func (h *HistoryTest) DeleteHistoryTransferByWrongId(t *testing.T) {
 	resp, _ := client.Do(req)
 
 	bodyBytes, _ := io.ReadAll(resp.Body)
-	actualResp := &dto.APIResponse[*domain.HistoryTransfer]{}
+	actualResp := &dto.APIResponse[*domain.GetHistoryTransferById]{}
 	json.Unmarshal(bodyBytes, actualResp)
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -274,7 +274,7 @@ func (h *HistoryTest) DeleteAllHistoryTransfer(t *testing.T) {
 	assert.Equal(t, errFind2, sql.ErrNoRows)
 
 	bodyBytes, _ := io.ReadAll(resp.Body)
-	actualResp := &dto.APIResponse[*domain.HistoryTransfer]{}
+	actualResp := &dto.APIResponse[*domain.GetHistoryTransferById]{}
 	json.Unmarshal(bodyBytes, actualResp)
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)

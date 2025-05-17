@@ -19,20 +19,16 @@ func NewTopUpRepository(mysql *config.MySqlStore) *TopUpRepository {
 }
 
 type TopUpInterface interface {
-	GetAllHistoryTopUp(ctx context.Context, userid int) (*[]domain.HistoryTopUpForGetAll, error)
-	GetHistoryTopUpById(ctx context.Context, id int, userid int) (*domain.HistoryTopUp, error)
+	GetAllHistoryTopUp(ctx context.Context, userid int) (*[]domain.GetHistoryTopUpForGetAll, error)
+	GetHistoryTopUpById(ctx context.Context, id int, userid int) (*domain.GetHistoryTopUpById, error)
 	DeleteAllHistoryTopUp(tx *sql.Tx, ctx context.Context, userid int) error
 	UpdateIsRead(ctx context.Context, id int) error
 	FindBalanceById(tx *sql.Tx, ctx context.Context, id int) (*domain.Balance, error)
 	IncreaseBalanceById(tx *sql.Tx, ctx context.Context, amount uint, id int) error
-	CreateTopUpHistory(ctx context.Context, domain *domain.HistoryTopUp) error
+	CreateTopUpHistory(ctx context.Context, domain *domain.CreateHistoryTopUp) error
 	StartTransaction(ctx context.Context) (*sql.Tx, error)
 	FindIsRead(ctx context.Context, id int) (*domain.IsRead, error)
 	DeleteHistoryTopUpById(tx *sql.Tx, ctx context.Context, id int, userid int) error
-}
-
-func (tp *TopUpRepository) StartACID(ctx context.Context) (*sql.Tx, error) {
-	return tp.mysql.Db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
 }
 
 func (tp *TopUpRepository) FindIsRead(ctx context.Context, id int) (*domain.IsRead, error) {
@@ -64,7 +60,7 @@ func (tp *TopUpRepository) UpdateIsRead(ctx context.Context, id int) error {
 	return nil
 }
 
-func (tp *TopUpRepository) GetAllHistoryTopUp(ctx context.Context, userid int) (*[]domain.HistoryTopUpForGetAll, error) {
+func (tp *TopUpRepository) GetAllHistoryTopUp(ctx context.Context, userid int) (*[]domain.GetHistoryTopUpForGetAll, error) {
 	rowsHistory, err := tp.mysql.Db.QueryContext(ctx, "SELECT history_topup.id, amount, isRead, status, history_topup.created_at FROM history_topup INNER JOIN users ON history_topup.userId = users.id WHERE history_topup.userId = ? ORDER BY history_topup.created_at DESC", userid)
 	fmt.Println(rowsHistory)
 
@@ -73,9 +69,9 @@ func (tp *TopUpRepository) GetAllHistoryTopUp(ctx context.Context, userid int) (
 	}
 	defer rowsHistory.Close()
 
-	arrOfHistoryTopUp := []domain.HistoryTopUpForGetAll{}
+	arrOfHistoryTopUp := []domain.GetHistoryTopUpForGetAll{}
 	for rowsHistory.Next() {
-		history := &domain.HistoryTopUpForGetAll{}
+		history := &domain.GetHistoryTopUpForGetAll{}
 		if err := rowsHistory.Scan(&history.Id, &history.Amount, &history.IsRead, &history.Status, &history.CreatedAt); err != nil {
 			return nil, err
 		}
@@ -84,14 +80,14 @@ func (tp *TopUpRepository) GetAllHistoryTopUp(ctx context.Context, userid int) (
 	return &arrOfHistoryTopUp, nil
 }
 
-func (tp *TopUpRepository) GetHistoryTopUpById(ctx context.Context, id int, userid int) (*domain.HistoryTopUp, error) {
+func (tp *TopUpRepository) GetHistoryTopUpById(ctx context.Context, id int, userid int) (*domain.GetHistoryTopUpById, error) {
 	rowsHistory, err := tp.mysql.Db.QueryContext(ctx, "SELECT id, amount, balance, previous_balance, isRead, status, created_at FROM history_topup WHERE id = ? AND userId = ? FOR UPDATE", id, userid)
 
 	if err != nil {
 		panic(err)
 	}
 	defer rowsHistory.Close()
-	history := &domain.HistoryTopUp{}
+	history := &domain.GetHistoryTopUpById{}
 	if rowsHistory.Next() {
 		if err := rowsHistory.Scan(&history.Id, &history.Amount, &history.Balance, &history.PreviousBalance, &history.IsRead, &history.Status, &history.CreatedAt); err != nil {
 			return nil, err

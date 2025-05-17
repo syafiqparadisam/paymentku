@@ -16,7 +16,7 @@ docker-compose:
 
 # TRANSACTION START
 run-transactional: docker-compose	
-	cd ${TRANSACTION_SVC_PATH} && go build -o server.out server.go && ./server
+	cd ${TRANSACTION_SVC_PATH} && go build -o server.out server.go && ./server.out
 
 test-transactional:
 	cd ${TRANSACTION_SVC_PATH}/test && go test -v ./... --count=1

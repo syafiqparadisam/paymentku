@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 
-	history_config "github.com/syafiqparadisam/paymentku/services/history/config"
-	"github.com/syafiqparadisam/paymentku/services/history/domain"
-	"github.com/syafiqparadisam/paymentku/services/history/test/mock"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
+	"github.com/syafiqparadisam/paymentku/services/transactional/test/mock"
 )
 
 type TopUpSeeder struct {
-	MySql *history_config.MySqlStore
+	MySql *config.MySqlStore
 }
 
 type TopUp struct {
@@ -25,11 +25,11 @@ type TopUp struct {
 	CreatedAt       string
 }
 
-func NewTopUpSeeder(mysql *history_config.MySqlStore) *TopUpSeeder {
+func NewTopUpSeeder(mysql *config.MySqlStore) *TopUpSeeder {
 	return &TopUpSeeder{MySql: mysql}
 }
 
-func (topUpSeeder *TopUpSeeder) FindAll(userid int) (*[]domain.HistoryTopUpForGetAll, error) {
+func (topUpSeeder *TopUpSeeder) FindAll(userid int) (*[]domain.GetHistoryTopUpForGetAll, error) {
 	rowsHistory, err := topUpSeeder.MySql.Db.Query("SELECT history_topup.id, amount, isRead, status, history_topup.created_at FROM history_topup INNER JOIN users ON history_topup.userId = users.id WHERE history_topup.userId = ?", userid)
 
 	if err != nil {
@@ -37,9 +37,9 @@ func (topUpSeeder *TopUpSeeder) FindAll(userid int) (*[]domain.HistoryTopUpForGe
 	}
 	defer rowsHistory.Close()
 
-	arrOfHistoryTopUp := []domain.HistoryTopUpForGetAll{}
+	arrOfHistoryTopUp := []domain.GetHistoryTopUpForGetAll{}
 	for rowsHistory.Next() {
-		history := &domain.HistoryTopUpForGetAll{}
+		history := &domain.GetHistoryTopUpForGetAll{}
 		if err := rowsHistory.Scan(&history.Id, &history.Amount, &history.IsRead, &history.Status, &history.CreatedAt); err != nil {
 			return nil, err
 		}
@@ -48,14 +48,14 @@ func (topUpSeeder *TopUpSeeder) FindAll(userid int) (*[]domain.HistoryTopUpForGe
 	return &arrOfHistoryTopUp, nil
 }
 
-func (topUpSeeder *TopUpSeeder) FindById(id int, userid int) (*domain.HistoryTopUp, error) {
+func (topUpSeeder *TopUpSeeder) FindById(id int, userid int) (*domain.GetHistoryTopUpById, error) {
 	rowsHistory, err := topUpSeeder.MySql.Db.Query("SELECT id, amount, balance, previous_balance, isRead, status, created_at FROM history_topup WHERE id = ? AND userId = ? FOR UPDATE", id, userid)
 
 	if err != nil {
 		return nil, err
 	}
 	defer rowsHistory.Close()
-	history := &domain.HistoryTopUp{}
+	history := &domain.GetHistoryTopUpById{}
 	if rowsHistory.Next() {
 		if err := rowsHistory.Scan(&history.Id, &history.Amount, &history.Balance, &history.PreviousBalance, &history.IsRead, &history.Status, &history.CreatedAt); err != nil {
 			return nil, err

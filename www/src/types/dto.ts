@@ -16,7 +16,7 @@ export type Profile = {
     name: string,
     email: string,
     avatar: string,
-    balance: number,
+    balance: string,
     bio: string,
     phoneNumber: string,
     accountNumber: string

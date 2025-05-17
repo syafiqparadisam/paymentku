@@ -19,17 +19,19 @@ func NewTransferRepository(mysql *config.MySqlStore) *TransferRepository {
 }
 
 type TransferInterface interface {
-	StartACID(context.Context) (*sql.Tx, error)
-	GetHistoryTransferById(ctx context.Context, id int, userid int) (*domain.HistoryTransfer, error)
-	GetAllHistoryTransfer(ctx context.Context, userid int) (*[]domain.HistoryTransferForGetAll, error)
+	GetHistoryTransferById(ctx context.Context, id int, userid int) (*domain.GetHistoryTransferById, error)
+	GetAllHistoryTransfer(ctx context.Context, userid int) (*[]domain.GetHistoryTransfers, error)
 	DeleteAllHistoryTransfer(tx *sql.Tx, ctx context.Context, userid int) error
 	UpdateIsRead(ctx context.Context, id int) error
 	FindIsRead(ctx context.Context, id int) (*domain.IsRead, error)
 	DeleteHistoryTransferById(tx *sql.Tx, ctx context.Context, id int, userid int) error
-}
-
-func (t *TransferRepository) StartACID(ctx context.Context) (*sql.Tx, error) {
-	return t.mysql.Db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+	FindUsersById(tx *sql.Tx, ctx context.Context, id int) (*domain.UserInfo, error)
+	DecreaseBalanceById(tx *sql.Tx, ctx context.Context, amount uint, userid int) error
+	IncreaseBalanceByAccNumber(tx *sql.Tx, ctx context.Context, amount uint, accNum uint64) error
+	FindUserByAccNum(tx *sql.Tx, ctx context.Context, accNum uint64) (*domain.UserInfo, error)
+	InsertTransferHistory(ctx context.Context, domain *domain.CreateHistoryTransfer) error
+	StartTransaction(ctx context.Context) (*sql.Tx, error)
+	InsertToNotification(ctx context.Context, domain *domain.Notification) error
 }
 
 func (tp *TransferRepository) UpdateIsRead(ctx context.Context, id int) error {
@@ -61,16 +63,16 @@ func (tp *TransferRepository) FindIsRead(ctx context.Context, id int) (*domain.I
 	return nil, sql.ErrNoRows
 }
 
-func (tf *TransferRepository) GetAllHistoryTransfer(ctx context.Context, userid int) (*[]domain.HistoryTransferForGetAll, error) {
+func (tf *TransferRepository) GetAllHistoryTransfer(ctx context.Context, userid int) (*[]domain.GetHistoryTransfers, error) {
 	rowsHistory, err := tf.mysql.Db.QueryContext(ctx, "SELECT id, sender, receiver, amount, isRead, status, created_at FROM history_transfer WHERE userId = ? ORDER BY created_at DESC", userid)
 	fmt.Println(rowsHistory)
 	if err != nil {
 		panic(err)
 	}
 	defer rowsHistory.Close()
-	arrOfHistoryTf := []domain.HistoryTransferForGetAll{}
+	arrOfHistoryTf := []domain.GetHistoryTransfers{}
 	for rowsHistory.Next() {
-		historyTf := &domain.HistoryTransferForGetAll{}
+		historyTf := &domain.GetHistoryTransfers{}
 		if err := rowsHistory.Scan(
 			&historyTf.Id,
 			&historyTf.Sender,
@@ -87,13 +89,13 @@ func (tf *TransferRepository) GetAllHistoryTransfer(ctx context.Context, userid 
 	return &arrOfHistoryTf, nil
 }
 
-func (tf *TransferRepository) GetHistoryTransferById(ctx context.Context, id int, userid int) (*domain.HistoryTransfer, error) {
+func (tf *TransferRepository) GetHistoryTransferById(ctx context.Context, id int, userid int) (*domain.GetHistoryTransferById, error) {
 	rowsHistory, err := tf.mysql.Db.QueryContext(ctx, "SELECT id, sender, receiver, notes, amount, isRead, status, sender_name, receiver_name, created_at, previous_balance, balance FROM history_transfer WHERE id = ? AND userId = ?", id, userid)
 	if err != nil {
 		panic(err)
 	}
 	defer rowsHistory.Close()
-	history := &domain.HistoryTransfer{}
+	history := &domain.GetHistoryTransferById{}
 	if rowsHistory.Next() {
 		if err := rowsHistory.Scan(
 			&history.Id,

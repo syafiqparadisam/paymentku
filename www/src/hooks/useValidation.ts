@@ -18,7 +18,7 @@ export const useValidation = () => {
 
     const validatePhoneNumber = (val: string): { success: boolean, error: string | null, trimmedval: string } => {
         // start with 0, must be number, 11 - 13 characters long
-        const phonePattern = /^0\d{11,13}$/
+        const phonePattern = /^0\d{10,15}$/
         if (!val.match(phonePattern)) {
             return { success: false, error: "Please fill correct phone number, and phone number must be atleast 11 - 13 characters", trimmedval: val }
         }

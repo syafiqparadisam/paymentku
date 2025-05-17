@@ -21,7 +21,7 @@ services:
           "-u",
           "root",
           "--password=$$MYSQL_ROOT_PASSWORD",
-        ]
+        ]   
       start_period: 5s
       interval: 5s
       timeout: 5s
@@ -30,39 +30,39 @@ services:
       - mysqldb:/var/lib/mysql
       - ../../../database/init.sql:/docker-entrypoint-initdb.d/initsql
 
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.118.0
-    container_name: otel-collector
-    command: ["--config=/etc/otel-collector-config.yaml"]
-    volumes:
-      - ../../../observability/otel-collector.yaml:/etc/otel-collector-config.yaml
-    ports:
-      - "127.0.0.1:1888:1888" # pprof extension
-      - "127.0.0.1:8888:8888" # Prometheus metrics exposed by the collector
-      - "127.0.0.1:8889:8889" # Prometheus exporter metrics
-      - "127.0.0.1:13133:13133" # health_check extension
-      - "127.0.0.53:4317:4317" # OTLP gRPC receiver
-      - "127.0.0.1:55670:55679" # zpages extension
-    depends_on:
-      - jaeger
+  # otel-collector:
+  #   image: otel/opentelemetry-collector-contrib:0.118.0
+  #   container_name: otel-collector
+  #   command: ["--config=/etc/otel-collector-config.yaml"]
+  #   volumes:
+  #     - ../../../observability/otel-collector.yaml:/etc/otel-collector-config.yaml
+  #   ports:
+  #     - "127.0.0.1:1888:1888" # pprof extension
+  #     - "127.0.0.1:8888:8888" # Prometheus metrics exposed by the collector
+  #     - "127.0.0.1:8889:8889" # Prometheus exporter metrics
+  #     - "127.0.0.1:13133:13133" # health_check extension
+  #     - "127.0.0.53:4317:4317" # OTLP gRPC receiver
+  #     - "127.0.0.1:55670:55679" # zpages extension
+  #   depends_on:
+  #     - jaeger
 
-  prometheus:
-    image: prom/prometheus:v3.0.1
-    container_name: prometheus
-    volumes:
-      - ../../../observability/prometheus.yaml:/etc/prometheus/prometheus.yml
-    ports:
-      - "127.0.0.1:9090:9090"
-    depends_on:
-      - otel-collector
+  # prometheus:
+  #   image: prom/prometheus:v3.0.1
+  #   container_name: prometheus
+  #   volumes:
+  #     - ../../../observability/prometheus.yaml:/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "127.0.0.1:9090:9090"
+  #   depends_on:
+  #     - otel-collector
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.65.0
-    container_name: jaeger
-    ports:
-      - "127.0.0.1:16686:16686"
-      - "127.0.0.1:32783:14268"
-      - "127.0.0.1:32782:4250"
+  # jaeger:
+  #   image: jaegertracing/all-in-one:1.65.0
+  #   container_name: jaeger
+  #   ports:
+  #     - "127.0.0.1:16686:16686"
+  #     - "127.0.0.1:32783:14268"
+  #     - "127.0.0.1:32782:4250"
 
   redis:
     image: redis:7.4.1

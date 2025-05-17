@@ -2,14 +2,14 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { User } from "../../types/response";
 
 export const initialState: User= {
-    balance: 0,
+    balance: "0",
     email: "",
     user: "",
     name: "",
-    photo_public_id: import.meta.env.VITE_DEFAULT_PHOTO_PROFILE,
+    photo_public_id: null,
     accountNumber: 0,
     photo_profile: "",
-    phoneNumber: "",
+    phone_number: "",
     bio: "",
     created_at: ""
 }
@@ -26,7 +26,7 @@ export const userSlice = createSlice({
             state.accountNumber = action.payload.accountNumber
             state.photo_profile = action.payload.photo_profile
             state.bio = action.payload.bio
-            state.phoneNumber = action.payload.phoneNumber
+            state.phone_number = action.payload.phone_number
             state.created_at = action.payload.created_at
             state.photo_public_id = action.payload.photo_public_id
         }

@@ -5,19 +5,20 @@ import (
 
 	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
 	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
-	history_repo "github.com/syafiqparadisam/paymentku/services/transactional/repository/history"
+	topup_repo "github.com/syafiqparadisam/paymentku/services/transactional/repository/topup"
+	transfer_repo "github.com/syafiqparadisam/paymentku/services/transactional/repository/transfer"
 )
 
 type Usecase struct {
-	tfRepo    history_repo.TransferInterface
-	topUpRepo history_repo.TopUpInterface
+	tfRepo    transfer_repo.TransferInterface
+	topUpRepo topup_repo.TopUpInterface
 }
 
 type UsecaseInterface interface {
-	GetAllHistoryTopUp(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.HistoryTopUpForGetAll]
-	GetAllHistoryTransfer(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.HistoryTransferForGetAll]
-	GetHistoryTransferById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.HistoryTransfer]
-	GetHistoryTopUpById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.HistoryTopUp]
+	GetAllHistoryTopUp(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.GetHistoryTopUpForGetAll]
+	GetAllHistoryTransfer(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.GetHistoryTransfers]
+	GetHistoryTransferById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.GetHistoryTransferById]
+	GetHistoryTopUpById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.GetHistoryTopUpById]
 	DeleteAllHistoryTopUp(ctx context.Context, user *dto.XUserData) dto.APIResponse[interface{}]
 	DeleteHistoryTopUpById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[interface{}]
 	DeleteHistoryTransferById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[interface{}]
@@ -26,6 +27,6 @@ type UsecaseInterface interface {
 	InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequest, user *dto.XUserData) dto.APIResponse[interface{}]
 }
 
-func NewTransactionalUsecase(tf transactional_repo.TransferInterface, topup transactional_repo.TopUpInterface) *Usecase {
+func NewTransactionalUsecase(tf transfer_repo.TransferInterface, topup topup_repo.TopUpInterface) *Usecase {
 	return &Usecase{tfRepo: tf, topUpRepo: topup}
 }

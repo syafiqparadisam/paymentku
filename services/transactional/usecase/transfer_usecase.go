@@ -15,12 +15,12 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
 
-	tx, err := u.TransferRepo.StartTransaction(ctx)
+	tx, err := u.tfRepo.StartTransaction(ctx)
 	if err != nil {
 		panic(err)
 	}
 	// find balance user and check transfer amount is greater than balance?
-	foundSender, errFoundSender := u.TransferRepo.FindUsersById(tx, ctx, userid)
+	foundSender, errFoundSender := u.tfRepo.FindUsersById(tx, ctx, userid)
 	if errFoundSender != nil {
 		panic(errFoundSender)
 	}
@@ -35,7 +35,7 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
-	foundReceiver, errFoundReceiver := u.TransferRepo.FindUserByAccNum(tx, ctx, payload.AccountNumber)
+	foundReceiver, errFoundReceiver := u.tfRepo.FindUserByAccNum(tx, ctx, payload.AccountNumber)
 	if errFoundReceiver == sql.ErrNoRows {
 		response := dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: errors.ErrUserNoRows.Error()}
 		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
@@ -45,24 +45,24 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		panic(errFoundReceiver)
 	}
 
-	errDecreaseBalance := u.TransferRepo.DecreaseBalanceById(tx, ctx, payload.Amount, userid)
+	errDecreaseBalance := u.tfRepo.DecreaseBalanceById(tx, ctx, payload.Amount, userid)
 	if errDecreaseBalance != nil {
 		tx.Rollback()
 		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
 		// insert to mongodb transfer
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
+		errInsertHistory := u.tfRepo.InsertTransferHistory(ctx, transferInfo)
 		if errInsertHistory != nil {
 			panic(errInsertHistory)
 		}
 		panic(errDecreaseBalance)
 	}
 
-	errIncreaseBalance := u.TransferRepo.IncreaseBalanceByAccNumber(tx, ctx, payload.Amount, payload.AccountNumber)
+	errIncreaseBalance := u.tfRepo.IncreaseBalanceByAccNumber(tx, ctx, payload.Amount, payload.AccountNumber)
 	if errIncreaseBalance != nil {
 		tx.Rollback()
 
 		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
+		errInsertHistory := u.tfRepo.InsertTransferHistory(ctx, transferInfo)
 		if errInsertHistory != nil {
 			panic(errInsertHistory)
 		}
@@ -74,18 +74,18 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 	}
 
 	transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "SUCCESS", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance-int64(payload.Amount))
-	errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
+	errInsertHistory := u.tfRepo.InsertTransferHistory(ctx, transferInfo)
 	if errInsertHistory != nil {
 		tx.Rollback()
 		panic(errInsertHistory)
 	}
 	// insert notification to receiver
 	notification := domain.NewNotification(foundReceiver.Id, transferInfo, foundReceiver)
-	errInsertNotification := u.TransferRepo.InsertToNotification(ctx, notification)
+	errInsertNotification := u.tfRepo.InsertToNotification(ctx, notification)
 
 	if errInsertNotification != nil {
 		transferInfo := domain.NewHistoryTransfer(userid, foundSender.User, foundSender.Name, foundReceiver.User, foundReceiver.Name, "FAILED", payload.Notes, payload.Amount, foundSender.Balance, foundSender.Balance)
-		errInsertHistory := u.TransferRepo.InsertTransferHistory(ctx, transferInfo)
+		errInsertHistory := u.tfRepo.InsertTransferHistory(ctx, transferInfo)
 		if errInsertHistory != nil {
 			panic(errInsertHistory)
 		}

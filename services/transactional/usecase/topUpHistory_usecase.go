@@ -12,7 +12,7 @@ import (
 	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
 )
 
-func (u *Usecase) GetAllHistoryTopUp(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.HistoryTopUpForGetAll] {
+func (u *Usecase) GetAllHistoryTopUp(ctx context.Context, user *dto.XUserData) dto.APIResponse[*[]domain.GetHistoryTopUpForGetAll] {
 	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
 
@@ -20,18 +20,18 @@ func (u *Usecase) GetAllHistoryTopUp(ctx context.Context, user *dto.XUserData) d
 	if err != nil {
 		panic(err)
 	}
-	response := dto.APIResponse[*[]domain.HistoryTopUpForGetAll]{StatusCode: 200, Data: history, Message: "Ok"}
+	response := dto.APIResponse[*[]domain.GetHistoryTopUpForGetAll]{StatusCode: 200, Data: history, Message: "Ok"}
 	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
 
-func (u *Usecase) GetHistoryTopUpById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.HistoryTopUp] {
+func (u *Usecase) GetHistoryTopUpById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[*domain.GetHistoryTopUpById] {
 	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
 	// find is read and do some conditional
 	isRead, errFind := u.topUpRepo.FindIsRead(ctx, id)
 	if errFind == sql.ErrNoRows {
-		response := dto.APIResponse[*domain.HistoryTopUp]{StatusCode: 404, Message: errors.ErrHistoryNoRows.Error()}
+		response := dto.APIResponse[*domain.GetHistoryTopUpById]{StatusCode: 404, Message: errors.ErrHistoryNoRows.Error()}
 		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
@@ -49,7 +49,7 @@ func (u *Usecase) GetHistoryTopUpById(ctx context.Context, user *dto.XUserData, 
 
 	history, err := u.topUpRepo.GetHistoryTopUpById(ctx, id, userid)
 	if err == sql.ErrNoRows {
-		response := dto.APIResponse[*domain.HistoryTopUp]{StatusCode: 404, Message: errors.ErrHistoryNoRows.Error()}
+		response := dto.APIResponse[*domain.GetHistoryTopUpById]{StatusCode: 404, Message: errors.ErrHistoryNoRows.Error()}
 		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
@@ -58,7 +58,7 @@ func (u *Usecase) GetHistoryTopUpById(ctx context.Context, user *dto.XUserData, 
 		panic(err)
 	}
 
-	response := dto.APIResponse[*domain.HistoryTopUp]{StatusCode: 200, Data: history, Message: "Ok"}
+	response := dto.APIResponse[*domain.GetHistoryTopUpById]{StatusCode: 200, Data: history, Message: "Ok"}
 	log.Info().Int("Status Code", response.StatusCode).Interface("Data", response.Data).Str("Message", response.Message).Msg("Response logs")
 	return response
 }
@@ -66,7 +66,7 @@ func (u *Usecase) GetHistoryTopUpById(ctx context.Context, user *dto.XUserData, 
 func (u *Usecase) DeleteAllHistoryTopUp(ctx context.Context, user *dto.XUserData) dto.APIResponse[interface{}] {
 	log := config.Log()
 	userid, _ := strconv.Atoi(user.UserId)
-	tx, err := u.topUpRepo.StartACID(ctx)
+	tx, err := u.topUpRepo.StartTransaction(ctx)
 
 	if err != nil {
 		panic(err)
@@ -90,7 +90,7 @@ func (u *Usecase) DeleteAllHistoryTopUp(ctx context.Context, user *dto.XUserData
 
 func (u *Usecase) DeleteHistoryTopUpById(ctx context.Context, user *dto.XUserData, id int) dto.APIResponse[interface{}] {
 	userid, _ := strconv.Atoi(user.UserId)
-	tx, err := u.topUpRepo.StartACID(ctx)
+	tx, err := u.topUpRepo.StartTransaction(ctx)
 	if err != nil {
 		panic(err)
 	}

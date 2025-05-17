@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"log"
 
-	history_config "github.com/syafiqparadisam/paymentku/services/history/config"
-	"github.com/syafiqparadisam/paymentku/services/history/test/mock"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	"github.com/syafiqparadisam/paymentku/services/transactional/test/mock"
 )
 
 type UserSeeder struct {
-	MySql *history_config.MySqlStore
+	MySql *config.MySqlStore
 }
 
-func NewUserSeeder(mysql *history_config.MySqlStore) *UserSeeder {
+func NewUserSeeder(mysql *config.MySqlStore) *UserSeeder {
 	return &UserSeeder{
 		MySql: mysql,
 	}

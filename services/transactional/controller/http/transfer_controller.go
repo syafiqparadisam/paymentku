@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
-	"go.opentelemetry.io/otel"
 )
 
 // gorong mariiii.
@@ -15,9 +14,7 @@ func (s *ControllerHTTP) HandleTransfer(w http.ResponseWriter, r *http.Request, 
 	tfReq := &dto.TransferRequest{}
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	tracer := otel.GetTracerProvider()
-	ctx, span := tracer.Tracer("github.com/syafiqparadisam/paymentku/services/transactional/controller/http").Start(ctx, "create transfer")
-	defer span.End()
+
 	if err := json.NewDecoder(r.Body).Decode(tfReq); err != nil {
 		return WriteJSON(w, http.StatusBadRequest, dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid input format"})
 	}

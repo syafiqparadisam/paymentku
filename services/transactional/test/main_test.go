@@ -7,11 +7,12 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/syafiqparadisam/paymentku/services/history/config"
-	controller_http "github.com/syafiqparadisam/paymentku/services/history/controller/http"
-	history_repo "github.com/syafiqparadisam/paymentku/services/history/repository/history"
-	"github.com/syafiqparadisam/paymentku/services/history/test/seeder"
-	"github.com/syafiqparadisam/paymentku/services/history/usecase"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
+	controller_http "github.com/syafiqparadisam/paymentku/services/transactional/controller/http"
+	topup_repo "github.com/syafiqparadisam/paymentku/services/transactional/repository/topup"
+	transfer_repo "github.com/syafiqparadisam/paymentku/services/transactional/repository/transfer"
+	"github.com/syafiqparadisam/paymentku/services/transactional/test/seeder"
+	"github.com/syafiqparadisam/paymentku/services/transactional/usecase"
 )
 
 type HistoryTest struct {
@@ -53,9 +54,9 @@ func TestHistory(t *testing.T) {
 		TransferSeeder: tfSeeder,
 	}
 
-	tfRepo := history_repo.NewTransferRepository(mysql)
-	topUpRepo := history_repo.NewTopUpRepository(mysql)
-	usecase := usecase.NewHistoryUsecase(tfRepo, topUpRepo)
+	tfRepo := transfer_repo.NewTransferRepository(mysql)
+	topUpRepo := topup_repo.NewTopUpRepository(mysql)
+	usecase := usecase.NewTransactionalUsecase(tfRepo, topUpRepo)
 	cfg := config.NewHTTPConfig().WithPort(appPort)
 	server := controller_http.NewControllerHTTP(usecase, cfg)
 	history := NewHistoryTest(t, server, seeder)

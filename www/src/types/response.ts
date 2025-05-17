@@ -7,14 +7,14 @@ export type Response<T> = {
 export type User = {
     user: string
     email: string
-    balance: number
+    balance: string
     photo_profile: string
     photo_public_id: string | null
     accountNumber: number
     name: string
     created_at: string
     bio: string
-    phoneNumber: string
+    phone_number: string
 }
 
 export type FindUserByAccount = {
@@ -46,7 +46,7 @@ export type HistoryTopUps = {
 export type HistoryTopUp = {
     id: number,
     amount: number,
-    balance: number,
+    balance: BigInt,
     previousBalance: number,
     isRead: boolean,
     status: "SUCCESS" | "FAILED",
@@ -69,8 +69,8 @@ export type HistoryTransfer = {
     receiver: string,
     notes: string,
     senderName: string,
-    previousBalance: number,
-    balance: number,
+    previousBalance: BigInt,
+    balance: BigInt,
     receiverName: string,
     amount: number,
     isRead: boolean,

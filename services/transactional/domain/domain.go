@@ -1,6 +1,8 @@
 package domain
 
-type HistoryTopUp struct {
+import "time"
+
+type GetHistoryTopUpById struct {
 	Id              int    `json:"id"`
 	Amount          uint   `json:"amount"`
 	Balance         int64  `json:"balance"`
@@ -10,7 +12,7 @@ type HistoryTopUp struct {
 	CreatedAt       string `json:"createdAt"`
 }
 
-type HistoryTopUpForGetAll struct {
+type GetHistoryTopUpForGetAll struct {
 	Id        int    `json:"id"`
 	Amount    uint   `json:"amount"`
 	IsRead    bool   `json:"isRead"`
@@ -18,7 +20,7 @@ type HistoryTopUpForGetAll struct {
 	CreatedAt string `json:"createdAt"`
 }
 
-type HistoryTransferForGetAll struct {
+type GetHistoryTransfers struct {
 	Id        int    `json:"id"`
 	Sender    string `json:"sender"`
 	Receiver  string `json:"receiver"`
@@ -28,7 +30,7 @@ type HistoryTransferForGetAll struct {
 	CreatedAt string `json:"createdAt"`
 }
 
-type HistoryTransfer struct {
+type GetHistoryTransferById struct {
 	Id              int     `json:"id"`
 	Sender          string  `json:"sender"`
 	Receiver        string  `json:"receiver"`
@@ -41,4 +43,54 @@ type HistoryTransfer struct {
 	Balance         int64   `json:"balance"`
 	ReceiverName    string  `json:"receiverName"`
 	CreatedAt       string  `json:"createdAt"`
+}
+
+type CreateHistoryTopUp struct {
+	UserId          int
+	Amount          uint
+	Balance         int64
+	Status          string
+	PreviousBalance int64
+	CreatedAt       string
+}
+
+type CreateHistoryTransfer struct {
+	UserId          int
+	Sender          string
+	SenderName      string
+	Receiver        string
+	ReceiverName    string
+	Status          string
+	Notes           string
+	Amount          uint
+	Balance         int64
+	PreviousBalance int64
+	CreatedAt       string
+}
+
+func NewHistoryTransfer(userid int, sender string, senderName, receiver string, receiverName, status, notes string, amount uint, prevBalance, balance int64) *CreateHistoryTransfer {
+	return &CreateHistoryTransfer{
+		UserId:          userid,
+		Sender:          sender,
+		SenderName:      senderName,
+		Receiver:        receiver,
+		ReceiverName:    receiverName,
+		PreviousBalance: prevBalance,
+		Balance:         balance,
+		Status:          status,
+		Notes:           notes,
+		Amount:          amount,
+		CreatedAt:       time.Now().UTC().Format("2006-01-02T15:04:05.999Z"),
+	}
+}
+
+func NewHistoryTopUp(amount uint, balance int64, prevBalance int64, status string, userid int) *CreateHistoryTopUp {
+	return &CreateHistoryTopUp{
+		UserId:          userid,
+		Amount:          amount,
+		Balance:         balance,
+		Status:          status,
+		PreviousBalance: prevBalance,
+		CreatedAt:       time.Now().UTC().Format("2006-01-02T15:04:05.999Z"),
+	}
 }

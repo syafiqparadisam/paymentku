@@ -21,11 +21,11 @@ func NewTransferSeeder(mysql *config.MySqlStore) *TransferSeeder {
 }
 
 type HistoryTransfer struct {
-	Id           int64
+	Id           int
 	Sender       string
 	Receiver     string
 	Notes        string
-	Amount       uint
+	Amount       int
 	IsRead       int8
 	Status       string
 	SenderName   string

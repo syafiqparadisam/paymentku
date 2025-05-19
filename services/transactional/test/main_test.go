@@ -17,8 +17,9 @@ import (
 
 type HistoryTest struct {
 	*Seeder
-	Test       *testing.T
-	Controller *controller_http.ControllerHTTP
+	Test           *testing.T
+	Controller     *controller_http.ControllerHTTP
+	InternalSecret string
 }
 
 type Seeder struct {
@@ -31,15 +32,16 @@ func TestHistory(t *testing.T) {
 	envFilePath := "../.env"
 	godotenv.Load(envFilePath)
 
-	appPort := os.Getenv("HISTORY_SVC_PORT")
+	appPort := os.Getenv("APP_PORT")
 	t.Log(appPort)
+
+	internalSecret := os.Getenv("INTERNAL_SECRET")
 	user := os.Getenv("DB_USER")
 	pass := os.Getenv("DB_PASSWD")
 	host := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
-	dbParam := os.Getenv("DB_PARAM")
-	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s", user, pass, host, dbPort, dbName, dbParam)
+	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, pass, host, dbPort, dbName)
 	mysql, errSql := config.NewMySqlStore(url)
 	if errSql != nil {
 		log.Fatal(errSql)
@@ -59,12 +61,12 @@ func TestHistory(t *testing.T) {
 	usecase := usecase.NewTransactionalUsecase(tfRepo, topUpRepo)
 	cfg := config.NewHTTPConfig().WithPort(appPort)
 	server := controller_http.NewControllerHTTP(usecase, cfg)
-	history := NewHistoryTest(t, server, seeder)
+	history := NewHistoryTest(t, server, seeder, internalSecret)
 	history.Start()
 }
 
-func NewHistoryTest(t *testing.T, controller *controller_http.ControllerHTTP, seeder *Seeder) *HistoryTest {
-	return &HistoryTest{Test: t, Controller: controller, Seeder: seeder}
+func NewHistoryTest(t *testing.T, controller *controller_http.ControllerHTTP, seeder *Seeder, internalSecret string) *HistoryTest {
+	return &HistoryTest{Test: t, Controller: controller, Seeder: seeder, InternalSecret: internalSecret}
 }
 
 func (h *HistoryTest) Start() {

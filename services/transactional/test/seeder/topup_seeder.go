@@ -16,11 +16,11 @@ type TopUpSeeder struct {
 
 type TopUp struct {
 	Id              int64
-	Amount          uint
+	Amount          int
 	Balance         int64
 	PreviousBalance int64
 	IsRead          int8
-	UserId          int64
+	UserId          int
 	Status          string
 	CreatedAt       string
 }

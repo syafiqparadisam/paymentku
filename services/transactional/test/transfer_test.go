@@ -8,8 +8,10 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	controller_http "github.com/syafiqparadisam/paymentku/services/transactional/controller/http"
 	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
@@ -45,7 +47,11 @@ func (h *HistoryTest) GetAllHistoryTransfer(t *testing.T) {
 	}()
 
 	// setup request
-	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/transfer?userid=%d", senderIdUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodGet, server.URL, http.NoBody)
+	req.Header.Add("X-Internal-Secret", h.InternalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
+	req.Header.Add("X-Userid", strconv.FormatInt(senderIdUser, 10))
+
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
@@ -88,6 +94,7 @@ func (h *HistoryTest) GetHistoryTransferById(t *testing.T) {
 
 	// setup server
 	server := httptest.NewServer(controller_http.MakeHTTPHandler(h.Controller.ExstractHeaderXUserData(h.Controller.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
+
 	defer func() {
 		h.Seeder.TransferSeeder.Down(idTransfer1)
 		h.Seeder.UserSeeder.Down(senderIdUser, senderIdProfile)
@@ -95,8 +102,13 @@ func (h *HistoryTest) GetHistoryTransferById(t *testing.T) {
 		server.Close()
 	}()
 
+	fmt.Println(server.URL)
 	// setup request
-	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/transfer/%d?userid=%d", idTransfer1, senderIdUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/%d", idTransfer1), http.NoBody)
+	req.Header.Add("X-Internal-Secret", h.InternalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
+	req.Header.Add("X-Userid", strconv.FormatInt(senderIdUser, 10))
+
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
@@ -150,7 +162,11 @@ func (h *HistoryTest) GetHistoryTransferByWrongId(t *testing.T) {
 
 	// setup request
 	randomIdTf := rand.Intn(10000)
-	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/transfer/%d?userid=%d", randomIdTf, senderIdUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/%d", randomIdTf), http.NoBody)
+	req.Header.Add("X-Internal-Secret", h.InternalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
+	req.Header.Add("X-Userid", strconv.FormatInt(senderIdUser, 10))
+
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
@@ -185,7 +201,11 @@ func (h *HistoryTest) DeleteHistoryTransferById(t *testing.T) {
 	}()
 
 	// setup request
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/transfer/%d?userid=%d", idTransfer1, senderIdUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/%d", idTransfer1), http.NoBody)
+	req.Header.Add("X-Internal-Secret", h.InternalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
+	req.Header.Add("X-Userid", strconv.FormatInt(senderIdUser, 10))
+
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
@@ -225,7 +245,11 @@ func (h *HistoryTest) DeleteHistoryTransferByWrongId(t *testing.T) {
 
 	// setup request
 	randomIdTf := rand.Intn(100000)
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/transfer/%d?userid=%d", randomIdTf, senderIdUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/%d", randomIdTf), http.NoBody)
+	req.Header.Add("X-Internal-Secret", h.InternalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
+	req.Header.Add("X-Userid", strconv.FormatInt(senderIdUser, 10))
+
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 
@@ -263,7 +287,11 @@ func (h *HistoryTest) DeleteAllHistoryTransfer(t *testing.T) {
 	}()
 
 	// setup request
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+fmt.Sprintf("/transfer?userid=%d", senderIdUser), http.NoBody)
+	req, _ := http.NewRequest(http.MethodDelete, server.URL, http.NoBody)
+	req.Header.Add("X-Internal-Secret", h.InternalSecret)
+	req.Header.Add("X-Request-id", uuid.New().String())
+	req.Header.Add("X-Userid", strconv.FormatInt(senderIdUser, 10))
+
 	client := &http.Client{}
 	resp, _ := client.Do(req)
 

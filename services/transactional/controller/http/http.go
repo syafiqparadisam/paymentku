@@ -45,8 +45,10 @@ func MakeHTTPHandler(f HandlerFunc, methods ...string) http.HandlerFunc {
 
 		}()
 
+
 		if header.Get("X-Internal-Secret") != internalSecret || header.Get("X-Request-id") == ""{
 			WriteJSON(w, http.StatusForbidden, dto.APIResponse[interface{}]{StatusCode: http.StatusForbidden, Message: errors.ErrUnauthorizedInternalAccess.Error()})
+			return
 		}
 
 		if r.Method != methods[0] && r.Method != methods[1] {
@@ -71,6 +73,7 @@ func (s *ControllerHTTP) ExstractHeaderXUserData(f decodeJWTTokenFunc) HandlerFu
 		if err := f(w, r, XUserData); err != nil {
 			return err
 		}
+
 		return nil
 	}
 }

@@ -13,6 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileModule } from './profile/profile.module';
 import { DataSource } from 'typeorm';
 import { mysqlOptionRunner } from './ormconfig';
+import { TransactionalModule } from './transactional/transactional.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { mysqlOptionRunner } from './ormconfig';
     ]),
     CloudinaryModule,
     ProfileModule,
+    TransactionalModule,
   ],
   providers: [Logger],
 })

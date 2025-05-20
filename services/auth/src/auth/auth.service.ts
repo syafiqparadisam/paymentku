@@ -165,6 +165,7 @@ export class AuthService {
           message: 'Wrong Username or Password',
         };
       }
+      
       const comparePass = await this.usersService.comparePassword(
         payload.password,
         user.password,

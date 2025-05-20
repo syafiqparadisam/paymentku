@@ -1,4 +1,16 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
-@Controller('transactional')
-export class TransactionalController {}
+@Controller('/api/v1')
+export class TransactionalController {
+  @Get('history/topup')
+  async getHistoryTopup() {
+
+  }
+
+  @Get('/history/transfer')
+  async getHistoryTransfer() {
+
+  }
+
+  
+}

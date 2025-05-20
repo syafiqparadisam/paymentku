@@ -35,13 +35,7 @@ import { AccessTokenGuardGuard } from '../access-token-guard/access-token-guard.
 import { ConfigService } from '@nestjs/config';
 import jwtPayload from '../interfaces/jwtPayload';
 import { GoogleStrategy } from './strategies/google.strategy';
-import crypto from 'crypto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { allowedFile } from '../config/cloudinary-config';
-import { diskStorage } from 'multer';
-import path from 'node:path';
-import fs from 'node:fs/promises';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+
 
 @Controller('/api/v1')
 export class AuthController {

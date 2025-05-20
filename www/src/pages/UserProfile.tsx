@@ -35,9 +35,7 @@ import toRupiah from "@develoka/angka-rupiah-js";
 import UploadFileDialog from "../component/UploadFileDialog";
 import useAlert from "../hooks/useAlert";
 import Alert from "../component/Alert";
-import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../features/user/userSlice";
-import { User } from "../types/response";
+import { useDispatch } from "react-redux";
 
 const UserProfile = () => {
   const [updateName, { isSuccess: successUpdateName }] =
@@ -93,8 +91,8 @@ const UserProfile = () => {
     cleanUp();
     setErr("");
     refetch();
-    console.log(data.data)
-    dispatch(setUser(data.data));
+    // console.log(data.data)
+    // dispatch(setUser(data.data));
   }, [
     successUpdateBio,
     successUpdateName,

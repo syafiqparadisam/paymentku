@@ -236,7 +236,7 @@ const UserProfile = () => {
                       fontFamily: "sans-serif",
                     }}
                     minRows={5}
-                    defaultValue={user.bio}
+                    defaultValue={user?.bio}
                     onChange={(e) => {
                       updateVal(e.target.value);
                     }}
@@ -330,7 +330,7 @@ const UserProfile = () => {
                 <Avatar
                   alt="Travis Howard"
                   sx={{ width: "300px", height: "300px" }}
-                  src={user.photo_profile}
+                  src={user?.photo_profile}
                 />
               </Badge>
             </Box>
@@ -340,12 +340,12 @@ const UserProfile = () => {
               <Input
                 sx={{ marginBottom: "20px" }}
                 fullWidth
-                value={user.user}
+                value={user?.user}
                 onClick={handleUpdateUsername}
               />
               <InputLabel>Name: </InputLabel>
               <Input
-                value={user.name}
+                value={user?.name}
                 onClick={(e: MouseEvent<HTMLDivElement, MouseEvent> | any) => {
                   openModal(e.target.value, "name");
                 }}
@@ -368,7 +368,7 @@ const UserProfile = () => {
             >
               <Typography fontWeight={"bold"}>
                 Your balance is{" "}
-                {toRupiah(user.balance, { dot: ",", floatingPoint: 0 })}
+                {toRupiah(user?.balance, { dot: ",", floatingPoint: 0 })}
               </Typography>
             </Box>
             <Box
@@ -382,7 +382,7 @@ const UserProfile = () => {
               <TextField
                 size="small"
                 disabled
-                value={user.accountNumber}
+                value={user?.accountNumber}
               ></TextField>
             </Box>
             <Box
@@ -393,7 +393,7 @@ const UserProfile = () => {
               pt={3}
             >
               <label>Email :</label>
-              <TextField size="small" disabled value={user.email}></TextField>
+              <TextField size="small" disabled value={user?.email}></TextField>
             </Box>
             <Box
               display={"flex"}
@@ -405,9 +405,9 @@ const UserProfile = () => {
               <label>Phone number :</label>
               <TextField
                 size="small"
-                value={user.phone_number}
+                value={user?.phone_number}
                 placeholder={
-                  user.phone_number == null
+                  user?.phone_number == null
                     ? "You haven't yet set your phone number"
                     : ""
                 }
@@ -430,7 +430,7 @@ const UserProfile = () => {
                   openModal(e.target.value, "Bio");
                 }}
                 minRows={5}
-                value={user.bio ? user.bio : "You don't have a bio"}
+                value={user?.bio ? user?.bio : "You don't have a bio"}
               ></TextareaAutosize>
             </Box>
             <Box
@@ -442,7 +442,7 @@ const UserProfile = () => {
             >
               <Typography fontWeight={"bold"}>
                 This account was created at{" "}
-                {timeStampToLocaleString(user.created_at)}
+                {timeStampToLocaleString(user?.created_at || new Date())}
               </Typography>
             </Box>
             <Box display={"flex"} flexDirection={"row"} mt={7} gap={2}>

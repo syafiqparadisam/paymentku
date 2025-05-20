@@ -20,13 +20,32 @@ type TopUp struct {
 	Balance         int64
 	PreviousBalance int64
 	IsRead          int8
-	UserId          int
+	UserId          int64
 	Status          string
 	CreatedAt       string
 }
 
 func NewTopUpSeeder(mysql *config.MySqlStore) *TopUpSeeder {
 	return &TopUpSeeder{MySql: mysql}
+}
+
+
+func (topupSeeder *TopUpSeeder) Find(idUser int64) *[]TopUp {
+	rows, err := topupSeeder.MySql.Db.Query("SELECT id,amount,balance,previous_balance,isRead,userId,status,created_at FROM history_topup WHERE userId = ?", idUser)
+	if err != nil {
+		panic(err)
+	}
+	arrTopUp := []TopUp{}
+	for rows.Next() {
+		topup := &TopUp{}
+		if err := rows.Scan(&topup.Id, &topup.Amount, &topup.Balance, &topup.PreviousBalance, &topup.IsRead, &topup.UserId, &topup.Status, &topup.CreatedAt); err != nil {
+			fmt.Println("SCANNING ERROR")
+			panic(err)
+		}
+		arrTopUp = append(arrTopUp, *topup)
+	}
+	fmt.Println("Topup seeder has been up")
+	return &arrTopUp
 }
 
 func (topUpSeeder *TopUpSeeder) FindAll(userid int) (*[]domain.GetHistoryTopUpForGetAll, error) {
@@ -74,6 +93,20 @@ func (topUpSeeder *TopUpSeeder) Up(payload *mock.HistoryTopUp) int64 {
 	fmt.Println("Topup seeder has been up")
 	return idTopUp
 }
+
+
+func (topupSeeder *TopUpSeeder) DownFromUserId(userid int64) {
+	result, err := topupSeeder.MySql.Db.Exec("DELETE FROM history_topup WHERE userId = ?", userid)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	affRows, _ := result.RowsAffected()
+	if affRows == 0 {
+		panic("Nothing to update")
+	}
+	fmt.Println("Topup seeder has been down")
+}
+
 
 func (topupSeeder *TopUpSeeder) Down(id int64) {
 	result, err := topupSeeder.MySql.Db.Exec("DELETE FROM history_topup WHERE id = ?", id)

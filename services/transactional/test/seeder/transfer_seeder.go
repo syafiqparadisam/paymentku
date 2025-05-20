@@ -20,6 +20,23 @@ func NewTransferSeeder(mysql *config.MySqlStore) *TransferSeeder {
 	}
 }
 
+
+type HistoryTransferFull struct {
+	Id              int64
+	Sender          string
+	Receiver        string
+	Notes           string
+	Amount          uint
+	IsRead          int8
+	Status          string
+	SenderName      string
+	ReceiverName    string
+	CreatedAt       string
+	PreviousBalance int64
+	Balance         int64
+	UserId          int64
+}
+
 type HistoryTransfer struct {
 	Id           int
 	Sender       string
@@ -32,6 +49,38 @@ type HistoryTransfer struct {
 	ReceiverName string
 	CreatedAt    string
 	UserId       int64
+}
+
+func (transferSeeder *TransferSeeder) Find(idUser int64) *[]HistoryTransferFull {
+	rows, err := transferSeeder.MySql.Db.Query("SELECT * FROM history_transfer WHERE userId = ?", idUser)
+	if err != nil {
+		panic(err)
+	}
+
+	arrOfHistory := []HistoryTransferFull{}
+	for rows.Next() {
+		history := &HistoryTransferFull{}
+		if err := rows.Scan(
+			&history.Id,
+			&history.Sender,
+			&history.SenderName,
+			&history.Receiver,
+			&history.ReceiverName,
+			&history.PreviousBalance,
+			&history.Balance,
+			&history.Status,
+			&history.Notes,
+			&history.Amount,
+			&history.IsRead,
+			&history.CreatedAt,
+			&history.UserId,
+		); err != nil {
+			panic(err)
+		}
+		arrOfHistory = append(arrOfHistory, *history)
+	}
+	fmt.Println("Transfer Seeder has been up")
+	return &arrOfHistory
 }
 
 func (transferSeeder *TransferSeeder) Up(payload *mock.HistoryTransfer) int64 {
@@ -98,6 +147,20 @@ func (transferSeeder *TransferSeeder) FindById(id int, userid int) (*domain.GetH
 	}
 	return nil, sql.ErrNoRows
 }
+
+
+func (transferSeeder *TransferSeeder) DownFromUserid(idUser int64) {
+	result, err := transferSeeder.MySql.Db.Exec("DELETE FROM history_transfer WHERE userId = ?", idUser)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	affRows, _ := result.RowsAffected()
+	if affRows == 0 {
+		panic("Nothing to update")
+	}
+	fmt.Println("Transfer Seeder has been down")
+}
+
 
 func (transferSeeder *TransferSeeder) Down(idTransfer int64) {
 	result, err := transferSeeder.MySql.Db.Exec("DELETE FROM history_transfer WHERE id = ?", idTransfer)

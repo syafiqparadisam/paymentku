@@ -4,7 +4,7 @@ import "time"
 
 type GetHistoryTopUpById struct {
 	Id              int    `json:"id"`
-	Amount          uint   `json:"amount"`
+	Amount          int   `json:"amount"`
 	Balance         int64  `json:"balance"`
 	PreviousBalance int64  `json:"previousBalance"`
 	IsRead          bool   `json:"isRead"`
@@ -14,7 +14,7 @@ type GetHistoryTopUpById struct {
 
 type GetHistoryTopUpForGetAll struct {
 	Id        int    `json:"id"`
-	Amount    uint   `json:"amount"`
+	Amount    int   `json:"amount"`
 	IsRead    bool   `json:"isRead"`
 	Status    string `json:"status"`
 	CreatedAt string `json:"createdAt"`
@@ -24,7 +24,7 @@ type GetHistoryTransfers struct {
 	Id        int    `json:"id"`
 	Sender    string `json:"sender"`
 	Receiver  string `json:"receiver"`
-	Amount    uint   `json:"amount"`
+	Amount    int   `json:"amount"`
 	IsRead    bool   `json:"isRead"`
 	Status    string `json:"status"`
 	CreatedAt string `json:"createdAt"`
@@ -35,7 +35,7 @@ type GetHistoryTransferById struct {
 	Sender          string  `json:"sender"`
 	Receiver        string  `json:"receiver"`
 	Notes           *string `json:"notes"`
-	Amount          uint    `json:"amount"`
+	Amount          int    `json:"amount"`
 	IsRead          bool    `json:"isRead"`
 	Status          string  `json:"status"`
 	SenderName      string  `json:"senderName"`
@@ -47,7 +47,7 @@ type GetHistoryTransferById struct {
 
 type CreateHistoryTopUp struct {
 	UserId          int
-	Amount          uint
+	Amount          int
 	Balance         int64
 	Status          string
 	PreviousBalance int64
@@ -84,7 +84,7 @@ func NewHistoryTransfer(userid int, sender string, senderName, receiver string, 
 	}
 }
 
-func NewHistoryTopUp(amount uint, balance int64, prevBalance int64, status string, userid int) *CreateHistoryTopUp {
+func NewHistoryTopUp(amount int, balance int64, prevBalance int64, status string, userid int) *CreateHistoryTopUp {
 	return &CreateHistoryTopUp{
 		UserId:          userid,
 		Amount:          amount,

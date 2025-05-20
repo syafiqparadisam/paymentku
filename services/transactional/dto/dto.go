@@ -5,7 +5,7 @@ type XUserData struct {
 }
 
 type TopUpRequest struct {
-	Amount uint `json:"amount" required:"true"`
+	Amount int `json:"amount" required:"true"`
 }
 
 type TransferRequest struct {

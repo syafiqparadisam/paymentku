@@ -23,9 +23,9 @@
     "migrate-generate": "npx typeorm-ts-node-esm migration:generate ./src/migration/Migrate -d ./src/ormconfig.ts",
     "migrate-create": "npx typeorm migration:create ./src/migration/Migrate"
   },
-  
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
+    "@nestjs/axios": "^4.0.0",
     "@nestjs/cache-manager": "^2.2.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
@@ -38,6 +38,7 @@
     "@nestjs/typeorm": "^10.0.1",
     "@types/bcrypt": "^5.0.2",
     "@types/opossum": "^8.1.7",
+    "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "cache-manager-redis-store": "^3.0.1",
     "class-transformer": "^0.5.1",

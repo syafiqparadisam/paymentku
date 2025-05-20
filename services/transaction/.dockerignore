@@ -1,5 +1,0 @@
-test/*
-*_test.go
-.golangci.yml
-*.out
-*.env.*

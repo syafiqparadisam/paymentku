@@ -26,6 +26,7 @@ type Seeder struct {
 	TopUpSeeder    *seeder.TopUpSeeder
 	UserSeeder     *seeder.UserSeeder
 	TransferSeeder *seeder.TransferSeeder
+	NotifSeeder    *seeder.NotifSeeder
 }
 
 func TestHistory(t *testing.T) {
@@ -50,10 +51,12 @@ func TestHistory(t *testing.T) {
 	userSeeder := seeder.NewUserSeeder(mysql)
 	topupSeeder := seeder.NewTopUpSeeder(mysql)
 	tfSeeder := seeder.NewTransferSeeder(mysql)
+	notifSeeder := seeder.NewNotifSeeder(mysql)
 	seeder := &Seeder{
 		UserSeeder:     userSeeder,
 		TopUpSeeder:    topupSeeder,
 		TransferSeeder: tfSeeder,
+		NotifSeeder: notifSeeder,
 	}
 
 	tfRepo := transfer_repo.NewTransferRepository(mysql)
@@ -83,4 +86,11 @@ func (h *HistoryTest) Start() {
 	h.Test.Run("DeleteHistoryTransferById", h.DeleteHistoryTransferById)
 	h.Test.Run("DeleteHistoryTransferByWrongId", h.DeleteHistoryTransferByWrongId)
 	h.Test.Run("DeleteAllHistoryTransfer", h.DeleteAllHistoryTransfer)
+
+	h.Test.Run("Do topup", h.CreateTopUpTransaction)
+	h.Test.Run("Do topup with 0 amount", h.CreateTopUpTransactionWith0Amount)
+	h.Test.Run("Do transfer", h.CreateTransferTransaction)
+	h.Test.Run("Do transfer with less balance", h.CreateTransferTransactionWithLessBalance)
+	h.Test.Run("Do transfer with self account number", h.CreateTransferTransactionWithSelfAccountNumber)
+
 }

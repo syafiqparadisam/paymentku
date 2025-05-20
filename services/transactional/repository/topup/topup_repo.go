@@ -31,7 +31,7 @@ func (s *TopUpRepository) FindBalanceById(tx *sql.Tx, ctx context.Context, useri
 	return nil, sql.ErrNoRows
 }
 
-func (s *TopUpRepository) IncreaseBalanceById(tx *sql.Tx, ctx context.Context, amount uint, id int) error {
+func (s *TopUpRepository) IncreaseBalanceById(tx *sql.Tx, ctx context.Context, amount int, id int) error {
 	// query to update balance
 	result, err := tx.ExecContext(ctx, "update users set balance = balance + ?  where id = ?", amount, id)
 	if err != nil {

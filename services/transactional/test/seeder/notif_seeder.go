@@ -3,11 +3,11 @@ package seeder
 import (
 	"fmt"
 
-	transaction_config "github.com/syafiqparadisam/paymentku/services/transaction/config"
+	"github.com/syafiqparadisam/paymentku/services/transactional/config"
 )
 
 type NotifSeeder struct {
-	MySql *transaction_config.MySqlStore
+	MySql *config.MySqlStore
 }
 
 type Notification struct {
@@ -21,7 +21,7 @@ type Notification struct {
 	Description string
 }
 
-func NewNotifSeeder(mysql *transaction_config.MySqlStore) *NotifSeeder {
+func NewNotifSeeder(mysql *config.MySqlStore) *NotifSeeder {
 	return &NotifSeeder{
 		MySql: mysql,
 	}

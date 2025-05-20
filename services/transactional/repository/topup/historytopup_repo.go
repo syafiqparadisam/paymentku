@@ -24,7 +24,7 @@ type TopUpInterface interface {
 	DeleteAllHistoryTopUp(tx *sql.Tx, ctx context.Context, userid int) error
 	UpdateIsRead(ctx context.Context, id int) error
 	FindBalanceById(tx *sql.Tx, ctx context.Context, id int) (*domain.Balance, error)
-	IncreaseBalanceById(tx *sql.Tx, ctx context.Context, amount uint, id int) error
+	IncreaseBalanceById(tx *sql.Tx, ctx context.Context, amount int, id int) error
 	CreateTopUpHistory(ctx context.Context, domain *domain.CreateHistoryTopUp) error
 	StartTransaction(ctx context.Context) (*sql.Tx, error)
 	FindIsRead(ctx context.Context, id int) (*domain.IsRead, error)

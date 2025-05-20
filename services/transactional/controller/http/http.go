@@ -45,8 +45,7 @@ func MakeHTTPHandler(f HandlerFunc, methods ...string) http.HandlerFunc {
 
 		}()
 
-
-		if header.Get("X-Internal-Secret") != internalSecret || header.Get("X-Request-id") == ""{
+		if header.Get("X-Internal-Secret") != internalSecret || header.Get("X-Request-id") == "" {
 			WriteJSON(w, http.StatusForbidden, dto.APIResponse[interface{}]{StatusCode: http.StatusForbidden, Message: errors.ErrUnauthorizedInternalAccess.Error()})
 			return
 		}
@@ -94,8 +93,9 @@ func (s *ControllerHTTP) Routes() http.Handler {
 	mux.Handle("/history/topup", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleAllTopUpHistory), http.MethodGet, http.MethodDelete))
 	mux.Handle("/history/topup/{id}", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTopUpHistoryById), http.MethodGet, http.MethodDelete))
 	mux.Handle("/history/transfer/{id}", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransferHistoryById), http.MethodGet, http.MethodDelete))
-	mux.Handle("POST /topup", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandlerTopUp), http.MethodPost))
-	mux.Handle("POST /transfer", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransfer), http.MethodPost))
+
+	mux.Handle("POST /transaction/topup", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandlerTopUp), http.MethodPost))
+	mux.Handle("POST /transaction/transfer", MakeHTTPHandler(s.ExstractHeaderXUserData(s.HandleTransfer), http.MethodPost))
 	fmt.Printf("Server listening on port%s\n", s.cfg.Port)
 
 	return mux

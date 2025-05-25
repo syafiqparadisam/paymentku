@@ -14,6 +14,7 @@ import UserProfile from "./UserProfile";
 import { Help, Settings } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
+import { route } from "../constant/route";
 
 type Props = {
   children: ReactNode | ReactElement;
@@ -38,7 +39,7 @@ const User: React.FC<Props> = ({ children }) => {
           <List sx={{ width: "100%" }}>
             <ListItem
               disablePadding
-              onClick={() => navigate("/dashboard/user")}
+              onClick={() => navigate(route["user"])}
               sx={{ width: "100%" }}
             >
               <ListItemButton>
@@ -58,7 +59,7 @@ const User: React.FC<Props> = ({ children }) => {
             </ListItem>
             <ListItem
               disablePadding
-              onClick={() => navigate("/dashboard/history/topup")}
+              onClick={() => navigate(route["topuphistory"])}
               sx={{ width: "100%" }}
             >
               <ListItemButton>
@@ -78,7 +79,7 @@ const User: React.FC<Props> = ({ children }) => {
             </ListItem>
             <ListItem
               disablePadding
-              onClick={() => navigate("/dashboard/settings")}
+              onClick={() => navigate(route["settings"])}
               sx={{ width: "100%" }}
             >
               <ListItemButton>
@@ -98,7 +99,7 @@ const User: React.FC<Props> = ({ children }) => {
             </ListItem>
             <ListItem
               disablePadding
-              onClick={() => navigate("/dashboard/help")}
+              onClick={() => navigate(route["help"])}
               sx={{ width: "100%" }}
             >
               <ListItemButton>

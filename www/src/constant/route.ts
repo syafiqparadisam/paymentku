@@ -3,12 +3,12 @@ export const route = {
   signin: "/signin",
   home: "/",
   forgotPassword: "/forgotPassword",
-  transferhistory: "/dashboard/history/transfer",
-  topuphistory: "/dashboard/history/topup",
+  transferhistory: "/dashboard/user/history/transfer",
+  topuphistory: "/dashboard/user/history/topup",
   transfer: "/dashboard/transfer",
   topup: "/dashboard/topup",
   signup: "/signup",
-  help: "/dashboard/help",
-  settings: "/dashboard/settings",
+  help: "/dashboard/user/help",
+  settings: "/dashboard/user/settings",
   user: "/dashboard/user"
 };

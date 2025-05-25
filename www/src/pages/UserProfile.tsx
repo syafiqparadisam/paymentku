@@ -2,6 +2,7 @@ import { ArrowBack } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import { TextareaAutosize } from "@mui/base";
 import { useState, useEffect } from "react";
+import * as yup from "yup";
 import {
   Box,
   Button,
@@ -17,48 +18,47 @@ import {
   DialogContent,
 } from "@mui/material";
 import {
-  // useUpdateNameMutation,
-  // useUpdateBioMutation,
-  // useUpdatePhoneMutation,
+  useUpdateNameMutation,
+  useUpdatePhoneMutation,
   useGetUserQuery,
+  useUpdateBioMutation,
 } from "../services/profileApi";
-import {
-  //   useDeleteAccountMutation,
-  useLogoutMutation,
-  //   useUpdateUsernameMutation,
-} from "../services/authApi";
+import { useLogoutMutation } from "../services/authApi";
 import timeStampToLocaleString from "../utils/timeStampToClient";
-// import { useValidation } from "../hooks/useValidation";
 import { useNavigate } from "react-router-dom";
 // @ts-ignore
 import toRupiah from "@develoka/angka-rupiah-js";
 import UploadFileDialog from "../component/UploadFileDialog";
-// import useAlert from "../hooks/useAlert";
 import Alert from "../component/Alert";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../app/store";
-import { setUser } from "../features/user/userSlice";
-import { FieldValues, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import {
-  updateUsernameSchema,
+  setBio,
+  setName,
+  setPhoneNumber,
+  setUser,
+} from "../features/user/userSlice";
+import {
+  updateBioSchema,
+  updateNameSchema,
+  updatePhoneSchema,
 } from "../utils/validationSchema";
 
 const UserProfile = () => {
   const user = useSelector((state: RootState) => state.user);
-  // const [updateName, { isSuccess: successUpdateName }] =
-  //   useUpdateNameMutation();
-  // const [updateBio, { isSuccess: successUpdateBio }] = useUpdateBioMutation();
-  // const [updatePhone, { isSuccess: successUpdatePhone }] =
-  //   useUpdatePhoneMutation();
-  // const [updateUser, { isSuccess: successUpdateUser }] =
-  //   useUpdateUsernameMutation();
+  const [updateName, { isSuccess: successUpdateName }] =
+    useUpdateNameMutation();
+  const [updateBio, { isSuccess: successUpdateBio }] = useUpdateBioMutation();
+  const [updatePhone, { isSuccess: successUpdatePhone }] =
+    useUpdatePhoneMutation();
   const [logout, { isSuccess: successLogout }] = useLogoutMutation();
-  // const [deleteAccount, { isSuccess: successDeleteAccount }] =
-  //   useDeleteAccountMutation();
-  // const [label, setLabel] = useState("");
-  // const [valueInput, setValue] = useState("");
   const { data, isSuccess } = useGetUserQuery();
+
+  const [val, setValue] = useState({
+    bio: "",
+    phoneNumber: "",
+    name: "",
+  });
   const dispatch = useDispatch();
   const [ui, setUI] = useState({
     alert: false,
@@ -66,129 +66,44 @@ const UserProfile = () => {
     uploadFile: false,
   });
 
+  const [err, setErr] = useState({
+    bio: "",
+    phoneNumber: "",
+    name: "",
+  });
   
-  const resolver = yupResolver(updateUsernameSchema);
-  const { handleSubmit} = useForm({ resolver });
-
   useEffect(() => {
+    console.log(data?.data);
     if (isSuccess && data?.data) {
       dispatch(setUser(data?.data));
+      setValue({
+        bio: data?.data.bio,
+        phoneNumber: data?.data.phone_number,
+        name: data?.data.name,
+      });
     }
   }, [isSuccess]);
-  // const {
-  //   handleUpdateUsername,
-  //   setValueForUsername,
-  //   validateInput,
-  //   cleanUp,
-  //   label,
-  //   open,
-  //   value,
-  //   valueForUsername,
-  //   updateVal,
-  //   totalInput,
-  //   openModal,
-  //   validatePhoneNumber,
-  //   valueForPassword,
-  //   setValueForPassword,
-  // } = useValidation();
 
   const navigate = useNavigate();
-  // useEffect(() => {
-  //   cleanUp();
-  //   setErr("");
+  useEffect(() => {
+    if (successUpdateBio) {
+      setErr((prev) => ({ ...prev, bio: "" }));
+      dispatch(setBio({ bio: val.bio }));
+    }
 
-  //   if (successUpdateBio) {
-  //     dispatch(setBio());
-  //   }
-  // }, [
-  //   successUpdateBio,
-  //   successUpdateName,
-  //   successUpdatePhone,
-  //   successUpdateUser,
-  // ]);
-
-  // // Memilih schema validasi berdasarkan currentLabel
-  // const currentSchema = useMemo(() => {
-  //   switch (currentLabel) {
-  //     case "username":
-  //       return updateUsernameSchema;
-  //     case "name":
-  //       return updateNameSchema;
-  //     case "Bio":
-  //       return updateBioSchema;
-  //     case "Phone number":
-  //       return updatePhoneSchema;
-
-  //     default:
-  //       return z.object({}); // Schema kosong jika tidak ada label yang cocok
-  //   }
-  // }, [currentLabel]);
-
-  // async function handleSubmit() {
-  //   try {
-  //     switch (label) {
-  //       case "username":
-  //         const {
-  //           success: successUsername,
-  //           error: errUsername,
-  //           trimmedval,
-  //         } = validateInput(valueForUsername);
-  //         if (!successUsername) {
-  //           throw { data: { message: errUsername } };
-  //         }
-  //         await updateUser({
-  //           username: trimmedval,
-  //           password: valueForPassword,
-  //         }).unwrap();
-  //         break;
-  //       case "name":
-  //         const {
-  //           success: successName,
-  //           error: errName,
-  //           trimmedval: nameVal,
-  //         } = validateInput(value);
-
-  //         if (!successName) {
-  //           throw { data: { message: errName } };
-  //         }
-  //         await updateName({ name: nameVal }).unwrap();
-  //         break;
-  //       case "Bio":
-  //         await updateBio({ bio: value }).unwrap();
-
-  //         break;
-  //       case "Phone number":
-  //         const {
-  //           success: successPhone,
-  //           error: errPhone,
-  //           trimmedval: phoneVal,
-  //         } = validatePhoneNumber(value);
-  //         if (!successPhone) {
-  //           throw { data: { message: errPhone } };
-  //         }
-  //         await updatePhone({ phoneNumber: phoneVal }).unwrap();
-  //         break;
-  //       case "delete account":
-  //         await deleteAccount({ password: value }).unwrap();
-  //         break;
-  //       default:
-  //         throw new Error("Something went wrong");
-  //     }
-  //   } catch (e) {
-  //     setErr(e);
-  //   }
-  // }
-
-  const onSubmits = async (data: FieldValues) => {
-    console.log("Form submitted with data:", data);
-  };
+    if (successUpdatePhone) {
+      setErr((prev) => ({ ...prev, phoneNumber: "" }));
+      dispatch(setPhoneNumber({ phone_number: val.phoneNumber }));
+    }
+    if (successUpdateName) {
+      setErr((prev) => ({ ...prev, name: "" }));
+      dispatch(setName({ name: val.name }));
+    }
+  }, [successUpdateBio, successUpdateName, successUpdatePhone]);
 
   return (
     <>
-      <UploadFileDialog
-        open={ui.uploadFile}
-        setOpen={() => setUI((prev) => ({ ...prev, uploadFile: true }))}
-      />
+      <UploadFileDialog open={ui.uploadFile} setOpen={setUI} />
 
       <Alert
         open={ui.alert}
@@ -210,101 +125,38 @@ const UserProfile = () => {
         fullWidth
       >
         <DialogTitle id="alert-dialog-title" fontWeight={"bold"}>
-          Update 
+          Update
         </DialogTitle>
-        <form onSubmit={handleSubmit(onSubmits)}>
-          <DialogContent>
-            <Box display={"flex"} width={"100%"} justifyContent={"center"}>
-              {/* {err && (
-              <Typography
-                color={"red"}
-                textAlign={"center"}
-                fontWeight={"bold"}
-                fontSize={"15px"}
-              >
-                {err?.data?.message}
-              </Typography>
-            )} */}
-            </Box>
-            <Box
-              display={"flex"}
-              flexDirection={"column"}
-              justifyContent={"center"}
-            >
-              <Typography fontWeight={"bold"}>
-                {/* {label === "username" || label === "delete account"
-                ? "If you're login with google, Please don't fill password field"
-                : ""} */}
-              </Typography>
-              {/* <InputLabel htmlFor={label}>{label} :</InputLabel>
-            {label != "Bio" ? (
-              <TextField
-                sx={{ fontWeight: "bold", fontSize: "15px" }}
-                defaultValue={label === "username" ? valueForUsername : value}
-                onChange={(e) => {
-                  if (label === "username") {
-                    setValueForUsername(e.target.value);
-                  } else {
-                    updateVal(e.target.value);
-                  }
-                }}
-              />
-            ) : (
-              <>
-                <TextareaAutosize
-                  id={label}
-                  style={{
-                    border: "1px solid black",
-                    fontFamily: "sans-serif",
-                  }}
-                  minRows={5}
-                  defaultValue={user?.bio}
-                  onChange={(e) => {
-                    updateVal(e.target.value);
-                  }}
-                ></TextareaAutosize>
-              </>
-            )} */}
-            </Box>
-            {/* {totalInput > 1 && (
-            <Box display={"flex"} flexDirection={"column"} width={"100%"}>
-              <InputLabel
-                sx={{ fontWeight: "bold", fontSize: "15px" }}
-                htmlFor="pass"
-              >
-                Password :
-              </InputLabel>
-              <TextField
-                id="pass"
-                type="password"
-                onChange={(e) => {
-                  setValueForPassword(e.target.value);
-                }}
-              />
-            </Box>
-          )} */}
-          </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="error"
-              type="submit"
-              onClick={() => {
-                setUI((prev) => ({ ...prev, dialog: false }));
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              type="submit"
-              color="success"
-              onClick={() => {}}
-            >
-              Submit
-            </Button>
-          </DialogActions>
-        </form>
+        <DialogContent>
+          <Box display={"flex"} width={"100%"} justifyContent={"center"}></Box>
+          <Box
+            display={"flex"}
+            flexDirection={"column"}
+            justifyContent={"center"}
+          >
+            <Typography fontWeight={"bold"}></Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="error"
+            type="submit"
+            onClick={() => {
+              setUI((prev) => ({ ...prev, dialog: false }));
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            type="submit"
+            color="success"
+            onClick={() => {}}
+          >
+            Submit
+          </Button>
+        </DialogActions>
       </Dialog>
 
       <Box
@@ -365,12 +217,41 @@ const UserProfile = () => {
               value={user?.user}
               // onClick={handleUpdateUsername}
             />
-            <InputLabel>Name: </InputLabel>
+            <InputLabel>Nickname: </InputLabel>
+            {err?.name && <Typography color={"red"}>{err.name}</Typography>}
             <Input
-              value={user?.name}
-              // onClick={(e: MouseEvent<HTMLDivElement, MouseEvent> | any) => {
-              //   openModal(e.target.value, "name");
-              // }}
+              value={val.name}
+              onChange={(e) => {
+                try {
+                  setValue((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }));
+                  setErr((prev) => ({ ...prev, name: "" }));
+                  updateNameSchema.validateSync({
+                    name: e.target.value,
+                  });
+                } catch (error: any) {
+                  if (error instanceof yup.ValidationError) {
+                    setErr((prev) => ({ ...prev, name: error.message }));
+                    return;
+                  }
+                }
+              }}
+              onBlur={async (e) => {
+                try {
+                  setErr((prev) => ({ ...prev, name: "" }));
+                  await updateNameSchema.validate({
+                    name: e.target.value,
+                  });
+                  await updateName({ name: e.target.value });
+                } catch (error: any) {
+                  if (error instanceof yup.ValidationError) {
+                    setErr((prev) => ({ ...prev, name: error.message }));
+                    return;
+                  }
+                }
+              }}
             />
           </Box>
         </Box>
@@ -425,14 +306,48 @@ const UserProfile = () => {
             pt={3}
           >
             <label>Phone number :</label>
+            {err?.phoneNumber && (
+              <Typography color={"red"}>{err.phoneNumber}</Typography>
+            )}
             <TextField
               size="small"
-              value={user?.phone_number}
+              value={val.phoneNumber}
               placeholder={
                 user?.phone_number == null
                   ? "You haven't yet set your phone number"
                   : ""
               }
+              onChange={(e) => {
+                try {
+                  setValue((prev) => ({
+                    ...prev,
+                    phoneNumber: e.target.value,
+                  }));
+                  setErr((prev) => ({ ...prev, phoneNumber: "" }));
+                  updatePhoneSchema.validateSync({
+                    phoneNumber: e.target.value,
+                  });
+                } catch (error: any) {
+                  if (error instanceof yup.ValidationError) {
+                    setErr((prev) => ({ ...prev, phoneNumber: error.message }));
+                    return;
+                  }
+                }
+              }}
+              onBlur={async (e) => {
+                try {
+                  setErr((prev) => ({ ...prev, phoneNumber: "" }));
+                  await updatePhoneSchema.validate({
+                    phoneNumber: e.target.value,
+                  });
+                  await updatePhone({ phoneNumber: e.target.value });
+                } catch (error: any) {
+                  if (error instanceof yup.ValidationError) {
+                    setErr((prev) => ({ ...prev, phoneNumber: error.message }));
+                    return;
+                  }
+                }
+              }}
             ></TextField>
           </Box>
           <Box
@@ -443,11 +358,40 @@ const UserProfile = () => {
             pt={3}
           >
             <label>Bio :</label>
+            {err?.bio && <Typography color={"red"}>{err.bio}</Typography>}
             <TextareaAutosize
               style={{ border: "1px solid black", fontFamily: "sans-serif" }}
-              onChange={() => {}}
+              onChange={(e) => {
+                try {
+                  setValue((prev) => ({ ...prev, bio: e.target.value }));
+                  setErr((prev) => ({ ...prev, bio: "" }));
+                  const bio = updateBioSchema.validateSync({
+                    bio: e.target.value,
+                  });
+                  console.log(bio);
+                } catch (error: any) {
+                  if (error instanceof yup.ValidationError) {
+                    setErr((prev) => ({ ...prev, bio: error.message }));
+                    return;
+                  }
+                }
+              }}
+              onBlur={async (e) => {
+                try {
+                  setErr((prev) => ({ ...prev, bio: "" }));
+                  await updateBioSchema.validate({
+                    bio: e.target.value,
+                  });
+                  await updateBio({ bio: e.target.value });
+                } catch (error: any) {
+                  if (error instanceof yup.ValidationError) {
+                    setErr((prev) => ({ ...prev, bio: error.message }));
+                    return;
+                  }
+                }
+              }}
               minRows={5}
-              value={user?.bio ? user?.bio : "You don't have a bio"}
+              value={val.bio}
             ></TextareaAutosize>
           </Box>
           <Box
@@ -470,16 +414,7 @@ const UserProfile = () => {
                 setUI((prev) => ({ ...prev, alert: true }));
               }}
             >
-              Logout aja
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              // onClick={(e: MouseEvent<HTMLButtonElement, MouseEvent> | any) => {
-              //   openModal(e.target.value + "", "delete account");
-              // }}
-            >
-              Delete account
+              Logout
             </Button>
           </Box>
         </Box>

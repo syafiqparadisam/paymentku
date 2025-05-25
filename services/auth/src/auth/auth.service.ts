@@ -94,10 +94,7 @@ export class AuthService {
       );
       if (userAndprofile.profile.name == null) {
         // delete cache profile
-        await this.redisService.deleteCacheProfile(
-          [lockKey],
-          userAndprofile.id,
-        );
+        await this.redisService.delCacheProfile(userAndprofile.id, [lockKey]);
 
         await this.usersService.updateName(
           userAndprofile.profile.id,
@@ -107,10 +104,7 @@ export class AuthService {
       }
       if (userAndprofile.profile.photo_profile == null) {
         // delete cache profile
-        await this.redisService.deleteCacheProfile(
-          [lockKey],
-          userAndprofile.id,
-        );
+        await this.redisService.delCacheProfile(userAndprofile.id, [lockKey]);
 
         await this.usersService.updatePhotoProfile(
           payload.picture,
@@ -165,7 +159,7 @@ export class AuthService {
           message: 'Wrong Username or Password',
         };
       }
-      
+
       const comparePass = await this.usersService.comparePassword(
         payload.password,
         user.password,
@@ -432,15 +426,17 @@ export class AuthService {
   }
 
   async updatePassword(newPwDTo: NewPWDTO, token: string): Promise<response> {
-    if (newPwDTo.confirmPassword != newPwDTo.password) {
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Please confirm your password as same as your password on top',
-      };
-    }
-
-    const lockKey = crypto.randomUUID();
     try {
+      if (newPwDTo.confirmPassword != newPwDTo.password) {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message:
+            'Please confirm your password as same as your password on top',
+        };
+      }
+
+      const lockKey = crypto.randomUUID();
+
       // get user by userid
       const id = await this.redisService.getPWToken(token, [lockKey]);
       if (!id) {
@@ -452,6 +448,8 @@ export class AuthService {
 
       // update new password
       await this.usersService.updatePassword(newPwDTo.password, Number(id));
+
+      await this.redisService.delCacheProfile(Number(id), [lockKey]);
 
       // delete password token, after password updated
       await this.redisService.deletePWToken(token, [lockKey]);
@@ -508,8 +506,7 @@ export class AuthService {
       }
 
       // delete cache profile
-      await this.redisService.deleteCacheProfile([lockKey], userData.user_id);
-
+      await this.redisService.delCacheProfile(userData.user_id, [lockKey]);
       // updating username
       await this.usersService.updateUsername(userData.user_id, dto.username);
       return {
@@ -558,6 +555,7 @@ export class AuthService {
         userData.user_id,
       );
       await this.usersService.deleteAccount(userData.user_id, join.profile.id);
+      await this.redisService.delCacheProfile(userData.user_id, [lockKey]);
 
       return { statusCode: HttpStatus.OK, message: 'Successfully to delete' };
     } catch (error) {

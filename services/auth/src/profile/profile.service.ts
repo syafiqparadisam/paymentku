@@ -7,6 +7,7 @@ import { profile } from 'src/interfaces/profile';
 import jwtPayload from 'src/interfaces/jwtPayload';
 import fs from 'node:fs/promises';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { lock } from 'superagent';
 @Injectable()
 export class ProfileService {
   constructor(
@@ -27,12 +28,12 @@ export class ProfileService {
 
         // set cache
         await this.redisService.cacheUserProfile(userid, [lockKey], profile);
-        console.log(profile);
         return {
           statusCode: HttpStatus.OK,
           data: profile,
         };
       }
+      console.log(profile);
 
       return {
         statusCode: HttpStatus.OK,
@@ -43,11 +44,16 @@ export class ProfileService {
     }
   }
 
-  async updatePhoneNumber(phone_number: string, user_id: number): Promise<response> {
+  async updatePhoneNumber(
+    phone_number: string,
+    user_id: number,
+  ): Promise<response> {
     try {
       const user = await this.usersService.joiningUserAndProfile(user_id);
       await this.usersService.updatePhoneNumber(user.profile.id, phone_number);
-
+      const lockKey = crypto.randomUUID();
+      await this.redisService.delCacheProfile(user_id, [lockKey]);
+      
       return {
         statusCode: HttpStatus.OK,
         message: 'Successfully update phone number',
@@ -61,6 +67,8 @@ export class ProfileService {
     try {
       const user = await this.usersService.joiningUserAndProfile(user_id);
       await this.usersService.updateBio(user.profile.id, bio);
+      const lockKey = crypto.randomUUID();
+      await this.redisService.delCacheProfile(user_id, [lockKey]);
 
       return {
         statusCode: HttpStatus.OK,
@@ -75,6 +83,8 @@ export class ProfileService {
     try {
       const user = await this.usersService.joiningUserAndProfile(user_id);
       await this.usersService.updateName(user.profile.id, name);
+      const lockKey = crypto.randomUUID();
+      await this.redisService.delCacheProfile(user_id, [lockKey]);
 
       return {
         statusCode: HttpStatus.OK,
@@ -110,7 +120,6 @@ export class ProfileService {
     publicIdImg: string,
   ): Promise<response> {
     try {
-      const lockKey = crypto.randomUUID();
       // upload file to cloudinary
       const result = await this.cloudinaryService.uploadImage(pathUploadfile);
 
@@ -119,7 +128,8 @@ export class ProfileService {
         userData.user_id,
       );
       // delete cache profile
-      await this.redisService.deleteCacheProfile([lockKey], userData.user_id);
+      const lockKey = crypto.randomUUID()
+      await this.redisService.delCacheProfile(userData.user_id, [lockKey])
 
       await this.usersService.updatePhotoProfile(
         result.secure_url,

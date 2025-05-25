@@ -9,7 +9,7 @@ export class updateName {
 export class updatePhoneNumber {
   @IsNotEmpty()
   @IsString()
-  @Matches(/^(\+62|62|0)8[1-9][0-9]{6,9}$/, {
+  @Matches(/^0\d{9,14}$/, {
     message: 'Nomor telepon tidak valid',
   })
   phone_number: string;

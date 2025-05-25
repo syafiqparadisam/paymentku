@@ -27,10 +27,14 @@ export class RedisService {
       typeof v === 'bigint' ? v.toString() : v,
     );
 
-    console.log(val);
-
     await this.redisStore.setex('userprofile:' + userid.toString(), 120, val);
     await locking.release();
+  }
+
+  async delCacheProfile(userid: number, lockKey: string[]) {
+    const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
+    await this.redisStore.del('userprofile:' + userid.toString())
+    await locking.release()
   }
 
   async getCacheProfile(
@@ -42,7 +46,7 @@ export class RedisService {
     if (!user) return null;
     await locking.release();
     const parsedUser = JSON.parse(user);
-    parsedUser.balance = parsedUser.balance.toString()
+    parsedUser.balance = parsedUser.balance.toString();
     return parsedUser;
   }
 
@@ -67,11 +71,7 @@ export class RedisService {
       throw error;
     }
   }
-  async deleteCacheProfile(lockKey: string[], userid: number) {
-    const locking = await this.redisLock.acquire(lockKey, this.durationQuery);
-    await this.redisStore.del(`userprofile:${userid}`);
-    await locking.release();
-  }
+
 
   async isAuthTokenAlreadyExist(
     key: string,

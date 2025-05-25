@@ -39,8 +39,14 @@ export const userSlice = createSlice({
     ) => {
       state.phone_number = action.payload.phone_number;
     },
+    setName: (
+      state,
+      action: PayloadAction<Pick<User, "name">>
+    ) => {
+      state.name = action.payload.name;
+    },
   },
 });
 
-export const { setUser, setBio, setPhoneNumber } = userSlice.actions;
+export const { setUser, setBio, setPhoneNumber,setName } = userSlice.actions;
 export default userSlice.reducer;

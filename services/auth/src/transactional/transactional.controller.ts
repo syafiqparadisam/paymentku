@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -23,7 +24,7 @@ export class TransactionalController {
   ) {}
 
   private async forwardRequest(
-    method: 'GET' | 'POST',
+    method: 'GET' | 'POST' | 'DELETE',
     path: string,
     req,
     data?: any,
@@ -41,11 +42,20 @@ export class TransactionalController {
       headers,
     };
 
-    const response = await firstValueFrom(
-      method === 'GET'
-        ? this.httpService.get(url, options)
-        : this.httpService.post(url, data, options),
-    );
+    let response;
+    switch (method) {
+      case 'GET':
+        response = await firstValueFrom(this.httpService.get(url, options));
+        break;
+      case 'POST':
+        response = await firstValueFrom(
+          this.httpService.post(url, data, options),
+        );
+        break;
+      case 'DELETE':
+        response = await firstValueFrom(this.httpService.delete(url, options));
+        break;
+    }
 
     return response;
   }
@@ -56,7 +66,19 @@ export class TransactionalController {
     try {
       const path = `/history/topup`;
       const result = await this.forwardRequest('GET', path, req);
-      console.log(result.data);
+      return res.status(result.status).json(result.data);
+    } catch (error) {
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Delete('history/topup')
+  @UseGuards(AccessTokenGuardGuard)
+  async deleteHistoryTopup(@Req() req: Request, @Res() res) {
+    try {
+      const path = `/history/transfer`;
+      const result = await this.forwardRequest('DELETE', path, req);
+      console.log(result)
       return res.status(result.status).json(result.data);
     } catch (error) {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -74,7 +96,6 @@ export class TransactionalController {
       console.log('melbu kene kan');
       const path = `/history/topup/${id}`;
       const result = await this.forwardRequest('GET', path, req);
-      console.log(result.data);
       return res.status(result.status).json(result.data);
     } catch (error) {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -87,7 +108,18 @@ export class TransactionalController {
     try {
       const path = `/history/transfer`;
       const result = await this.forwardRequest('GET', path, req);
-      console.log(result.data);
+      return res.status(result.status).json(result.data);
+    } catch (error) {
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Delete('history/transfer')
+  @UseGuards(AccessTokenGuardGuard)
+  async deleteHistoryTransfer(@Req() req: Request, @Res() res) {
+    try {
+      const path = `/history/transfer`;
+      const result = await this.forwardRequest('DELETE', path, req);
       return res.status(result.status).json(result.data);
     } catch (error) {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -104,7 +136,6 @@ export class TransactionalController {
     try {
       const path = `/history/transfer/${id}`;
       const result = await this.forwardRequest('GET', path, req);
-      console.log(result.data);
       return res.status(result.status).json(result.data);
     } catch (error) {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -121,7 +152,6 @@ export class TransactionalController {
         req,
         body,
       );
-      console.log(result.data);
       return res.status(result.status).json(result.data);
     } catch (error) {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -138,7 +168,6 @@ export class TransactionalController {
         req,
         body,
       );
-      console.log(result.data);
       return res.status(result.status).json(result.data);
     } catch (error) {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);

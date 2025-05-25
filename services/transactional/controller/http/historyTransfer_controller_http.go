@@ -35,7 +35,7 @@ func (c *ControllerHTTP) GetTransferHistoryById(w http.ResponseWriter, r *http.R
 	defer cancel()
 	
 
-	id, err := ExtractIDFromPath(r, "/transfer/")
+	id, err := ExtractIDFromPath(r, "/history/transfer/")
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, &dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid history id"})
 	}
@@ -47,7 +47,7 @@ func (c *ControllerHTTP) DeleteTransferHistoryById(w http.ResponseWriter, r *htt
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	
-	id, err := ExtractIDFromPath(r, "/transfer/")
+	id, err := ExtractIDFromPath(r, "/history/transfer/")
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, &dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid history id"})
 	}

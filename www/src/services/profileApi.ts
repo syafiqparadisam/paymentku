@@ -11,7 +11,13 @@ const profileApi = authApi.injectEndpoints({
       providesTags: ["user"],
       transformErrorResponse(baseQueryReturnValue, meta) {
         if (meta?.response?.status === 401 || meta?.response?.status === 403) {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin";
+          if (
+            window.location.href !=
+            import.meta.env.VITE_FRONTEND_URL + "/signin"
+          ) {
+            window.location.href =
+              import.meta.env.VITE_FRONTEND_URL + "/signin";
+          }
         }
         if (baseQueryReturnValue.status == "FETCH_ERROR") {
           window.location.href = import.meta.env.VITE_FRONTEND_URL;

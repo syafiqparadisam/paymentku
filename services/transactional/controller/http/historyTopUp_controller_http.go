@@ -34,7 +34,8 @@ func (c *ControllerHTTP) GetTopUpHistoryById(w http.ResponseWriter, r *http.Requ
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	id, err := ExtractIDFromPath(r, "/topup/")
+	id, err := ExtractIDFromPath(r, "/history/topup/")
+
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, &dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid history id"})
 	}
@@ -47,7 +48,7 @@ func (c *ControllerHTTP) DeleteTopUpHistoryById(w http.ResponseWriter, r *http.R
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	id, err := ExtractIDFromPath(r, "/topup/")
+	id, err := ExtractIDFromPath(r, "/history/topup/")
 	if err != nil {
 		return WriteJSON(w, http.StatusBadRequest, &dto.APIResponse[interface{}]{StatusCode: http.StatusBadRequest, Message: "Invalid history id"})
 	}

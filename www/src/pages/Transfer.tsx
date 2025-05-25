@@ -44,6 +44,7 @@ const Transfer = () => {
     },
   ] = useTransferMutation();
   const [accountNumber, { data, isSuccess }] = useFindAccountMutation();
+  let debounceTimeout: NodeJS.Timeout;
   useEffect(() => {
     if (accNum.length == 0) return;
     if (!/^\d+$/.test(accNum)) {
@@ -51,7 +52,14 @@ const Transfer = () => {
       return;
     }
     setErr({ data: { message: " " } });
-    accountNumber({accNum: Number(accNum)}).unwrap()
+    // Bersihkan debounce sebelumnya
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      accountNumber({ accNum: Number(accNum) }).unwrap();
+    }, 1000);
+
+    // Optional: bersihkan saat komponen unmount
+    return () => clearTimeout(debounceTimeout);
   }, [accNum]);
 
   const navigate = useNavigate();
@@ -75,7 +83,8 @@ const Transfer = () => {
     if (successTransfer) {
       setOpenSnackbar(true);
     }
-  }, [errTransfer, successTransfer]);
+    setOpen(false)
+  }, [successTransfer]);
 
   return (
     <>
@@ -89,7 +98,6 @@ const Transfer = () => {
           message={dataTransfer?.message}
         />
       )}
-      {/* {errTransfer?.} */}
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -106,9 +114,9 @@ const Transfer = () => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" fontWeight={"bold"}>
-            Do you really want to transfer{" "}
+            Are you sure you want to transfer{" "}
             {toRupiah(Number(amount), { dot: ",", floatingPoint: 0 })} from{" "}
-            {data?.data?.user} ??
+            {data?.data?.user}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -190,23 +198,6 @@ const Transfer = () => {
                   fullWidth
                   onChange={(e) => setAccNum(e.target.value)}
                 />
-                {/* <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={async () => {
-                    try {
-                      accNum.length == 0
-                        ? null
-                        : await accountNumber({
-                            accNum: Number(accNum),
-                          }).unwrap();
-                    } catch (error) {
-                      setErr(error);
-                    }
-                  }}
-                >
-                  Find
-                </Button> */}
               </Box>
               <Box>
                 {err?.data?.message !== "" && (

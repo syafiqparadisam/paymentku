@@ -27,7 +27,6 @@ function App() {
   return (
     <>
       <GlobalStyles styles={[]}>
-
       </GlobalStyles>
       <BrowserRouter>
         {/* <Navbar /> */}

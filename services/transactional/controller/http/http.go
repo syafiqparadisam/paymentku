@@ -80,11 +80,12 @@ func (s *ControllerHTTP) ExstractHeaderXUserData(f decodeJWTTokenFunc) HandlerFu
 func NewControllerHTTP(usecase usecase.UsecaseInterface, cfg *config.HTTPConfig) *ControllerHTTP {
 	return &ControllerHTTP{usecase: usecase, cfg: cfg}
 }
-
 func ExtractIDFromPath(r *http.Request, prefix string) (int, error) {
-	path := strings.TrimPrefix(r.URL.Path, prefix)
-	idStr := strings.Trim(path, "/")
-	return strconv.Atoi(idStr)
+    path := strings.TrimPrefix(r.URL.Path, prefix) // tambahkan slash!
+
+    idStr := strings.Trim(path, "/")
+
+    return strconv.Atoi(idStr)
 }
 
 func (s *ControllerHTTP) Routes() http.Handler {

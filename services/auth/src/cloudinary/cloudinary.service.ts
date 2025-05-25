@@ -8,10 +8,9 @@ export class CloudinaryService {
     try {
       const result = await v2.uploader.upload(filePath, {
         transformation: {
-          width: 300,
-          height: 300,
+          aspect_ratio: "1.0",
           gravity: 'center',
-          crop: 'crop',
+          crop: 'fill',
         },
         resource_type: 'image',
       });

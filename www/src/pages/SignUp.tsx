@@ -13,15 +13,30 @@ import { Link, useNavigate } from "react-router-dom";
 import { SignUpInput } from "../types/dto";
 import { useSignUpMutation } from "../services/authApi";
 import { route } from "../constant/route";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useGetUserQuery } from "../services/profileApi";
+import { setUser } from "../features/user/userSlice";
 
 
 const SignUp = () => {
+  const { data, isSuccess: successUser } = useGetUserQuery();
+  const dispatch = useDispatch();
   const [signUp, { isSuccess, error }] = useSignUpMutation()
   const { register, handleSubmit, formState: { errors } } = useForm<SignUpInput>()
   const onSubmit: SubmitHandler<SignUpInput> = (data) => {
     signUp(data)
   }
   const navigate = useNavigate()
+
+  useEffect(() => {
+    console.log(data?.data);
+    if (successUser && data?.data) {
+      dispatch(setUser(data?.data));
+      navigate("/dashboard");
+    }
+  }, [successUser, data]);
+
   if (isSuccess) navigate("/signin")
   return (
     <>

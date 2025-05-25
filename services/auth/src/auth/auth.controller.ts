@@ -100,7 +100,7 @@ export class AuthController {
         secure: true,
       });
       const frontendUrl =
-        this.configService.get<string>('FRONTEND') + '/dashboard/user';
+        this.configService.get<string>('FRONTEND') + '/dashboard';
       return res.redirect(frontendUrl);
     } catch (error) {
       console.log(error);

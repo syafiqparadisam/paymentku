@@ -4,7 +4,7 @@ import CardItemDashboard from "../component/CardItemDashboard";
 import Category from "../component/Category";
 // @ts-ignore
 import toRupiah from "@develoka/angka-rupiah-js";
-import { route } from "../constant/route";
+import { route } from "../constant/route.ts";
 
 const Dashboard = () => {
   return (

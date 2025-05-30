@@ -76,9 +76,20 @@ export class TransactionalController {
   @UseGuards(AccessTokenGuardGuard)
   async deleteHistoryTopup(@Req() req: Request, @Res() res) {
     try {
-      const path = `/history/transfer`;
+      const path = `/history/topup`;
       const result = await this.forwardRequest('DELETE', path, req);
       console.log(result)
+      return res.status(result.status).json(result.data);
+    } catch (error) {
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  @Delete('history/topup/:id')
+  @UseGuards(AccessTokenGuardGuard)
+  async deleteHistoryTopupById(@Req() req: Request, @Res() res, @Param('id') id: string) {
+    try {
+      const path = `/history/topup/${id}`;
+      const result = await this.forwardRequest('DELETE', path, req);
       return res.status(result.status).json(result.data);
     } catch (error) {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -93,7 +104,6 @@ export class TransactionalController {
     @Param('id') id: string,
   ) {
     try {
-      console.log('melbu kene kan');
       const path = `/history/topup/${id}`;
       const result = await this.forwardRequest('GET', path, req);
       return res.status(result.status).json(result.data);
@@ -126,7 +136,19 @@ export class TransactionalController {
     }
   }
 
-  @Get('history/transfer/:id?')
+  @Delete('history/transfer/:id')
+  @UseGuards(AccessTokenGuardGuard)
+  async deleteHistoryTransferById(@Req() req: Request, @Res() res, @Param('id') id: string) {
+    try {
+      const path = `/history/transfer/${id}`;
+      const result = await this.forwardRequest('DELETE', path, req);
+      return res.status(result.status).json(result.data);
+    } catch (error) {
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Get('history/transfer/:id')
   @UseGuards(AccessTokenGuardGuard)
   async getHistoryTransferById(
     @Req() req: Request,

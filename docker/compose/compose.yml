@@ -27,7 +27,7 @@ services:
       retries: 10
     volumes:
       - mysqldb:/var/lib/mysql
-      - ../../../database/table.sql:/docker-entrypoint-initdb.d/initsql
+      - ../../database/table.sql:/docker-entrypoint-initdb.d/initsql
 
   # otel-collector:
   #   image: otel/opentelemetry-collector-contrib:0.118.0
@@ -73,7 +73,7 @@ services:
       - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
-      - ../../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf
 
 volumes:
    mysqldb:

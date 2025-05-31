@@ -26,7 +26,7 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - ../../../database/table.sql:/docker-entrypoint-initdb.d/initsql
+      - ../../database/table.sql:/docker-entrypoint-initdb.d/initsql
 
   redis:
     image: redis:7.4.1
@@ -37,4 +37,4 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
     volumes:
-      - ../../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf

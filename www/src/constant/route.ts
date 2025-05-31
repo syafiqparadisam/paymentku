@@ -12,6 +12,7 @@ export const route = {
   settings: "/dashboard/user/settings",
   user: "/dashboard/user",
   maintenance: "/maintenance",
+  passwordReset: "/passwordReset*"
 };
 
 export const excludeRedirectRouteWhenUnauth = [
@@ -19,4 +20,5 @@ export const excludeRedirectRouteWhenUnauth = [
   route["forgotPassword"],
   route["signup"],
   route["home"],
+  route["passwordReset"]
 ];

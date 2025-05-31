@@ -33,11 +33,10 @@ func NewRedisStore() (*RedisStore, error) {
 
 	redisHost := os.Getenv("REDIS_HOST")
 	redisPort := os.Getenv("REDIS_PORT")
-	redisPass := os.Getenv("REDIS_PASSWORD")
+
 	// Buat koneksi ke Redis
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
-		Password: redisPass,
 		DB:       0,
 	})
 

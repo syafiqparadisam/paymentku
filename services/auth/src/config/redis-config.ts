@@ -7,7 +7,6 @@ export const redisClientFactory: FactoryProvider<Redis> = {
     const redisInstance = new Redis({
       host: process.env.REDIS_HOST,
       port: parseInt(process.env.REDIS_PORT),
-      password: process.env.REDIS_PASSWORD
     });
 
     redisInstance.on('error', (e) => {

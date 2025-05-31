@@ -81,7 +81,7 @@ jobs:
       - name: Deploy transaction service to dockerhub
         uses: docker/build-push-action@v5
         with:
-          context: "{{defaultContext}}:services/transaction"
+          context: "{{defaultContext}}:services/transactional"
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/transactional_paymentku:${{secrets.DOCKER_TAGS_PAYMENTKU}}
 

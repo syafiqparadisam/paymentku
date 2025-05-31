@@ -40,9 +40,9 @@ jobs:
         run: |
           make docker-compose
       
-      - name: Create table to mysql
-        run: |
-           docker exec -i mysqldb mysql -u ${{secrets.DB_USER}} -p"${{ secrets.DB_PASSWD }}" ${{secrets.DB_NAME}} < database/table.sql
+      # - name: Create table to mysql
+      #   run: |
+      #      docker exec -i mysqldb mysql -u ${{secrets.DB_USER}} -p"${{ secrets.DB_PASSWD }}" ${{secrets.DB_NAME}} < database/table.sql
 
       - name: Test auth service
         run: |
@@ -51,9 +51,9 @@ jobs:
       - name: Test transactional service
         run: make test-transactional
       
-      - name: Cleaning table
-        run: |
-           docker exec -i mysqldb mysql -u ${{secrets.DB_USER}} -p"${{ secrets.DB_PASSWD }}" ${{secrets.DB_NAME}} < database/clean.sql
+      # - name: Cleaning table
+      #   run: |
+      #      docker exec -i mysqldb mysql -u ${{secrets.DB_USER}} -p"${{ secrets.DB_PASSWD }}" ${{secrets.DB_NAME}} < database/clean.sql
       
       - name: Down
         run: make down

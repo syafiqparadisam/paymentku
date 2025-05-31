@@ -7,7 +7,7 @@ COMPOSE_PATH := docker/compose/dev
 
 install:
 	cd services/auth && npm install
-	cd servicees/transactional && go mod download
+	cd services/transactional && go mod download
 	cd www && npm install
 	echo "Successfully install, then please fill .env file inside each services folder, www folder, docker/compose/dev folder like .env.example"
 
@@ -15,7 +15,7 @@ docker-compose:
 	docker compose -f ${COMPOSE_PATH}/compose.yml up -d
 
 # TRANSACTION START
-run-transactional: docker-compose	
+run-transactional:
 	cd ${TRANSACTION_SVC_PATH} && go build -o server.out server.go && ./server.out
 
 test-transactional:
@@ -23,7 +23,7 @@ test-transactional:
 # TRANSACTION END
 
 # AUTHENTICATION START
-run-auth: docker-compose
+run-auth:
 	cd ${AUTH_SVC_PATH} && npm run start:dev
 
 test-auth:
@@ -36,13 +36,6 @@ run-fe:
 
 # ALL
 test: test-auth test-transactional
-
-# MIGRATE
-migrate-run: docker-compose
-	cd services/auth && npm run migrate-run
-
-migrate-revert: docker-compose
-	cd services/auth && npm run migrate-revert
 
 down: 
 	docker compose -f ${COMPOSE_PATH}/compose.yml down

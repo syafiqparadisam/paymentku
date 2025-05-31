@@ -36,12 +36,19 @@ jobs:
         run: |
           make install
 
+      - name: Running docker compose 
+        run: |
+          make docker-compose
+
       - name: Test auth service
         run: |
           make test-auth
      
       - name: Test transactional service
         run: make test-transactional
+      
+      - name: Down
+        run: make down
     
   build:
     name: Staging

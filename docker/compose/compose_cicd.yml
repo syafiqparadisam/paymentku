@@ -1,0 +1,40 @@
+services:
+  mysqldb:
+    image: mysql:9.1
+    container_name: mysqldb
+    restart: on-failure
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_ROOT_USER: ${DB_USER}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWD}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "127.0.0.1",
+          "-u",
+          "root",
+          "--password=$$MYSQL_ROOT_PASSWORD",
+        ]   
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ../../../database/table.sql:/docker-entrypoint-initdb.d/initsql
+
+  redis:
+    image: redis:7.4.1
+    container_name: redis
+    restart: on-failure
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - ../../../database/redis/redis.conf:/usr/local/etc/redis/redis.conf

@@ -2,17 +2,20 @@
 
 TRANSACTION_SVC_PATH := services/transactional
 AUTH_SVC_PATH := services/auth
-COMPOSE_PATH := docker/compose/dev
+COMPOSE_PATH := docker/compose
 
 
 install:
 	cd services/auth && npm install
 	cd services/transactional && go mod download
 	cd www && npm install
-	echo "Successfully install, then please fill .env file inside each services folder, www folder, docker/compose/dev folder like .env.example"
+	echo "Successfully install, then please fill .env file inside each services folder, www folder, docker/compose folder like .env.example"
 
 docker-compose:
 	docker compose -f ${COMPOSE_PATH}/compose.yml up -d
+
+compose-cicd:
+	docker compose -f ${COMPOSE_PATH}/compose_cicd.yml up -d
 
 # TRANSACTION START
 run-transactional:

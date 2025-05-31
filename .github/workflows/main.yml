@@ -32,13 +32,16 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      - name: Prune all Docker volumes (dangerous)
+        run: docker volume prune -f
+
       - name: Setup Project
         run: |
           make install
-
+      
       - name: Running docker compose 
         run: |
-          make docker-compose
+          make compose-cicd
       
       # - name: Create table to mysql
       #   run: |

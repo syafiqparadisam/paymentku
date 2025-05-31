@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/syafiqparadisam/paymentku/services/transactional/config"
 	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
 	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
@@ -18,6 +19,7 @@ func (u *Usecase) InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequ
 		log.Info().Int("Status Code", response.StatusCode).Str("Message", response.Message).Msg("Response logs")
 		return response
 	}
+
 	// update balance and find user
 	userid, _ := strconv.Atoi(user.UserId)
 	tx, errTx := u.topUpRepo.StartTransaction(ctx)
@@ -44,6 +46,10 @@ func (u *Usecase) InsertHistoryTopUp(ctx context.Context, payload *dto.TopUpRequ
 	if err := tx.Commit(); err != nil {
 		panic(err)
 	}
+
+	lockKey := uuid.New().String()
+	u.topUpRepo.DeleteUserCache(userid, lockKey)
+	
 
 	topUpInfo := domain.NewHistoryTopUp(payload.Amount, balance.Balance+int64(payload.Amount), balance.Balance, "SUCCESS", userid)
 	errInsertHistory := u.topUpRepo.CreateTopUpHistory(ctx, topUpInfo)

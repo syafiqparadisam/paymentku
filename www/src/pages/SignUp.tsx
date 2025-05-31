@@ -30,7 +30,6 @@ const SignUp = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log(data?.data);
     if (successUser && data?.data) {
       dispatch(setUser(data?.data));
       navigate("/dashboard");

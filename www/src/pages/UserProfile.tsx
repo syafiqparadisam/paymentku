@@ -73,7 +73,6 @@ const UserProfile = () => {
   });
   
   useEffect(() => {
-    console.log(data?.data);
     if (isSuccess && data?.data) {
       dispatch(setUser(data?.data));
       setValue({
@@ -368,7 +367,6 @@ const UserProfile = () => {
                   const bio = updateBioSchema.validateSync({
                     bio: e.target.value,
                   });
-                  console.log(bio);
                 } catch (error: any) {
                   if (error instanceof yup.ValidationError) {
                     setErr((prev) => ({ ...prev, bio: error.message }));

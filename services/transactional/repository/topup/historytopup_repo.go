@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/syafiqparadisam/paymentku/services/transactional/config"
 	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
@@ -12,10 +13,12 @@ import (
 
 type TopUpRepository struct {
 	mysql *config.MySqlStore
+	redis *config.RedisStore
+	redisDuration time.Duration
 }
 
-func NewTopUpRepository(mysql *config.MySqlStore) *TopUpRepository {
-	return &TopUpRepository{mysql: mysql}
+func NewTopUpRepository(mysql *config.MySqlStore, redis *config.RedisStore) *TopUpRepository {
+	return &TopUpRepository{mysql: mysql, redis: redis, redisDuration: time.Second * 2}
 }
 
 type TopUpInterface interface {
@@ -29,6 +32,7 @@ type TopUpInterface interface {
 	StartTransaction(ctx context.Context) (*sql.Tx, error)
 	FindIsRead(ctx context.Context, id int) (*domain.IsRead, error)
 	DeleteHistoryTopUpById(tx *sql.Tx, ctx context.Context, id int, userid int) error
+	DeleteUserCache(userID int, lockKey string) error
 }
 
 func (tp *TopUpRepository) FindIsRead(ctx context.Context, id int) (*domain.IsRead, error) {

@@ -33,7 +33,6 @@ export class ProfileService {
           data: profile,
         };
       }
-      console.log(profile);
 
       return {
         statusCode: HttpStatus.OK,

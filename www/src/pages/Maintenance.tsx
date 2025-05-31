@@ -12,7 +12,7 @@ const Maintenance = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(data?.data);
+    (data?.data);
     if (successUser && data?.data) {
       dispatch(setUser(data?.data));
     }

@@ -10,5 +10,13 @@ export const route = {
   signup: "/signup",
   help: "/dashboard/user/help",
   settings: "/dashboard/user/settings",
-  user: "/dashboard/user"
+  user: "/dashboard/user",
+  maintenance: "/maintenance",
 };
+
+export const excludeRedirectRouteWhenUnauth = [
+  route["signin"],
+  route["forgotPassword"],
+  route["signup"],
+  route["home"],
+];

@@ -36,7 +36,6 @@ import { ConfigService } from '@nestjs/config';
 import jwtPayload from '../interfaces/jwtPayload';
 import { GoogleStrategy } from './strategies/google.strategy';
 
-
 @Controller('/api/v1')
 export class AuthController {
   constructor(
@@ -230,63 +229,4 @@ export class AuthController {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
-  // @All('transactional*')
-  // @UseGuards(AccessTokenGuardGuard)
-  // async redirectToHistoryService(
-  //   @Req() req,
-  //   @Res() res,
-  //   @Body() body,
-  // ): Promise<void> {
-  //   // config url to fetch into another service
-  //   const transactional_svc = this.configService.get<string>('TRANSACTIONAL_SVC');
-  //   const spliturl: string[] = req.url.split('/');
-  //   const urlAfterProfile = spliturl.slice(4, spliturl.length).join('/');
-  //   let url;
-  //   if (spliturl.length == 4 || spliturl[4] == '') {
-  //     url = transactional_svc + urlAfterProfile + '?userid=' + req.user_id;
-  //   } else {
-  //     url = transactional_svc + '/' + urlAfterProfile + '?userid=' + req.user_id;
-  //   }
-
-  //   try {
-  //     const result = await this.fetcherService(url, req, body);
-  //     if (result.status == 500) {
-  //       return res.sendStatus(result.status);
-  //     }
-  //     const data = await result.json();
-  //     return res.status(data.statusCode).json(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //     return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
-
-  // async fetcherService(url: string, req: Request, body) {
-  //   try {
-  //     let result;
-  //     if (req.method == 'GET' || !body) {
-  //       result = await fetch(url, {
-  //         method: req.method,
-  //         headers: {
-  //           ...req.headers,
-  //           'X-Request-Id': crypto.randomUUID(),
-  //         },
-  //       });
-  //     } else {
-  //       result = await fetch(url, {
-  //         method: req.method,
-  //         headers: {
-  //           ...req.headers,
-  //           'X-Request-Id': crypto.randomUUID(),
-  //         },
-  //         body: JSON.stringify(body),
-  //       });
-  //     }
-  //     return result;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
-
 }

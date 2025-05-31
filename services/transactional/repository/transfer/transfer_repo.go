@@ -5,12 +5,34 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/go-redsync/redsync/v4"
 	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
 	"github.com/syafiqparadisam/paymentku/services/transactional/errors"
 )
 
 func (s *TransferRepository) StartTransaction(ctx context.Context) (*sql.Tx, error) {
 	return s.mysql.Db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+}
+
+func (t *TransferRepository) DeleteUserCache(userID int, lockKey string) error {
+	// Buat distributed mutex berdasarkan lockKey
+	mutex := t.redis.Rs.NewMutex(lockKey, redsync.WithExpiry(t.redisDuration))
+
+	// Acquire lock
+	if err := mutex.Lock(); err != nil {
+		return fmt.Errorf("failed to acquire lock: %w", err)
+	}
+	defer func() {
+		_, _ = mutex.Unlock()
+	}()
+
+	// Hapus cache Redis
+	key := fmt.Sprintf("userprofile:%d", userID)
+	if err := t.redis.Client.Del(t.redis.Ctx, key).Err(); err != nil {
+		return fmt.Errorf("failed to delete redis key: %w", err)
+	}
+
+	return nil
 }
 
 func (s *TransferRepository) FindUsersById(tx *sql.Tx, ctx context.Context, userid int) (*domain.UserInfo, error) {

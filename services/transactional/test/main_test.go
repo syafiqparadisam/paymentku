@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -37,17 +36,11 @@ func TestHistory(t *testing.T) {
 	t.Log(appPort)
 
 	internalSecret := os.Getenv("INTERNAL_SECRET")
-	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASSWD")
-	host := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
-	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, pass, host, dbPort, dbName)
-	mysql, errSql := config.NewMySqlStore(url)
+	mysql, errSql := config.NewMySqlStore()
 	if errSql != nil {
 		log.Fatal(errSql)
 	}
-	t.Log(url)
+	
 	userSeeder := seeder.NewUserSeeder(mysql)
 	topupSeeder := seeder.NewTopUpSeeder(mysql)
 	tfSeeder := seeder.NewTransferSeeder(mysql)
@@ -56,11 +49,14 @@ func TestHistory(t *testing.T) {
 		UserSeeder:     userSeeder,
 		TopUpSeeder:    topupSeeder,
 		TransferSeeder: tfSeeder,
-		NotifSeeder: notifSeeder,
+		NotifSeeder:    notifSeeder,
 	}
-
-	tfRepo := transfer_repo.NewTransferRepository(mysql)
-	topUpRepo := topup_repo.NewTopUpRepository(mysql)
+	redClient, err := config.NewRedisStore()
+	if err != nil {
+		t.Fatal("Failed connection to redis")
+	}
+	tfRepo := transfer_repo.NewTransferRepository(mysql, redClient)
+	topUpRepo := topup_repo.NewTopUpRepository(mysql, redClient)
 	usecase := usecase.NewTransactionalUsecase(tfRepo, topUpRepo)
 	cfg := config.NewHTTPConfig().WithPort(appPort)
 	server := controller_http.NewControllerHTTP(usecase, cfg)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/syafiqparadisam/paymentku/services/transactional/config"
 	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
@@ -12,10 +13,12 @@ import (
 
 type TransferRepository struct {
 	mysql *config.MySqlStore
+	redis *config.RedisStore
+	redisDuration time.Duration
 }
 
-func NewTransferRepository(mysql *config.MySqlStore) *TransferRepository {
-	return &TransferRepository{mysql: mysql}
+func NewTransferRepository(mysql *config.MySqlStore, redis *config.RedisStore) *TransferRepository {
+	return &TransferRepository{mysql: mysql, redis: redis, redisDuration: time.Second * 2}
 }
 
 type TransferInterface interface {
@@ -32,6 +35,7 @@ type TransferInterface interface {
 	InsertTransferHistory(ctx context.Context, domain *domain.CreateHistoryTransfer) error
 	StartTransaction(ctx context.Context) (*sql.Tx, error)
 	InsertToNotification(ctx context.Context, domain *domain.Notification) error
+	DeleteUserCache(userID int, lockKey string) error
 }
 
 func (tp *TransferRepository) UpdateIsRead(ctx context.Context, id int) error {

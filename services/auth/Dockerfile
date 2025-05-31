@@ -1,5 +1,5 @@
 
-FROM node:21-alpine AS build
+FROM node:22-alpine AS build
 
 # Create app directory
 WORKDIR /app    
@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # Use a new image for the runner stage
-FROM node:21-alpine AS runner
+FROM node:22-alpine AS runner
 
 # Set the working directory
 WORKDIR /app

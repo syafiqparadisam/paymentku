@@ -1,6 +1,7 @@
 import { authApi } from "./authApi";
 import { Profile } from "../types/dto";
 import { FindUserByAccount, Response, User } from "../types/response";
+import { excludeRedirectRouteWhenUnauth, route } from "../constant/route";
 
 const profileApi = authApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,17 +11,20 @@ const profileApi = authApi.injectEndpoints({
       }),
       providesTags: ["user"],
       transformErrorResponse(baseQueryReturnValue, meta) {
-        if (meta?.response?.status === 401 || meta?.response?.status === 403) {
-          if (
-            window.location.href !=
-            import.meta.env.VITE_FRONTEND_URL + "/signin"
-          ) {
-            window.location.href =
-              import.meta.env.VITE_FRONTEND_URL + "/signin";
-          }
+        if (
+          (meta?.response?.status === 401 || meta?.response?.status === 403) &&
+          !excludeRedirectRouteWhenUnauth.includes(window.location.pathname)
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["signin"];
         }
-        if (baseQueryReturnValue.status == "FETCH_ERROR") {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL;
+        if (
+          (baseQueryReturnValue.status == "FETCH_ERROR" ||
+            meta?.response?.status === 500) &&
+          window.location.pathname != route["maintenance"]
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["maintenance"];
         }
         return baseQueryReturnValue;
       },
@@ -35,11 +39,20 @@ const profileApi = authApi.injectEndpoints({
       }),
       invalidatesTags: ["user"],
       transformErrorResponse(baseQueryReturnValue, meta) {
-        if (meta?.response?.status === 401 || meta?.response?.status == 403) {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin";
+        if (
+          (meta?.response?.status === 401 || meta?.response?.status === 403) &&
+          !excludeRedirectRouteWhenUnauth.includes(window.location.pathname)
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["signin"];
         }
-        if (baseQueryReturnValue.status == "FETCH_ERROR") {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL;
+        if (
+          (baseQueryReturnValue.status == "FETCH_ERROR" ||
+            meta?.response?.status === 500) &&
+          window.location.pathname != route["maintenance"]
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["maintenance"];
         }
         return baseQueryReturnValue;
       },
@@ -54,11 +67,20 @@ const profileApi = authApi.injectEndpoints({
       }),
       invalidatesTags: ["user"],
       transformErrorResponse(baseQueryReturnValue, meta) {
-        if (meta?.response?.status === 401 || meta?.response?.status == 403) {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin";
+        if (
+          (meta?.response?.status === 401 || meta?.response?.status === 403) &&
+          !excludeRedirectRouteWhenUnauth.includes(window.location.pathname)
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["signin"];
         }
-        if (baseQueryReturnValue.status == "FETCH_ERROR") {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL;
+        if (
+          (baseQueryReturnValue.status == "FETCH_ERROR" ||
+            meta?.response?.status === 500) &&
+          window.location.pathname != route["maintenance"]
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["maintenance"];
         }
         return baseQueryReturnValue;
       },
@@ -74,12 +96,21 @@ const profileApi = authApi.injectEndpoints({
         }),
         invalidatesTags: ["user"],
         transformErrorResponse(baseQueryReturnValue, meta) {
-          if (meta?.response?.status === 401 || meta?.response?.status == 403) {
+          if (
+            (meta?.response?.status === 401 ||
+              meta?.response?.status === 403) &&
+            !excludeRedirectRouteWhenUnauth.includes(window.location.pathname)
+          ) {
             window.location.href =
-              import.meta.env.VITE_FRONTEND_URL + "/signin";
+              import.meta.env.VITE_FRONTEND_URL + route["signin"];
           }
-          if (baseQueryReturnValue.status == "FETCH_ERROR") {
-            window.location.href = import.meta.env.VITE_FRONTEND_URL;
+          if (
+            (baseQueryReturnValue.status == "FETCH_ERROR" ||
+              meta?.response?.status === 500) &&
+            window.location.pathname != route["maintenance"]
+          ) {
+            window.location.href =
+              import.meta.env.VITE_FRONTEND_URL + route["maintenance"];
           }
           return baseQueryReturnValue;
         },
@@ -99,16 +130,25 @@ const profileApi = authApi.injectEndpoints({
           headers: {
             "x-data-publicid": payload.publicId,
           },
-          // timeout: 1000 * 20
+          timeout: 1000 * 20,
         };
       },
       invalidatesTags: ["user"],
       transformErrorResponse(baseQueryReturnValue, meta) {
-        if (meta?.response?.status === 401 || meta?.response?.status == 403) {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin";
+        if (
+          (meta?.response?.status === 401 || meta?.response?.status === 403) &&
+          !excludeRedirectRouteWhenUnauth.includes(window.location.pathname)
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["signin"];
         }
-        if (baseQueryReturnValue.status == "FETCH_ERROR") {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL;
+        if (
+          (baseQueryReturnValue.status == "FETCH_ERROR" ||
+            meta?.response?.status === 500) &&
+          window.location.pathname != route["maintenance"]
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["maintenance"];
         }
         return baseQueryReturnValue;
       },
@@ -122,12 +162,54 @@ const profileApi = authApi.injectEndpoints({
         method: "GET",
       }),
       transformErrorResponse(baseQueryReturnValue, meta) {
-        if (meta?.response?.status === 401 || meta?.response?.status == 403) {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL + "/signin";
+        if (
+          (meta?.response?.status === 401 || meta?.response?.status === 403) &&
+          !excludeRedirectRouteWhenUnauth.includes(window.location.pathname)
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["signin"];
         }
-        if (baseQueryReturnValue.status == "FETCH_ERROR") {
-          window.location.href = import.meta.env.VITE_FRONTEND_URL;
+        if (
+          (baseQueryReturnValue.status == "FETCH_ERROR" ||
+            meta?.response?.status === 500) &&
+          window.location.pathname != route["maintenance"]
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["maintenance"];
         }
+        return baseQueryReturnValue;
+      },
+    }),
+    updateUsername: builder.mutation<
+      Response<null>,
+      Pick<Profile, "username" | "password">
+    >({
+      query: (data) => ({
+        url: "/username",
+        method: "PATCH",
+        body: {
+          username: data.username,
+          password: data.password,
+        },
+      }),
+      invalidatesTags: ["user"],
+      transformErrorResponse(baseQueryReturnValue, meta) {
+        if (
+          (meta?.response?.status === 401 || meta?.response?.status === 403) &&
+          !excludeRedirectRouteWhenUnauth.includes(window.location.pathname)
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["signin"];
+        }
+        if (
+          (baseQueryReturnValue.status == "FETCH_ERROR" ||
+            meta?.response?.status === 500) &&
+          window.location.pathname != route["maintenance"]
+        ) {
+          window.location.href =
+            import.meta.env.VITE_FRONTEND_URL + route["maintenance"];
+        }
+        return baseQueryReturnValue;
         return baseQueryReturnValue;
       },
     }),
@@ -141,4 +223,5 @@ export const {
   useUpdatePhoneMutation,
   useUpdatePhotoProfileMutation,
   useFindAccountMutation,
+  useUpdateUsernameMutation,
 } = profileApi;

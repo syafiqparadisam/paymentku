@@ -37,7 +37,6 @@ export class TransactionalController {
 
     const url = this.configService.get<string>('TRANSACTIONAL_SVC') + path;
 
-    console.log(url);
     const options = {
       headers,
     };
@@ -78,7 +77,7 @@ export class TransactionalController {
     try {
       const path = `/history/topup`;
       const result = await this.forwardRequest('DELETE', path, req);
-      console.log(result)
+      result;
       return res.status(result.status).json(result.data);
     } catch (error) {
       return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -86,7 +85,11 @@ export class TransactionalController {
   }
   @Delete('history/topup/:id')
   @UseGuards(AccessTokenGuardGuard)
-  async deleteHistoryTopupById(@Req() req: Request, @Res() res, @Param('id') id: string) {
+  async deleteHistoryTopupById(
+    @Req() req: Request,
+    @Res() res,
+    @Param('id') id: string,
+  ) {
     try {
       const path = `/history/topup/${id}`;
       const result = await this.forwardRequest('DELETE', path, req);
@@ -138,7 +141,11 @@ export class TransactionalController {
 
   @Delete('history/transfer/:id')
   @UseGuards(AccessTokenGuardGuard)
-  async deleteHistoryTransferById(@Req() req: Request, @Res() res, @Param('id') id: string) {
+  async deleteHistoryTransferById(
+    @Req() req: Request,
+    @Res() res,
+    @Param('id') id: string,
+  ) {
     try {
       const path = `/history/transfer/${id}`;
       const result = await this.forwardRequest('DELETE', path, req);

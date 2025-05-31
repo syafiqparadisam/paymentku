@@ -146,7 +146,6 @@ describe('Get User Profile', () => {
       .set('Cookie', cookies);
 
     const data = res.body.data;
-    console.log(res.body);
 
     expect(res.status).toBe(404);
     expect(res.body.statusCode).toBe(404);

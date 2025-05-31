@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+
+	"github.com/google/uuid"
 	"github.com/syafiqparadisam/paymentku/services/transactional/config"
 	"github.com/syafiqparadisam/paymentku/services/transactional/domain"
 	"github.com/syafiqparadisam/paymentku/services/transactional/dto"
@@ -56,6 +58,8 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		}
 		panic(errDecreaseBalance)
 	}
+	lockKey := uuid.New().String()
+	u.topUpRepo.DeleteUserCache(userid, lockKey)
 
 	errIncreaseBalance := u.tfRepo.IncreaseBalanceByAccNumber(tx, ctx, payload.Amount, payload.AccountNumber)
 	if errIncreaseBalance != nil {
@@ -68,6 +72,9 @@ func (u *Usecase) InsertHistoryTransfer(ctx context.Context, payload *dto.Transf
 		}
 		panic(errIncreaseBalance)
 	}
+	
+	lockKey2 := uuid.New().String()
+	u.topUpRepo.DeleteUserCache(foundReceiver.Id, lockKey2)
 
 	if errCommit := tx.Commit(); errCommit != nil {
 		panic(errCommit)

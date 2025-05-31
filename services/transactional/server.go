@@ -90,21 +90,19 @@ func main() {
 	// }
 
 	port := os.Getenv("APP_PORT")
-	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASSWD")
-	host := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
-	dbParam := os.Getenv("DB_PARAM")
-	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s", user, pass, host, dbPort, dbName, dbParam)
-	mysql, errSql := config.NewMySqlStore(url)
+	
+	mysql, errSql := config.NewMySqlStore()
 	if errSql != nil {
 		logZero.Fatal().Err(errSql).Msg("Mysql connection is error")
 	}
-	fmt.Println("connected to mysql on port", dbPort)
+	fmt.Println("connected to mysql on port")
+	redClient, err := config.NewRedisStore()
+	if err != nil {
+		logZero.Fatal().Err(err).Msg("Failed connection to redis")
+	}
 
-	tfRepo := transfer_repo.NewTransferRepository(mysql)
-	topUpRepo := topup_repo.NewTopUpRepository(mysql)
+	tfRepo := transfer_repo.NewTransferRepository(mysql, redClient)
+	topUpRepo := topup_repo.NewTopUpRepository(mysql, redClient)
 	usecase := usecase.NewTransactionalUsecase(tfRepo, topUpRepo)
 	cfg := config.NewHTTPConfig().WithPort(port)
 	controller := controller_http.NewControllerHTTP(usecase, cfg)
@@ -152,7 +150,7 @@ func main() {
 		os.Remove("server.out")
 	}()
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 
 	if err != nil && err != http.ErrServerClosed {
 		logZero.Fatal().Err(err).Msg("Server error")

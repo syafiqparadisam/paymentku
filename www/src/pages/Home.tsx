@@ -19,11 +19,11 @@ import { setUser } from "../features/user/userSlice";
 const Home = () => {
   const navigate = useNavigate();
   const { data, isSuccess } = useGetUserQuery();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isSuccess && data?.data) {
-      dispatch(setUser(data?.data))
+      dispatch(setUser(data?.data));
     }
   }, [isSuccess]);
 

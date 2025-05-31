@@ -3,12 +3,12 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - master
       - develop
       - features*
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   testing:
@@ -60,7 +60,7 @@ jobs:
     name: Staging
     runs-on: ubuntu-22.04
     needs: testing
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

@@ -53,7 +53,7 @@ func TestHistory(t *testing.T) {
 	}
 	redClient, err := config.NewRedisStore()
 	if err != nil {
-		t.Fatal("Failed connection to redis")
+		t.Fatal("Failed connection to redis", err.Error())
 	}
 	tfRepo := transfer_repo.NewTransferRepository(mysql, redClient)
 	topUpRepo := topup_repo.NewTopUpRepository(mysql, redClient)

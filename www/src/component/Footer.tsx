@@ -13,6 +13,7 @@ const Footer = () => {
     const navigate = useNavigate()
 
     const submittedForm = (data: Email) => {
+        console.log(data)
     }
 
     return (

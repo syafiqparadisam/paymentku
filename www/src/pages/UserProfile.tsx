@@ -364,7 +364,7 @@ const UserProfile = () => {
                 try {
                   setValue((prev) => ({ ...prev, bio: e.target.value }));
                   setErr((prev) => ({ ...prev, bio: "" }));
-                  const bio = updateBioSchema.validateSync({
+                  updateBioSchema.validateSync({
                     bio: e.target.value,
                   });
                 } catch (error: any) {

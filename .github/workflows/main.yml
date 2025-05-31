@@ -6,6 +6,9 @@ on:
       - main
       - develop
       - features*
+  pull_request:
+    branches:
+      - main
 
 jobs:
   testing:
@@ -43,20 +46,12 @@ jobs:
         run: |
           make compose-cicd
       
-      # - name: Create table to mysql
-      #   run: |
-      #      docker exec -i mysqldb mysql -u ${{secrets.DB_USER}} -p"${{ secrets.DB_PASSWD }}" ${{secrets.DB_NAME}} < database/table.sql
-
       - name: Test auth service
         run: |
           make test-auth
      
       - name: Test transactional service
         run: make test-transactional
-      
-      # - name: Cleaning table
-      #   run: |
-      #      docker exec -i mysqldb mysql -u ${{secrets.DB_USER}} -p"${{ secrets.DB_PASSWD }}" ${{secrets.DB_NAME}} < database/clean.sql
       
       - name: Down
         run: make down
@@ -65,7 +60,7 @@ jobs:
     name: Staging
     runs-on: ubuntu-22.04
     needs: testing
-    if: ${{github.ref == 'refs/heads/main'}}
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

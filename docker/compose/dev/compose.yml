@@ -27,7 +27,7 @@ services:
       retries: 10
     volumes:
       - mysqldb:/var/lib/mysql
-      - ../../../database/init.sql:/docker-entrypoint-initdb.d/initsql
+      - ../../../database/table.sql:/docker-entrypoint-initdb.d/initsql
 
   # otel-collector:
   #   image: otel/opentelemetry-collector-contrib:0.118.0
